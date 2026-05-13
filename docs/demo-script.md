@@ -46,25 +46,43 @@ Click Send via DocuSign. Wait for the simulated 1.5 seconds.
 
 > "Signed and filed."
 
-## 3:30 to 4:30 — The ledger writeback (the strategic moat)
+## 3:30 to 4:00 — The ledger writeback (the strategic moat)
 
 Point at the LedgerImpactPanel on the Signed Record page.
 
-> "This is the part that makes the answer Light-specific. The signed contract just wrote €5,000 MRR and €60,000 ARR to the Light ledger. Contract start date, renewal date, Salesforce link, all populated automatically. No RevOps manually retyping anything. For an AI-native ERP whose wedge is a rebuilt general ledger, contracts have to be born from ledger data and return as ledger data. The PDF is just the audit artifact."
+> "This is the part that makes the answer Light-specific. The signed contract just wrote MRR and ARR to the Light ledger. Contract start date, renewal date, Salesforce link, all populated automatically. No RevOps manually retyping anything. For an AI-native ERP whose wedge is a rebuilt general ledger, contracts have to be born from ledger data and return as ledger data. The PDF is just the audit artifact."
 
 Point at the Audit Trail.
 
 > "Every step is captured: created, auto-approved, sent, viewed, signed by counterparty, signed by Light, filed. Each event has actor, timestamp, and channel."
 
+## 4:00 to 4:30 — The workflow exits an operator actually needs
+
+Go back to a contract in flight and click an approval. Then click **Undo my approval** on that row.
+
+> "Real product point: I'm Martina, Head of Finance and Ops. I approve. I change my mind. I can withdraw before the envelope is sent. The chain walks back, the audit trail records the withdrawal. Once DocuSign has the envelope, undo is refused. That's the line."
+
+Click into Templates, expand "Rogue templates detected in Drive".
+
+> "Daily scan finds Word docs outside the master folder that look like master templates. Four flagged here. I can Archive one with one click. Or Notify owner."
+
+Click **Notify owner** on a row where lastUsedBy is still at the company.
+
+> "Inline Slack DM preview. Real recipient routing: still-employed last user gets a DM by name. Someone who left the company falls through to the team channel. No last user goes to a triage channel. The exact message body is shown. Send writes a record locally. In production, this fires `chat.postMessage` with interactive Approve / Reroute / Snooze buttons that thread back into the audit log."
+
 ## 4:30 to 5:00 — The other doc types + close
 
 Click Templates in sidebar.
 
-> "Eight templates supported: NDA, MSA, MSA Pilot, Order Form, Employment DK, Employment UK, Warrant, Advisor Warrant. Each has its own clause rules, DocuSign feature config, and conditional sections. Warrants require eIDAS QES and a witness signer. Employment offers use SMS identity verification. The pattern is the same: counsel keeps Word, we read it, DocuSign signs it, the ledger absorbs it."
+> "Eight templates supported: NDA, MSA, MSA Pilot, Order Form, Employment DK, Employment UK, Warrant, Advisor Warrant. Each has its own clause rules, DocuSign feature config, and conditional sections. Warrants require eIDAS QES and a witness signer. Employment offers use SMS identity verification. NDAs deliberately don't write to the ledger; they file for retention only. The pattern is consistent: counsel keeps Word, we read it, DocuSign signs it, the ledger absorbs what belongs there."
+
+Resize the browser to mobile width briefly.
+
+> "Same product on mobile. Sticky top bar with the nav drawer. KPIs stack. Clause review collapses to cards instead of squeezing a four-column table. Every action bar wraps without horizontal scroll. The case study is responsive on the surfaces an operator actually uses on the go."
 
 Click About in sidebar (briefly), then close.
 
-> "That is the full submission. Repo is on the screen, README walks through it, five docs in /docs/ for deeper architectural detail. Thanks for watching."
+> "That is the full submission. Repo is on the screen, README walks through it, six docs in /docs/ for deeper architectural detail. Thanks for watching."
 
 ## What to NOT do in the recording
 

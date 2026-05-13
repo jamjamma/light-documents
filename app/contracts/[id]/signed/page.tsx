@@ -113,7 +113,15 @@ export default function SignedRecordPage({ params }: { params: Promise<{ id: str
             ) : (
               <Card title="Ledger impact">
                 <div className="text-[13px] text-ink-500">
-                  Ledger writeback will appear here after the contract is filed. The Light ledger is updated with the structured data from the signed contract (MRR, headcount, cap table, vendor record).
+                  {contract.type === "NDA" ? (
+                    <>
+                      NDAs do not write to the ledger by design. There is no MRR, headcount, or equity to record. The signed document is filed for retention and the audit trail above is the system of record (who signed, when, on which template version).
+                    </>
+                  ) : (
+                    <>
+                      Ledger writeback will appear here after the contract is filed. The Light ledger is updated with the structured data from the signed contract (MRR for {contract.type === "MSA" || contract.type === "Order Form" ? "customer contracts" : contract.type === "Employment" ? "headcount + payroll" : "cap table"}).
+                    </>
+                  )}
                 </div>
               </Card>
             )}

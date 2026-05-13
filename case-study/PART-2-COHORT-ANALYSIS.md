@@ -78,7 +78,7 @@ In priority order, ten things I would dig into before drawing conclusions:
 | 4 | **Top 5 expanders per cohort.** Who is driving most of the expansion? | Concentration risk. If 80% of expansion is from 2 customers, NRR is fragile. |
 | 5 | **Q3 2024 M6 → M9 deceleration.** $85k → $89k = +4.7% in 3 months, slower than peer cohorts. | What changed for this cohort? Industry mix? Sales motion? |
 | 6 | **Q4 2024 M3 → M6 anemia.** $95k → $97k = +2.1%. | Early warning of slowing motion, or normal small-cohort variance? |
-| 7 | **Cohort customer count over time.** Did all 15 of Q1 2024 stay? | If 2 churned, the remaining 13 must have expanded by 41.4% to hit $81k — concentration concern. |
+| 7 | **Cohort customer count over time.** Did all 15 of Q1 2024 stay? | If 2 churned, the remaining 13 must have expanded by 41.4% to hit $81k (a concentration concern). |
 | 8 | **Contraction events.** Even within an "expanding" cohort, did some customers downgrade? | Contraction is the canary in the coal mine. |
 | 9 | **Renewal terms.** Are these multi-year or annual? What discounts on renewal? | Heavy renewal discounts inflate NRR but compress LTV. |
 | 10 | **ICP drift.** Are newer cohorts in different segments (enterprise vs SMB)? Different motion drives different expansion patterns. |

@@ -101,27 +101,44 @@ Candidate name, role, base salary, variable %, start date, manager, probation, n
 
 **DocuSign features used:** AutoPlace (8 anchor tags including witness), sequential signing, **eIDAS QES required**, **witness signer as third recipient**, 30-day expiry, day-7-14 reminders.
 
-### Vendor Agreement
+### Order Form (commercial companion to MSA)
 
-**What was manually edited today:** vendor name + signer, services description, monthly fee, term, payment terms, data processing flag, indemnity, termination terms.
+**What was manually edited today:** customer name + signer, seat count, unit price, billing period, MSA reference, special pricing notes.
 
-**Volume:** ~5-15 / month.
+**Volume:** ~15-25 / month (renewals + expansions; outweighs new MSAs once a customer base exists).
 
 **How our system eliminates it:**
 
 | Variable | Source |
 |---|---|
-| Vendor name, signer | Light ledger vendor record (renewal) OR Manual entry (new) |
-| Services description | Copied from previous contract on renewal |
-| Monthly fee | Renewal: from prior contract. New: typed. |
-| Term, auto-renew, payment | Defaults from Light's master (12 mo, on, Net 30) |
-| Data processing flag | Asked explicitly; triggers DPA + SOC2 exhibits when on |
+| Customer name + signer | Pulled from the linked MSA record |
+| Seats, unit price, billing period | Salesforce Opportunity fields |
+| MSA reference (required at clause-check time) | Picked from the customer's signed MSA record on file |
+| Effective date, term | Inherits from the parent MSA |
+| ARR amount (for routing) | Computed from seats × unit price × 12 |
 
-**Conditional sections attached automatically:**
-- DPA Exhibit — when data processing flag is on
-- SOC2 Addendum — when data processing flag is on
+**Routing fires automatically based on the computed ARR:** Head of F&O above €50k, CFO above €100k. The Order Form is the doc where the dollars actually move, so it benefits the most from the rules engine.
 
-**DocuSign features used:** AutoPlace (6 anchor tags), parallel signing, 21-day expiry, day-3-7-14 reminders.
+**DocuSign features used:** AutoPlace (4 anchor tags), parallel signing, 14-day expiry, day-3-7 reminders, links back to the parent MSA's envelope so finance can trace the lineage.
+
+### Pilot MSA (3-month POC variant)
+
+**What was manually edited today:** customer name + signer, pilot scope, success criteria, conversion-to-standard-MSA terms.
+
+**Volume:** ~5-10 / month (Series A growth stage means lots of pilots).
+
+**How our system eliminates it:**
+
+| Variable | Source |
+|---|---|
+| Customer name + signer | Salesforce / HubSpot deal record |
+| Pilot scope | Salesforce custom field "Pilot Scope" |
+| Success criteria | Salesforce custom field "Success Criteria" |
+| Conversion terms | Defaults from Pilot template (auto-renew off, capped fee, mutual exit) |
+
+**Why this is a distinct template, not a flag on the standard MSA:** Pilot terms are materially weaker (mutual exit, no auto-renew, no indemnity above pilot fee). Counsel wants a separate document so a pilot can never be confused with a standard customer agreement at audit time.
+
+**DocuSign features used:** AutoPlace (5 anchor tags), sequential signing, 7-day expiry (short pilot urgency), day-3 reminder only.
 
 ## How the manual DocuSign field placement friction is killed
 
