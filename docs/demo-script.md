@@ -1,0 +1,85 @@
+# Demo script (Loom)
+
+Target: 4 to 5 minutes. Narrate the click path, lead with the reframe, end on the ledger writeback. Do not over-explain the build.
+
+## 0:00 to 0:30 — The reframe
+
+> "The brief talks about manually editing Word docs and highlighting DocuSign fields by hand. That is the visible pain. But the real problem for Light specifically is controlled document execution. There is no single path from approved business terms to a signed agreement whose data flows back into the Light ledger. So my answer is: wrap DocuSign as infrastructure, keep Word for authoring, and build a workflow layer between them. Let me show you."
+
+Open `http://localhost:3000`. Point at the AboutWidget on the Dashboard. Read the one sentence.
+
+## 0:30 to 1:30 — Dashboard + the high-risk path (Bolt MSA)
+
+> "Dashboard shows 6 contracts in flight, 2 blocked, average cycle 3 days. Let me click into the high-risk one."
+
+Click Bolt MSA.
+
+> "Bolt is a €180k UK deal. The clause checker found three deviations from the master template: Net 60 instead of Net 30, unlimited liability instead of €500k cap, customer-only indemnity instead of mutual. Each deviation has a severity and a reason attached."
+
+Scroll to Routing.
+
+> "The routing rules engine fires three approvers: Legal because of clause deviations, Head of Finance because ARR is over €50k, CFO because ARR is over €100k. Each approval has its 'why' attached so the audit is clean."
+
+Scroll to Approval chain.
+
+> "Approvers are notified via Slack DM. Demo affordance: let me simulate Legal approving."
+
+Click "Simulate: Legal approves". Chip flips green.
+
+## 1:30 to 2:30 — The DocuSign envelope (the field placement answer)
+
+Click "Preview envelope".
+
+> "This is the populated MSA. Variables substituted from the intake form, highlighted in amber so you can see them. Note the signature blocks at the bottom: those are placed automatically by DocuSign using anchor tags counsel typed into the Word template once, as white-on-white text. No one drags a field by hand. Ever."
+
+Point at the right panel.
+
+> "DocuSign features per template: this MSA uses sequential signing, 30-day expiry, day-3-7-14 reminders, eIDAS QES because it's an EU contract over €100k. Conditional sections attached automatically: Service Level Exhibit always, DPA because the customer needs it, QES because of the value + jurisdiction trigger."
+
+## 2:30 to 3:30 — Run the happy path (Acme MSA, end-to-end)
+
+Close modal. Go back to Dashboard. Click Acme MSA.
+
+> "Acme is the happy path. €60k Salesforce deal, all clauses standard. Routing auto-approves Head of Finance by standing rule. Send is enabled."
+
+Click Send via DocuSign. Wait for the simulated 1.5 seconds.
+
+> "Signed and filed."
+
+## 3:30 to 4:30 — The ledger writeback (the strategic moat)
+
+Point at the LedgerImpactPanel on the Signed Record page.
+
+> "This is the part that makes the answer Light-specific. The signed contract just wrote €5,000 MRR and €60,000 ARR to the Light ledger. Contract start date, renewal date, Salesforce link, all populated automatically. No RevOps manually retyping anything. For an AI-native ERP whose wedge is a rebuilt general ledger, contracts have to be born from ledger data and return as ledger data. The PDF is just the audit artifact."
+
+Point at the Audit Trail.
+
+> "Every step is captured: created, auto-approved, sent, viewed, signed by counterparty, signed by Light, filed. Each event has actor, timestamp, and channel."
+
+## 4:30 to 5:00 — The other doc types + close
+
+Click Templates in sidebar.
+
+> "Five templates supported: NDA, MSA, Employment, Warrant, Vendor. Each has its own clause rules, DocuSign feature config, and conditional sections. NDAs can use PowerForms for recruitment funnels. Warrants require eIDAS QES and a witness signer. Employment offers use SMS identity verification. The pattern is the same: counsel keeps Word, we read it, DocuSign signs it, the ledger absorbs it."
+
+Click About in sidebar (briefly), then close.
+
+> "That is the full submission. Repo is on the screen, README walks through it, five docs in /docs/ for deeper architectural detail. Thanks for watching."
+
+## What to NOT do in the recording
+
+- Do not narrate the engineering ("we built this in Next.js with TypeScript..."). They do not care.
+- Do not list the file tree. Show the product.
+- Do not apologise for stubs. Acknowledge them honestly when relevant ("simulated send for demo speed") but move on.
+- Do not exceed 5 minutes. Cut ruthlessly.
+- Do not use jargon ("CLM", "AOV", "ICP") without context.
+
+## Backup talk track if asked questions in the interview
+
+- **"Why not just use DocuSign templates?"** → Anchor tags survive content reflow. DocuSign templates are bound to a specific layout. Anchor tags scale across template versions.
+- **"Why not buy Ironclad?"** → Too heavy at 50-100/mo volume. Revisit at 500+/mo. Light Documents is the right size for now and uniquely positioned because of the ledger integration.
+- **"How long to build the real version?"** → 6-10 weeks for an internal-replace MVP with 1 PM + 2 backend + 1 frontend + 0.5 designer.
+- **"What if Light does not use Salesforce?"** → Pluggable adapters. Demo shows Salesforce, HubSpot, Attio, Personio, Ashby, Manual entry all working through the same interface.
+- **"Why white-on-white anchor tags?"** → Invisible to signer in printed PDF, findable by DocuSign API `searchString` tabs. Standard DocuSign practice at scale.
+- **"What is the AI for?"** → Phase 2: Claude API for natural-language clause comparison against the master template. Production swap is a one-file change because the UI binds to `ClauseCheckResult[]`.
+- **"Did you talk to anyone at Light?"** → No, I worked from the brief and publicly available info. Assumptions stated in README.
