@@ -68,12 +68,14 @@ Requires Node 20+. No env vars, no auth, no database. State persists in localSto
 | 2 | Click "Bolt MSA" (high-risk, in review) | Detail page renders with 3 clause deviations flagged (Net 60, unlimited liability, customer-only indemnity) and 3 approval chips pending (Legal, Head of Finance, CFO) |
 | 3 | Click "Simulate: Legal approves" | Legal chip flips green. Status updates. Audit trail appends event |
 | 4 | Click "Preview envelope" | Modal opens with populated MSA, variables highlighted, anchor tags highlighted, DocuSign features listed (sequential signing, 30-day expiry, day-3-7-14 reminders), conditional sections listed (Service Level Exhibit, DPA, eIDAS QES because €180k EU) |
-| 5 | Approve remaining chips, click "Send via DocuSign" | Simulated 1.5-second loading, then routes to Signed Record page with audit trail (8 events) and Light ledger writeback (+€15k MRR, +€180k ARR, renewal alert) |
-| 6 | Click "+ New contract" | Three-step intake: pick template (5 options), pick source record (filtered by template type, shows source system badge), confirm details (form prefilled, live validation warnings) |
-| 7 | Click into "Templates" in sidebar | All 5 templates with their clause rules visible, sync metadata from Drive shown |
-| 8 | Click "About this build" in sidebar | Full submission memo in-app |
+| 5 | Approve remaining chips, click "Send via DocuSign" | Simulated 1.5-second loading, then routes to Signed Record page with audit trail and Light ledger writeback (MRR, ARR, renewal alert) |
+| 6 | Click "+ New contract" | Three-step intake: pick template (7 options), pick source record (filtered by template type, shows source system badge; or switch to **Manual entry** to add a record that isn't in any CRM), confirm details (form prefilled, live validation warnings) |
+| 7 | Click into "Templates" in sidebar | All 7 templates with their clause rules visible, sync metadata from Drive shown. Expand "Rogue templates detected in Drive" → 4 rogue files with Archive + Notify owner actions wired end-to-end (Notify shows the actual Slack DM body) |
+| 8 | Mid-flow, change mind on an approval you just made | Each row you approved shows an **Undo my approval** pill. Click it → row goes back to pending. If yours was the last vote, the contract walks back from ready_to_send → awaiting_approval. |
+| 9 | Resize to mobile width | Sidebar disappears; a sticky top bar holds the hamburger + brand. KPIs stack 2x2. Clause review becomes stacked cards. Every action bar wraps cleanly. |
+| 10 | Click "About this build" in sidebar | Full submission memo in-app, including a "Legal keeps Word, not us" callout and a cast list naming every demo persona (Sara Friis, Martina Holst, Tom Bauer, etc.) as illustrative. |
 
-Five demo scenarios pre-seeded: Acme MSA (happy path), Bolt MSA (non-standard), Jane Sørensen employment (standard), Marcus Lee employment (above-band), Anya Petrov warrant (Board-blocked). Plus Linear MSA and Datadog vendor renewal as pre-completed examples showing ledger writeback.
+11 in-flight + 4 signed contracts pre-seeded across all dashboard filters. Personas (Sara Friis, Martina Holst, Tom Bauer, Sara Lindberg, Anna Lind, Pia Andersen, Plesner, Astrid/Christian/Emma) are stand-ins, called out explicitly on `/about`.
 
 ## What works vs what is stubbed (honest)
 
@@ -82,14 +84,18 @@ Five demo scenarios pre-seeded: Acme MSA (happy path), Bolt MSA (non-standard), 
 | Routing, navigation | Real Next.js App Router | none |
 | State, persistence | Real localStorage with state machine, survives refresh | no real DB |
 | Template + record selection | Real typed data | data itself is mock |
+| Manual record entry | Real type-aware form (deal / candidate / stakeholder / vendor) with pre-filled defaults + live validation that names the missing fields | record persists locally only |
 | Form validation | Real, threshold-based, live | none |
 | Clause check | Real deterministic rules engine over typed `ClauseRule[]` | Not Claude. Labeled "Demo: deterministic stand-in" |
 | Approval routing | Real rules engine with dedup, channels, reasons | none |
-| Approval transitions | Real, immutable, via Simulate buttons | Real product Slacks approvers |
-| DocuSign envelope preview | Real populated template with anchor-tag callouts | No real DocuSign API call |
+| Approval transitions | Real, immutable, via Simulate buttons. **Undo my approval** is real and walks the contract back to `awaiting_approval` if the chain is no longer complete | Real product Slacks approvers with interactive buttons |
+| Reassign / Pass on / Re-ping / Reject | Real per-row workflow actions with audit-trail fan-out (new approver + previous assignee + contract owner) | Simulated DMs |
+| Rogue template Archive / Notify owner | Real local state + real Slack DM preview with smart recipient routing (still-employed lastUser → DM, left-company → channel fallback, no lastUser → triage channel) | No real Slack post |
+| DocuSign envelope preview | Real populated template with anchor-tag callouts + real envelope JSON shown | No real DocuSign API call |
 | Send → Signed | Real state transition with realistic delay | Labeled "Demo: 3-day cycle collapsed to 1.5s" |
 | Audit trail | Real, generated from journey events | timestamps relative to demo session |
 | Ledger writeback | Real UI panel rendered from journey state | Labeled "Demo: simulated ledger entry" |
+| Mobile UX | Real responsive layout: sticky top bar with hamburger, 2x2 KPI grid, stacked-card tables, wrap-friendly action bars | none |
 
 Every stubbed piece carries an explicit "Demo:" callout on the screen where it appears.
 
@@ -110,26 +116,33 @@ app/
 
 components/
 ├── ui/                                      Button, Card, Badge, Modal, EmptyState
-├── Sidebar.tsx, Header.tsx, DemoBanner.tsx
-├── StatusBadge.tsx, RiskBadge.tsx
+├── Sidebar.tsx, MobileTopBar.tsx, MobileNavContext.tsx
+├── Header.tsx, DemoBanner.tsx, Breadcrumb.tsx, BackButton.tsx
+├── StatusBadge.tsx, RiskBadge.tsx, DocumentTypeIcon.tsx
 ├── KpiStrip.tsx, AboutWidget.tsx
-├── ContractsTable.tsx                       Dashboard table with filter chips
-├── TemplateCard.tsx, TemplatePicker.tsx
-├── RecordPicker.tsx                         CRM-agnostic source record picker
+├── ContractsTable.tsx                       Dashboard table with filter tabs
+├── TemplateCard.tsx, TemplatePicker.tsx, TemplateDetailModal.tsx
+├── RecordPicker.tsx, ManualEntryModal.tsx   Source-record picker + type-aware manual entry
 ├── IntakeForm.tsx                           Conditional fields per template type
-├── ClauseDiff.tsx                           Clause-by-clause diff with severity coloring
+├── ClauseDiff.tsx                           Clause-by-clause diff (stacked cards on mobile)
 ├── RoutingPanel.tsx                         Required approvals with attached reasons
-├── ApprovalChain.tsx                        Approver chips with channel + delegate + simulate
+├── ApprovalChain.tsx, ApprovalActionsMenu.tsx
+├── ReassignModal.tsx, RejectModal.tsx
 ├── DocuSignPreviewModal.tsx                 Envelope preview with anchor-tag + DocuSign feature config
+├── RogueTemplatesPanel.tsx                  Daily Drive scan + interactive Archive + Notify owner with Slack DM preview
 ├── AuditTrail.tsx                           Timeline with notification events
 └── LedgerImpactPanel.tsx                    Ledger writeback summary (the Light-specific feature)
 
 lib/
-├── types.ts                                 Full TypeScript types (Template, Contract, ClauseRule, RoutingRule, ...)
-├── mock-data.ts                             5 templates with clause rules + DocuSign config + conditional sections, 8 source records across CRM/HRIS systems, 8 seed contracts pre-hydrated
+├── types.ts                                 Full TypeScript types (Template, Contract, ClauseRule, RoutingRule, RogueTemplate, ...)
+├── mock-data.ts                             7 templates with clause rules + DocuSign config + conditional sections, 14 source records across CRM/HRIS systems, 11 in-flight + 4 signed seed contracts, 4 rogue templates
 ├── clause-checker.ts                        Pure deterministic rules engine
-├── routing-rules.ts                         12 typed routing rules with reasons + channels + salary band data
-├── contract-store.ts                        State machine (VALID_TRANSITIONS), immutable updates, localStorage adapter, journey commands
+├── routing-rules.ts                         13 typed routing rules with reasons + channels
+├── approver-directory.ts                    6 approver groups + specialty matching + PTO delegations
+├── signer-routing.ts                        Light-side signer policy by entity + document type
+├── policy-config.ts                         Governing-law allow-list + salary bands + entity→jurisdiction
+├── template-meta.ts, template-meta-icons.tsx, template-bullets.tsx
+├── contract-store.ts                        State machine (VALID_TRANSITIONS), immutable updates, localStorage adapter, journey commands + rogue archive/notify + undo approval
 └── format.ts                                EUR + date + initials utilities
 
 docs/

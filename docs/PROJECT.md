@@ -125,7 +125,7 @@ Defined in `lib/contract-store.ts:VALID_TRANSITIONS`. Every command:
 - returns a new immutable `Contract`,
 - appends an `AuditEvent` atomically.
 
-`localStorage` key `light-documents-state` holds `{version, contracts, seededAt}`. Bumping `STATE_VERSION` invalidates old state and re-seeds.
+`localStorage` key `light-documents-state` holds `{version, contracts, manualSourceRecords?, rogueActions?, seededAt}`. Bumping `STATE_VERSION` invalidates old state and re-seeds. Current version: **7** (added `rogueActions` for archive/notify decisions on detected rogue templates).
 
 ---
 
@@ -177,24 +177,25 @@ Two-stage:
 `Button`, `Card`, `Badge`, `Modal` (with `headerActions` slot), `EmptyState`. Tailwind-styled, no behavioural logic.
 
 ### Layout
-`Sidebar` (responsive: mobile hamburger + drawer, desktop collapse-to-icons, persists in localStorage), `Header` (responsive padding, reserves 16px for hamburger on mobile), `Breadcrumb`, `DemoBanner`.
+`Sidebar` (slide-in drawer on mobile, collapse-to-icons on desktop, state persists in localStorage), `MobileTopBar` (sticky top bar that hosts the hamburger on mobile so it has a clear anchor instead of floating over scrolled content), `MobileNavContext` (shared drawer-open state between Sidebar and MobileTopBar), `Header` (stacks title + actions on mobile, normal padding on desktop), `Breadcrumb`, `DemoBanner`.
 
 ### Domain widgets
-- **`ContractsTable`** — sortable, filter chips (All / Awaiting me / Blocked / Signed this month). `min-w-[1180px]` with `overflow-x-auto` on narrow viewports.
-- **`KpiStrip`** — 4 KPIs at the top of the dashboard.
-- **`ClauseDiff`** — clause-by-clause diff with severity coloring (info / warn / block).
+- **`ContractsTable`** — sortable, filter tabs (All / Awaiting me / Blocked / Signed this month). Tabs scroll horizontally on mobile so they don't wrap.
+- **`KpiStrip`** — responsive KPI row. 2x2 grid on mobile, single row on `sm+`. Used on Dashboard + Archive.
+- **`ClauseDiff`** — clause-by-clause diff with severity coloring (info / warn / block). Stacked cards on mobile, table on desktop.
 - **`RoutingPanel`** — *why* this chain exists (rule reasons).
-- **`ApprovalChain`** — *who* + *why-this-person* + the per-row action menu.
+- **`ApprovalChain`** — *who* + *why-this-person* + the per-row action menu. Renders an "Undo my approval" pill on rows the current operator (Martina) approved, so a mind-change before send is one click. Refuses on `sent` / `signed` / `filed`.
 - **`ApprovalActionsMenu`** — dropdown for Reassign / Re-ping / Reject. Click-away aware.
 - **`ReassignModal`** — picker with specialty chips, OOO badges, intent toggle (Reassign vs Pass on), reason presets.
 - **`RejectModal`** — danger flow with reason presets, returns the contract to `needs_info`.
 - **`IntakeForm`** — conditional fields per `DocumentType` (MSA, NDA, Order Form, Employment, Warrant).
 - **`RecordPicker`** — CRM-agnostic source-record list with system badges.
-- **`TemplateCard`** + **`TemplatePicker`** + **`TemplateDetailModal`** — share visual language via `template-meta.ts`. Catalog card has "View details" + "Use this template"; picker card is one big click target.
-- **`DocuSignPreviewModal`** — 6-page envelope preview, signature blocks placed by anchor tags, API-payload toggle showing the actual `recipients` + `tabs` JSON.
+- **`ManualEntryModal`** — type-aware manual record entry (deal / candidate / stakeholder / vendor) that sits alongside CRM/HRIS imports. Pre-fills safe boilerplate (vesting 48m, cliff 12m, payment net 30), required-but-empty fields get amber borders, validation hint sits next to the button.
+- **`TemplateCard`** + **`TemplatePicker`** + **`TemplateDetailModal`** — share visual language via `template-meta.ts`. Detail modal renders the clause rules as stacked cards on mobile, table on desktop.
+- **`DocuSignPreviewModal`** — multi-page envelope preview, signature blocks placed by anchor tags, API-payload toggle showing the actual `recipients` + `tabs` JSON.
 - **`AuditTrail`** — chronological event list with icons per event type.
 - **`LedgerImpactPanel`** — the ledger writeback (MRR, headcount, cap-table delta).
-- **`RogueTemplatesPanel`** — detected rogue copies of master templates with similarity scores + recommended action.
+- **`RogueTemplatesPanel`** — detected rogue copies of master templates with similarity scores + recommended action. Archive + Notify owner are interactive: Archive dims the row and surfaces an Undo pill; Notify opens an inline Slack DM preview (routing rationale + the exact `chat.postMessage` body + a production note about Interactivity buttons) and on Send replaces the buttons with a green "sent" stamp. State persists via `rogueActions` in localStorage, cleared on Reset demo.
 - **`StatusBadge`** + **`RiskBadge`** + **`DocumentTypeIcon`** — typography micro-components reused everywhere.
 - **`AboutWidget`** — the dashboard preamble that explains the build.
 
@@ -206,11 +207,11 @@ Two-stage:
 |---|---|---|
 | `/` | Dashboard | KPI strip, AboutWidget, ContractsTable with filter chips |
 | `/templates` | Catalog | Section view (Customer / People / Equity) with recency badges, rogue-templates panel, top notice strip, "+ New contract" CTA in header |
-| `/contracts/new` | 3-step intake | Step 1 (template picker, shared visual language with catalog), Step 2 (record picker), Step 3 (intake form with live validation). Reads `?template=` query param. |
+| `/contracts/new` | 3-step intake | Step 1 (template picker, shared visual language with catalog), Step 2 (record picker; can switch to **Manual entry** tab to add a record that's not in any CRM), Step 3 (intake form with live validation). Reads `?template=` query param. |
 | `/contracts/[id]` | Contract detail | Stale-template banner, ClauseDiff, RoutingPanel, ApprovalChain with action menus, DocuSign send card with Save Draft / Preview / Send |
 | `/contracts/[id]/signed` | Signed record | PDF callout, audit trail, ledger impact panel, linked records |
 | `/archive` | All filed contracts | Lifetime KPIs, signed-record table |
-| `/about` | In-app submission memo | Same content as README, embedded |
+| `/about` | In-app submission memo | Same problem reframe + build-vs-buy as the README, plus a "Legal keeps Word, not us" callout and a "A note on the names in this demo" cast list that labels every persona (Sara Friis, Martina Holst, Tom Bauer, Sara Lindberg, Anna Lind, Plesner, Pia Andersen, Astrid/Christian/Emma) as illustrative. |
 
 ---
 
@@ -273,10 +274,64 @@ Board role has 3 members and strategy=all_required.
 
 ### Branch: save & exit
 ```
-Owner clicks Save Draft & Exit → audit event "Saved draft for later — owner
-   stepped away", returns to dashboard. Auto-save is already on; this is a
-   deliberate "I'm parking this" signal for analytics + future follow-up DMs.
+Owner clicks Save Draft & Exit → audit event "Saved draft for later
+   (owner stepped away)", returns to dashboard. Auto-save is already on;
+   this is a deliberate "I'm parking this" signal for analytics + future
+   follow-up DMs.
 ```
+
+### Branch: undo my approval
+```
+Operator (simulated Martina) approves a row, changes her mind before send →
+   clicks "Undo my approval" on her own row
+   → undoApproval() flips status back to pending, clears decidedAt/decidedBy
+   → audit event records "Withdrew approval"
+   → if her row was the last pending one and the contract had advanced to
+     ready_to_send, stage walks back to awaiting_approval with a system audit
+     event "Chain no longer complete; back to awaiting approval"
+Refused on sent / signed / filed — once DocuSign has the envelope, the chain
+is out of the platform's hands. The store also rejects undo from anyone other
+than the original approver: operators withdrawing someone else's approval
+would erode the audit trail; route them through Reassign or Reject instead.
+```
+
+---
+
+## 9b. Rogue templates: archive + notify
+
+Live on `/templates` (the rose-bordered panel under the catalog header).
+Daily Drive scan flags docs outside `/Master Templates/` that look like master
+templates but are not. Each row carries `fileName`, `similarity`,
+`diffSummary`, `lastUsedBy`, `recommendedAction`. The operator has two
+actions:
+
+### Archive
+```
+Click Archive → archiveRogue() persists {at, by} under rogueActions[fileId]
+   → row dims, "rogue" badge swaps to "archived", icon swaps to Archive
+   → Undo pill appears: "Archived by Martina · time · ↩ Undo"
+Production: move the docx in Drive to /Master Templates/_rogue-archive/<year>,
+write a rogue-archived audit event, surface a banner in Drive if anyone has
+the file open.
+```
+
+### Notify owner
+```
+Click Notify owner → inline Slack DM preview opens with:
+   - recipient routing rationale (data-driven from rogue record):
+        * still-employed lastUsedBy → DM by name
+        * lastUsedBy contains "left company" → channel fallback (#sales-ops)
+        * no lastUsedBy → triage channel (#legal-rogue-templates)
+   - the exact Slack message body that would post
+   - a production note about chat.postMessage + Interactivity buttons +
+     audit-log thread-back
+Click Send → notifyRogueOwner() records {at, by, channel, recipient}
+   → preview collapses to green pill "Slack DM/channel sent to X · time · ↩ Undo"
+```
+
+Both actions persist in `rogueActions` under localStorage and clear on Reset
+demo. The state shape is keyed by `driveFileId` so a row can be both archived
+AND notified independently.
 
 ---
 
@@ -355,14 +410,16 @@ light-documents/
 │
 ├── components/
 │   ├── ui/                           Button, Card, Badge, Modal, EmptyState
-│   ├── Sidebar.tsx                   Responsive: hamburger + collapse-to-icons
-│   ├── Header.tsx                    Responsive padding + actions slot
-│   ├── DemoBanner.tsx, Breadcrumb.tsx
+│   ├── Sidebar.tsx                   Drawer on mobile + collapse-to-icons on desktop
+│   ├── MobileTopBar.tsx              Sticky top bar that hosts the hamburger on mobile
+│   ├── MobileNavContext.tsx          Shared drawer-open state
+│   ├── Header.tsx                    Stacks title + actions on mobile
+│   ├── DemoBanner.tsx, Breadcrumb.tsx, BackButton.tsx
 │   ├── KpiStrip.tsx, AboutWidget.tsx
 │   ├── StatusBadge.tsx, RiskBadge.tsx, DocumentTypeIcon.tsx
 │   ├── ContractsTable.tsx
 │   ├── TemplateCard.tsx              + TemplatePicker.tsx + TemplateDetailModal.tsx
-│   ├── RecordPicker.tsx
+│   ├── RecordPicker.tsx              + ManualEntryModal.tsx
 │   ├── IntakeForm.tsx
 │   ├── ClauseDiff.tsx
 │   ├── RoutingPanel.tsx
@@ -425,8 +482,11 @@ Total: ~10k lines of TypeScript across `lib/` + `components/` + `app/`. Heaviest
 | 11 | On the Approve all chain → **Save draft & exit** | Returns to dashboard. Audit trail captured "Owner stepped away". Open back the contract → state preserved. |
 | 12 | Re-approve all → **Preview envelope** | DocuSign modal: 6 pages with anchor tags highlighted, sidebar shows each signer with "why" rationale, "Show API call" reveals the actual envelope JSON |
 | 13 | Click **Send via DocuSign** | Simulated 1.2s delay, lands on `/contracts/[id]/signed` with audit trail (8+ events) and ledger impact (+€xk MRR, +€xk ARR, renewal alert) |
-| 14 | Resize browser to mobile width | Sidebar collapses to hamburger. Tap hamburger → drawer slides in. Tap any nav item → drawer auto-closes. |
+| 14 | Resize browser to mobile width | Sidebar disappears; a sticky top bar appears with hamburger + brand. Tap hamburger → drawer slides in. Tap any nav item → drawer auto-closes. KPIs stack 2x2, clause review becomes stacked cards, every action bar wraps cleanly. |
 | 15 | Back on desktop, click the sidebar **collapse arrow** | Sidebar shrinks to icons-only. Hover any nav item → tooltip with the label. State persists across refresh. |
+| 16 | Approve Martina's row, change mind, click **Undo my approval** | Row reverts to pending. Audit trail captures "Withdrew approval". If she was the last pending approver, contract walks back from ready_to_send to awaiting_approval. |
+| 17 | Open **Templates**, expand "Rogue templates detected in Drive" | 4 rogue files listed with similarity + recommended action. Click **Notify owner** on the SecureBank row → inline Slack DM preview shows Sara Lindberg as the recipient + the exact message body + production-mode notes. Click **Send DM** → green "sent" pill replaces the buttons. Click **Archive** on John's draft row → row dims, "rogue" badge becomes "archived", Undo pill appears. |
+| 18 | Click **Reset demo data** in the sidebar | All in-session state (rogue actions, manually-added records, approvals, etc.) clears and re-seeds from the mock data. |
 
 ---
 
@@ -503,4 +563,4 @@ Production stack would add: Postgres, S3, Redis (BullMQ), Vercel/AWS, Google SSO
 
 ---
 
-**End of project map.** Updated 2026-05-12.
+**End of project map.** Updated 2026-05-13.

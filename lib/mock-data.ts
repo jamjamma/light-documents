@@ -600,7 +600,7 @@ export const TEMPLATES: Template[] = [
   },
   {
     id: "msa_pilot_v1_0",
-    name: "MSA — Pilot",
+    name: "MSA: Pilot",
     version: "v1.0",
     type: "MSA",
     risk: "low",
@@ -811,7 +811,7 @@ export const ROGUE_TEMPLATES: RogueTemplate[] = [
     detectedAt: "2026-05-12T22:14:00Z",
     matchesTemplate: "msa_v4_2",
     similarity: 0.78,
-    lastUsedBy: "John (Sales — left company Q4 2025)",
+    lastUsedBy: "John (Sales, left company Q4 2025)",
     lastUsedAt: "2025-12-04T14:20:00Z",
     diffSummary: "Based on MSA v4.0 (deprecated 2025-11). Liability cap modified to €100k. Custom-edited indemnity clause. No DPA exhibit.",
     recommendedAction: "Archive. John left in Q4 2025. Confirm with Tom (Sales) that no one is still referencing this file.",
@@ -1015,7 +1015,7 @@ export const SOURCE_RECORDS: SourceRecord[] = [
     type: "deal",
     system: "Salesforce",
     externalRef: "Opp 00847",
-    display: "Acme GmbH — Q3 Expansion",
+    display: "Acme GmbH, Q3 Expansion",
     subtitle: "€40k expansion · Order Form against existing MSA · 10 more seats + Analytics tier",
     syncedAt: "2026-05-12T11:55:00Z",
     data: {
@@ -1394,7 +1394,7 @@ const RAW_SEEDS: Contract[] = [
   },
   {
     id: "c_pilot_studios_msa",
-    name: "Pilot Studios MSA — Pilot",
+    name: "Pilot Studios MSA: Pilot",
     type: "MSA",
     templateId: "msa_pilot_v1_0",
     sourceRecordId: "sr_pilot_studios",

@@ -305,7 +305,7 @@ function PageBody({
                   </thead>
                   <tbody className="divide-y divide-ink-100">
                     <tr>
-                      <td className="px-3 py-2">Light Platform — Pro tier</td>
+                      <td className="px-3 py-2">Light Platform, Pro tier</td>
                       <td className="px-3 py-2">{f.seatCount ?? 10} seats</td>
                       <td className="px-3 py-2 text-right">€{Math.round((f.orderTotalEur ?? 0) / Math.max(1, f.seatCount ?? 10))}</td>
                       <td className="px-3 py-2 text-right">{formatEur(f.orderTotalEur)}</td>

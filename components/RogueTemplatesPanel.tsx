@@ -127,19 +127,19 @@ function resolveNotifyTarget(rogue: RogueTemplate): NotifyTarget {
 // next action. Pure function so it's easy to preview in the UI.
 function buildSlackMessage(rogue: RogueTemplate, target: NotifyTarget, templateName: string): string {
   const intro = target.channel === "slack_dm"
-    ? `Hey ${target.recipient.split(" ")[0]} —`
-    : `Heads-up team —`;
+    ? `Hey ${target.recipient.split(" ")[0]}, quick heads-up.`
+    : `Heads-up team.`;
   const pct = Math.round(rogue.similarity * 100);
   return [
-    `${intro} our daily Drive scan flagged \`${rogue.fileName}\` as a *rogue template* (${pct}% match to *${templateName}*).`,
+    `${intro} Our daily Drive scan flagged \`${rogue.fileName}\` as a *rogue template* (${pct}% match to *${templateName}*).`,
     ``,
     `*What's off:* ${rogue.diffSummary}`,
     ``,
     `*Recommended:* ${rogue.recommendedAction}`,
     ``,
-    `For new deals please use the master template in Light Documents so clause checks, approval routing, and ledger writeback all fire automatically. Reply to this thread if you need help routing an existing draft — happy to walk through it.`,
+    `For new deals please use the master template in Light Documents so clause checks, approval routing, and ledger writeback all fire automatically. Reply to this thread if you need help routing an existing draft, happy to walk through it.`,
     ``,
-    `— ${OPERATOR_NAME} (Head of Finance & Ops)`,
+    `${OPERATOR_NAME} (Head of Finance & Ops)`,
   ].join("\n");
 }
 

@@ -105,7 +105,7 @@ export function ReassignModal({ open, approval, onClose, onConfirm }: Props) {
               onChange={() => setIntent("reassign")}
               className="h-3.5 w-3.5"
             />
-            <span><strong>Reassign</strong> — operator override (Head of F&amp;O / contract owner)</span>
+            <span><strong>Reassign</strong>: operator override (Head of F&amp;O / contract owner)</span>
           </label>
           <label className="inline-flex items-center gap-1.5">
             <input
@@ -115,7 +115,7 @@ export function ReassignModal({ open, approval, onClose, onConfirm }: Props) {
               onChange={() => setIntent("pass_on")}
               className="h-3.5 w-3.5"
             />
-            <span><strong>Pass on</strong> — current assignee delegates</span>
+            <span><strong>Pass on</strong>: current assignee delegates</span>
           </label>
         </div>
 

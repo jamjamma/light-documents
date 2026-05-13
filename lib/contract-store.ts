@@ -549,7 +549,7 @@ export function reassignApproval(input: {
   //   Pass on:  new approver (action + "covering for X") + contract owner (FYI) + Head of F&O (queue-mgmt signal).
   // The operator who initiated a Reassign is presumed present (they clicked the button); same for the assignee who passed on.
   const newDm = intent === "pass_on"
-    ? `Slack DM sent to ${newMember.name} (${input.role}) — covering for ${oldName}`
+    ? `Slack DM sent to ${newMember.name} (${input.role}), covering for ${oldName}`
     : `Slack DM sent to ${newMember.name} (${input.role})`;
   working = appendAudit(working, {
     at: now(),
@@ -563,7 +563,7 @@ export function reassignApproval(input: {
     working = appendAudit(working, {
       at: now(),
       actor: "system",
-      event: `Slack DM sent to ${oldName} — removed from your queue`,
+      event: `Slack DM sent to ${oldName}: removed from your queue`,
       meta: `Reassigned to ${newMember.name} by ${input.byUserName}`,
     });
   } else {
@@ -571,7 +571,7 @@ export function reassignApproval(input: {
     working = appendAudit(working, {
       at: now(),
       actor: "system",
-      event: `Slack DM sent to Head of Finance & Ops — pass-on logged`,
+      event: `Slack DM sent to Head of Finance & Ops: pass-on logged`,
       meta: `${oldName} passed ${input.role} to ${newMember.name}. Workload + specialty signal.`,
     });
   }
@@ -581,7 +581,7 @@ export function reassignApproval(input: {
     working = appendAudit(working, {
       at: now(),
       actor: "system",
-      event: `Slack DM sent to ${working.owner} — approval chain updated`,
+      event: `Slack DM sent to ${working.owner}: approval chain updated`,
       meta: `${input.role}: ${oldName} → ${newMember.name} (${intent === "pass_on" ? "pass-on" : "reassign"})`,
     });
   }
@@ -708,7 +708,7 @@ export function saveDraftAndExit(id: string, byUserName: string): Contract {
   const audited = appendAudit(contract, {
     at: now(),
     actor: `${byUserName} (owner)`,
-    event: `Saved draft for later — owner stepped away`,
+    event: `Saved draft for later (owner stepped away)`,
     meta: `Stage: ${contract.stage}`,
   });
   return saveContract(audited);
