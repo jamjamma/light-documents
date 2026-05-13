@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import type { Approval } from "@/lib/types";
-import { Check, Clock, MessageSquare, Mail, ShieldCheck, XCircle } from "lucide-react";
+import { Check, Clock, MessageSquare, Mail, ShieldCheck, Undo2, XCircle } from "lucide-react";
 import { formatDateTime, initials } from "@/lib/format";
 import { ApprovalActionsMenu } from "./ApprovalActionsMenu";
 
@@ -12,6 +12,14 @@ interface Props {
   onReassign?: (approval: Approval) => void;
   onReping?: (approval: Approval) => void;
   onReject?: (approval: Approval) => void;
+  /**
+   * Withdraw an approval. The parent decides whether the current operator is
+   * allowed to undo this specific row (the store only lets the original
+   * approver withdraw); the row renders the Undo control only if this prop is
+   * supplied AND `canUndoApprove(approval)` returns true.
+   */
+  onUndoApprove?: (approval: Approval) => void;
+  canUndoApprove?: (approval: Approval) => boolean;
 }
 
 /**
@@ -23,7 +31,15 @@ interface Props {
  * name (legacy seeded data), the row falls back to the role label with a small
  * "Role only" note so the gap is visible rather than hidden.
  */
-export function ApprovalChain({ approvals, onSimulateApprove, onReassign, onReping, onReject }: Props) {
+export function ApprovalChain({
+  approvals,
+  onSimulateApprove,
+  onReassign,
+  onReping,
+  onReject,
+  onUndoApprove,
+  canUndoApprove,
+}: Props) {
   if (approvals.length === 0) {
     return null;
   }
@@ -133,8 +149,18 @@ export function ApprovalChain({ approvals, onSimulateApprove, onReassign, onRepi
               </div>
             )}
             {a.status === "approved" && a.decidedBy && (
-              <div className="mt-2 text-[11px] text-ink-500">
-                Approved by {a.decidedBy}
+              <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-ink-500">
+                <span>Approved by {a.decidedBy}</span>
+                {onUndoApprove && canUndoApprove?.(a) && (
+                  <button
+                    type="button"
+                    onClick={() => onUndoApprove(a)}
+                    className="inline-flex items-center gap-1 rounded-full bg-ink-50 px-2 py-0.5 text-[11px] text-ink-700 ring-1 ring-inset ring-ink-200 hover:bg-ink-100"
+                    title="Withdraw your approval. Returns the row to pending and walks the contract back to awaiting_approval if this was the last approver."
+                  >
+                    <Undo2 className="h-3 w-3" /> Undo my approval
+                  </button>
+                )}
               </div>
             )}
             {a.status === "auto_approved" && (

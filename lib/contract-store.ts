@@ -10,7 +10,17 @@ import { findMember } from "./approver-directory";
 const STORAGE_KEY = "light-documents-state";
 // Bump on every shape change to Contract / Approval / seed data so old localStorage
 // state is discarded and the demo re-seeds with the current data model.
-const STATE_VERSION = 6;
+const STATE_VERSION = 7;
+
+export interface RogueAction {
+  archived?: { at: string; by: string };
+  notified?: {
+    at: string;
+    by: string;
+    channel: "slack_dm" | "slack_channel" | "email";
+    recipient: string; // person or channel display name
+  };
+}
 
 interface StoredState {
   version: number;
@@ -21,6 +31,11 @@ interface StoredState {
    * them without touching the mock data.
    */
   manualSourceRecords?: import("./types").SourceRecord[];
+  /**
+   * Per-rogue-template actions taken by the operator (archive / notify).
+   * Keyed by driveFileId. Cleared on reset.
+   */
+  rogueActions?: Record<string, RogueAction>;
   seededAt: string;
 }
 
@@ -151,6 +166,105 @@ export function addManualSourceRecord(input: Omit<SourceRecord, "id" | "syncedAt
   };
   writeState(next);
   return record;
+}
+
+// ── Rogue templates: archive / notify actions ─────────────────────────────────
+
+/**
+ * Returns the action taken on a given rogue template, or an empty object if
+ * nothing has been done yet. Reads from localStorage so the operator's prior
+ * decisions persist across reloads.
+ */
+export function getRogueAction(driveFileId: string): RogueAction {
+  const state = ensureSeeded();
+  return state.rogueActions?.[driveFileId] ?? {};
+}
+
+export function listRogueActions(): Record<string, RogueAction> {
+  const state = ensureSeeded();
+  return state.rogueActions ?? {};
+}
+
+function patchRogueAction(driveFileId: string, patch: RogueAction | null): RogueAction {
+  const state = ensureSeeded();
+  const existing = state.rogueActions ?? {};
+  let nextActions: Record<string, RogueAction>;
+  if (patch === null) {
+    const { [driveFileId]: _, ...rest } = existing;
+    nextActions = rest;
+  } else {
+    nextActions = {
+      ...existing,
+      [driveFileId]: { ...existing[driveFileId], ...patch },
+    };
+  }
+  writeState({ ...state, rogueActions: nextActions });
+  return nextActions[driveFileId] ?? {};
+}
+
+/**
+ * Archive a rogue template. In the demo this just records the action locally;
+ * in production this would:
+ *   1. Move the docx in Drive to /Master Templates/_rogue-archive/<year>/
+ *   2. Write a "rogue-archived" audit event to the platform's audit log
+ *   3. If anyone still has the file open, surface a banner in Drive
+ *      ("this file was archived by Head of F&O — use the master MSA instead")
+ */
+export function archiveRogue(driveFileId: string, byUserName: string): RogueAction {
+  return patchRogueAction(driveFileId, { archived: { at: now(), by: byUserName } });
+}
+
+export function undoArchiveRogue(driveFileId: string): RogueAction {
+  const state = ensureSeeded();
+  const existing = state.rogueActions?.[driveFileId];
+  if (!existing) return {};
+  const { archived: _drop, ...rest } = existing;
+  if (Object.keys(rest).length === 0) {
+    return patchRogueAction(driveFileId, null);
+  }
+  // Replace wholesale (not merge) so `archived` is removed cleanly.
+  const nextActions = { ...(state.rogueActions ?? {}), [driveFileId]: rest };
+  writeState({ ...state, rogueActions: nextActions });
+  return rest;
+}
+
+/**
+ * Notify the file owner via Slack. In the demo we record who would be DM'd;
+ * in production this would post to the Slack Web API:
+ *   - chat.postMessage to the owner's DM channel (or #legal-rogue-templates
+ *     fallback if the user has DMs disabled / has left the company)
+ *   - Message template includes: file name, similarity score, diff summary,
+ *     recommended action, deep link back to /templates#<driveFileId>, and
+ *     interactive Approve / Pass-on buttons that round-trip via Slack's
+ *     Interactivity Request URL.
+ */
+export function notifyRogueOwner(input: {
+  driveFileId: string;
+  byUserName: string;
+  channel: NonNullable<RogueAction["notified"]>["channel"];
+  recipient: string;
+}): RogueAction {
+  return patchRogueAction(input.driveFileId, {
+    notified: {
+      at: now(),
+      by: input.byUserName,
+      channel: input.channel,
+      recipient: input.recipient,
+    },
+  });
+}
+
+export function undoNotifyRogue(driveFileId: string): RogueAction {
+  const state = ensureSeeded();
+  const existing = state.rogueActions?.[driveFileId];
+  if (!existing) return {};
+  const { notified: _drop, ...rest } = existing;
+  if (Object.keys(rest).length === 0) {
+    return patchRogueAction(driveFileId, null);
+  }
+  const nextActions = { ...(state.rogueActions ?? {}), [driveFileId]: rest };
+  writeState({ ...state, rogueActions: nextActions });
+  return rest;
 }
 
 // ── Commands (each returns the updated contract, never mutates) ──────────────
@@ -292,6 +406,66 @@ export function approve(
       ),
     );
   }
+
+  return saveContract(audited);
+}
+
+/**
+ * Reverse an approval the operator made and didn't want to commit to. Only the
+ * person who decided can withdraw it (defense against unrelated approvers being
+ * un-approved); enforced at the call site by matching `byUserName` against
+ * `decidedBy`.
+ *
+ * If the contract had already advanced to `ready_to_send` because this was the
+ * last pending approval, walk it back to `awaiting_approval`. We do not undo
+ * a send; once the envelope is in DocuSign the workflow is out of our hands.
+ */
+export function undoApproval(input: {
+  contractId: string;
+  role: Approval["role"];
+  assignedUserId?: string;
+  byUserName: string;
+}): Contract {
+  const contract = getContract(input.contractId);
+  if (!contract) throw new Error(`Contract not found: ${input.contractId}`);
+  if (contract.stage === "sent" || contract.stage === "signed" || contract.stage === "filed") {
+    throw new Error("Cannot undo approval after the envelope has been sent");
+  }
+
+  const approvals = contract.approvals ?? [];
+  const target = approvals.find((a) => {
+    if (a.role !== input.role) return false;
+    if (input.assignedUserId !== undefined && a.assignedUserId !== input.assignedUserId) return false;
+    return a.status === "approved";
+  });
+  if (!target) throw new Error("No matching approved row to undo");
+  // Only the person who decided can withdraw it. Operators withdrawing
+  // someone else's approval would erode the audit trail; route them through
+  // reassign / re-ping instead.
+  if (target.decidedBy && !target.decidedBy.startsWith(input.byUserName)) {
+    throw new Error("Only the approver can withdraw their own approval");
+  }
+
+  const next = approvals.map((a) => {
+    if (a !== target) return a;
+    const { decidedAt: _at, decidedBy: _by, ...rest } = a;
+    return { ...rest, status: "pending" as const };
+  });
+
+  // If we previously advanced to ready_to_send because everyone approved, walk
+  // back to awaiting_approval since the chain is no longer complete.
+  const wasReady = contract.stage === "ready_to_send" && !allApproved(next);
+  const stage: Stage = wasReady ? "awaiting_approval" : contract.stage;
+
+  const audited = appendAudit(
+    { ...contract, approvals: next, stage },
+    {
+      at: now(),
+      actor: `${input.byUserName} (${input.role})`,
+      event: `Withdrew approval`,
+      meta: wasReady ? "Chain no longer complete; back to awaiting approval" : undefined,
+    },
+  );
 
   return saveContract(audited);
 }

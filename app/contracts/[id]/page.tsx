@@ -23,6 +23,7 @@ import {
   repingApproval,
   rejectApproval,
   saveDraftAndExit,
+  undoApproval,
 } from "@/lib/contract-store";
 import { getTemplate, getSourceRecord } from "@/lib/mock-data";
 import { allApproved } from "@/lib/routing-rules";
@@ -97,6 +98,25 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
         : a.assignedName
       : a.role;
     approve(contract.id, a.role, decidedBy, a.assignedUserId);
+    refresh();
+  };
+
+  // Only the operator (simulated as Martina Holst in this demo) can withdraw
+  // their own approval, and only before the envelope has been sent. That keeps
+  // the audit trail honest: an operator cannot un-approve someone else's row.
+  const canUndoApprove = (a: Approval) => {
+    if (a.status !== "approved") return false;
+    if (contract.stage === "sent" || contract.stage === "signed" || contract.stage === "filed") return false;
+    return a.decidedBy?.startsWith(OPERATOR_NAME) ?? false;
+  };
+
+  const handleUndoApprove = (a: Approval) => {
+    undoApproval({
+      contractId: contract.id,
+      role: a.role,
+      assignedUserId: a.assignedUserId,
+      byUserName: OPERATOR_NAME,
+    });
     refresh();
   };
 
@@ -197,6 +217,8 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
               onReassign={(a) => setReassignFor(a)}
               onReping={handleReping}
               onReject={(a) => setRejectFor(a)}
+              onUndoApprove={handleUndoApprove}
+              canUndoApprove={canUndoApprove}
             />
           </Card>
         )}
