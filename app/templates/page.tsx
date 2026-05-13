@@ -78,7 +78,9 @@ export default function TemplatesPage() {
             <div className="min-w-0 flex-1">
               <h3 className="text-sm font-semibold text-ink-900">How Word documents connect to this platform</h3>
               <p className="mt-1 text-[13px] leading-relaxed text-ink-700">
-                The Legal team (Sara Friis, in-house counsel) saves Word documents to one canonical folder: <span className="rounded bg-ink-100 px-1.5 py-0.5 font-mono text-[12px] text-ink-900">/Light Documents/Master Templates/</span> in Google Drive. Only Legal and admins have edit access. On every save, the Drive Watch API fires a webhook to our platform. We parse the docx, extract <span className="font-mono text-[12px] text-ink-900">{`{{variables}}`}</span> and
+                The Legal team
+                <span className="text-ink-500"> (illustrated in this demo by Sara Friis as in-house counsel — see About for the full cast)</span>{" "}
+                saves Word documents to one canonical folder: <span className="rounded bg-ink-100 px-1.5 py-0.5 font-mono text-[12px] text-ink-900">/Light Documents/Master Templates/</span> in Google Drive. Only Legal and admins have edit access. On every save, the Drive Watch API fires a webhook to our platform. We parse the docx, extract <span className="font-mono text-[12px] text-ink-900">{`{{variables}}`}</span> and
                 <span className="font-mono text-[12px] text-ink-900"> {`\\sig:anchor\\`}</span> tags Legal typed directly into Word, and update our cache.
                 Templates are <strong>version-pinned at contract create time</strong>, so a master-template edit mid-flow does not disrupt an in-flight contract.
               </p>

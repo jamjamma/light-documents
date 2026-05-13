@@ -74,11 +74,20 @@ export default function AboutPage() {
 
         <Section title="How the Legal team keeps Word" icon={<FileType2 className="h-4 w-4" />}>
           <p>
-            Master templates stay as Word docs in Google Drive (or SharePoint), owned by the Legal team (Sara Friis, in-house counsel). Legal types{" "}
+            Master templates stay as Word docs in Google Drive (or SharePoint), owned by the Legal team
+            <span className="text-ink-500"> — in this demo that role is illustrated by Sara Friis, in-house counsel (a stand-in persona, see note below)</span>.
+            Legal types{" "}
             <code className="rounded bg-ink-100 px-1.5 py-0.5 font-mono text-[12px]">{`{{counterparty.legal_name}}`}</code>{" "}
             and <code className="rounded bg-ink-100 px-1.5 py-0.5 font-mono text-[12px]">{`\\sig:counterparty\\`}</code>{" "}
             directly into the document as text. On save, Drive webhooks our platform. We parse the docx (zip of XML),
-            extract variables and anchor tags, version-pin at contract create time. The Legal team never logs into our tool.
+            extract variables and anchor tags, version-pin at contract create time.
+          </p>
+          <p className="text-[13px] text-ink-500">
+            <strong className="text-ink-700">Legal keeps Word, not us.</strong>{" "}
+            Counsel never has to open Light Documents. They edit master templates the same way they do today — Word
+            in Drive, with Track Changes and comments. Our platform watches that folder via the Drive Watch API and
+            syncs the latest version automatically. No new editor, no new login, no migration. Everyone else (Sales,
+            People Ops, Finance) uses Light Documents to <em>execute</em> against those templates.
           </p>
           <p className="text-[13px] text-ink-500">
             Per-contract substitution uses <code className="rounded bg-ink-100 px-1.5 py-0.5 font-mono text-[12px]">docxtemplater</code>{" "}
@@ -162,6 +171,24 @@ export default function AboutPage() {
             <li>Approvers are real humans on Slack. Routing rules are owned by Head of Finance & Ops.</li>
             <li>Volume is the stated 50-100 / month. CLM-scale tools are overkill for this throughput.</li>
           </ol>
+        </Section>
+
+        <Section title="A note on the names in this demo" icon={<Users className="h-4 w-4" />}>
+          <p>
+            Every person mentioned in this prototype is an illustrative stand-in, not a real Light employee. The names
+            are seeded into the mock data so the workflow, audit trail, and Slack-style approvals feel concrete instead
+            of abstract.
+          </p>
+          <ul className="ml-5 list-disc space-y-1 text-[13px] text-ink-600">
+            <li><strong>Sara Friis</strong> — in-house counsel (e.g. role). Used throughout for "the Legal team".</li>
+            <li><strong>Martina Holst</strong> — Head of Finance & Ops (the persona this case study is written for, simulated as the logged-in user).</li>
+            <li><strong>Tom Bauer</strong> and <strong>Sara Lindberg</strong> — Sales AEs who originate contracts.</li>
+            <li><strong>Anna Lind</strong> — UK counsel example; <strong>Plesner</strong> — outside-counsel firm example; <strong>Pia Andersen</strong> — People Ops example.</li>
+            <li><strong>Astrid Sjöberg, Christian Bek, Emma Holloway</strong> — example board members on the Warrant flow.</li>
+          </ul>
+          <p className="text-[13px] text-ink-500">
+            Replace the directory + seed data and the same flow runs against Light's real org chart.
+          </p>
         </Section>
 
         <Section title="Tech stack" icon={<Database className="h-4 w-4" />}>

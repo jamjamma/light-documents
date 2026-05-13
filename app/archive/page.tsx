@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Card } from "@/components/ui/Card";
+import { KpiStrip } from "@/components/KpiStrip";
 import { DocumentTypeBadge, DocumentTypeIcon } from "@/components/DocumentTypeIcon";
 import { listContracts } from "@/lib/contract-store";
 import { formatDateTime, formatEur, formatEurCompact, initials } from "@/lib/format";
@@ -47,12 +48,14 @@ export default function ArchivePage() {
         breadcrumb={[{ label: "Dashboard", href: "/" }, { label: "Archive" }]}
       />
       <div className="space-y-4 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
-        <div className="panel flex items-stretch divide-x divide-ink-100 overflow-hidden">
-          <Kpi label="Signed total" value={String(kpis.totalSigned)} />
-          <Kpi label="Lifetime ARR booked" value={formatEur(kpis.totalArr)} />
-          <Kpi label="Headcount added" value={String(kpis.totalHires)} />
-          <Kpi label="Equity granted" value={kpis.totalEquityBps > 0 ? `${(kpis.totalEquityBps / 100).toFixed(2)}%` : "—"} />
-        </div>
+        <KpiStrip
+          kpis={[
+            { label: "Signed total", value: String(kpis.totalSigned) },
+            { label: "Lifetime ARR booked", value: formatEur(kpis.totalArr) },
+            { label: "Headcount added", value: String(kpis.totalHires) },
+            { label: "Equity granted", value: kpis.totalEquityBps > 0 ? `${(kpis.totalEquityBps / 100).toFixed(2)}%` : "—" },
+          ]}
+        />
 
         <Card title="Signed and filed contracts" subtitle={`${signed.length} record${signed.length === 1 ? "" : "s"}, most recent first.`}>
           {signed.length === 0 ? (
@@ -119,15 +122,6 @@ export default function ArchivePage() {
         </Card>
       </div>
     </>
-  );
-}
-
-function Kpi({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex-1 px-5 py-4">
-      <div className="text-[11px] uppercase tracking-wider text-ink-500">{label}</div>
-      <div className="mt-1 text-2xl font-semibold tracking-tight text-ink-900 tabular-nums">{value}</div>
-    </div>
   );
 }
 

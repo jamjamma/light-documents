@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Modal } from "./ui/Modal";
 import { Button } from "./ui/Button";
 import { addManualSourceRecord } from "@/lib/contract-store";
 import type { SourceRecord, Template } from "@/lib/types";
-import { Plus } from "lucide-react";
+import { AlertTriangle, Plus } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -29,6 +29,10 @@ interface FieldSpec {
   type: "text" | "number" | "email" | "date";
   placeholder?: string;
   required?: boolean;
+  /** Pre-filled when the modal opens. Use for safe boilerplate that the user
+   *  will usually keep (standard vesting cadences, etc.). Never pre-fill names,
+   *  emails, or anything legally consequential. */
+  defaultValue?: string;
 }
 
 // Per-record-type field set. These map to ContractFields keys so the new-contract
@@ -40,8 +44,8 @@ const FIELDS_BY_TYPE: Record<RecordType, FieldSpec[]> = {
     { key: "counterpartySignerTitle", label: "Signer title", type: "text", placeholder: "Head of Procurement" },
     { key: "counterpartySignerEmail", label: "Signer email", type: "email", required: true, placeholder: "signer@example.com" },
     { key: "contractValueEur", label: "Contract value (EUR ARR)", type: "number", placeholder: "60000" },
-    { key: "paymentTermsDays", label: "Payment terms (days)", type: "number", placeholder: "30" },
-    { key: "termMonths", label: "Initial term (months)", type: "number", placeholder: "12" },
+    { key: "paymentTermsDays", label: "Payment terms (days)", type: "number", placeholder: "30", defaultValue: "30" },
+    { key: "termMonths", label: "Initial term (months)", type: "number", placeholder: "12", defaultValue: "12" },
   ],
   candidate: [
     { key: "candidateName", label: "Candidate name", type: "text", required: true, placeholder: "e.g. Alex Müller" },
@@ -50,21 +54,21 @@ const FIELDS_BY_TYPE: Record<RecordType, FieldSpec[]> = {
     { key: "manager", label: "Reporting manager", type: "text", placeholder: "Reports to whom?" },
     { key: "salaryEur", label: "Annual salary (EUR)", type: "number", placeholder: "95000" },
     { key: "startDate", label: "Start date", type: "date" },
-    { key: "equityBps", label: "Equity grant (basis points, 0 if none)", type: "number", placeholder: "0" },
+    { key: "equityBps", label: "Equity grant (basis points, 0 if none)", type: "number", placeholder: "0", defaultValue: "0" },
   ],
   stakeholder: [
     { key: "stakeholderName", label: "Stakeholder name", type: "text", required: true, placeholder: "e.g. Anya Petrov" },
-    { key: "warrantPct", label: "Warrant percentage", type: "number", required: true, placeholder: "0.25" },
-    { key: "vestingMonths", label: "Vesting (months)", type: "number", placeholder: "48" },
-    { key: "cliffMonths", label: "Cliff (months)", type: "number", placeholder: "12" },
-    { key: "boardResolutionRef", label: "Board resolution reference", type: "text", placeholder: "BR-2026-Q2-001" },
+    { key: "warrantPct", label: "Warrant percentage", type: "number", required: true, placeholder: "e.g. 0.25" },
+    { key: "vestingMonths", label: "Vesting (months)", type: "number", placeholder: "48", defaultValue: "48" },
+    { key: "cliffMonths", label: "Cliff (months)", type: "number", placeholder: "12", defaultValue: "12" },
+    { key: "boardResolutionRef", label: "Board resolution reference", type: "text", placeholder: "e.g. BR-2026-Q2-001" },
   ],
   vendor: [
     { key: "vendorName", label: "Vendor name", type: "text", required: true, placeholder: "e.g. Datadog Inc." },
     { key: "vendorService", label: "Service description", type: "text", placeholder: "APM + log management" },
     { key: "monthlySpendEur", label: "Monthly spend (EUR)", type: "number", placeholder: "2500" },
-    { key: "counterpartySignerName", label: "Signer name", type: "text", required: true },
-    { key: "counterpartySignerEmail", label: "Signer email", type: "email", required: true },
+    { key: "counterpartySignerName", label: "Signer name", type: "text", required: true, placeholder: "Authorised signatory" },
+    { key: "counterpartySignerEmail", label: "Signer email", type: "email", required: true, placeholder: "signer@example.com" },
   ],
 };
 
@@ -115,10 +119,22 @@ export function ManualEntryModal({ open, template, onClose, onCreated }: Props) 
   const recordType = recordTypeForTemplate(template);
   const fields = useMemo(() => FIELDS_BY_TYPE[recordType], [recordType]);
   const [values, setValues] = useState<Record<string, string>>({});
+  const firstInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Seed the form with safe, non-binding defaults (vesting cadences, payment
+  // terms) every time the modal opens. We never pre-fill names, emails, or
+  // anything that would change the contract's legal substance.
   useEffect(() => {
-    if (open) setValues({});
-  }, [open, recordType]);
+    if (!open) return;
+    const seed: Record<string, string> = {};
+    for (const f of fields) {
+      if (f.defaultValue !== undefined) seed[f.key] = f.defaultValue;
+    }
+    setValues(seed);
+    // Focus the first input so the keyboard pops up immediately on mobile.
+    const t = setTimeout(() => firstInputRef.current?.focus(), 50);
+    return () => clearTimeout(t);
+  }, [open, recordType, fields]);
 
   const missingRequired = fields
     .filter((f) => f.required)
@@ -169,43 +185,65 @@ export function ManualEntryModal({ open, template, onClose, onCreated }: Props) 
         </span>
       }
       footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSubmit} disabled={!canSubmit} leadingIcon={<Plus className="h-3.5 w-3.5" />}>
-            Add &amp; select
-          </Button>
-        </>
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-end sm:gap-3">
+          {!canSubmit && (
+            <div
+              role="status"
+              className="flex flex-1 items-start gap-1.5 rounded-md bg-amber-50 px-2.5 py-1.5 text-[11px] text-amber-900 ring-1 ring-inset ring-amber-200 sm:text-left"
+            >
+              <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0 text-amber-600" />
+              <span>
+                Fill {missingRequired.map((f) => `"${f.label}"`).join(" + ")} to enable Add.
+              </span>
+            </div>
+          )}
+          <div className="flex items-center justify-end gap-2 sm:shrink-0">
+            <Button variant="ghost" onClick={onClose}>Cancel</Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={!canSubmit}
+              leadingIcon={<Plus className="h-3.5 w-3.5" />}
+              title={canSubmit ? undefined : `Fill ${missingRequired.map((f) => f.label).join(" + ")} first`}
+            >
+              Add &amp; select
+            </Button>
+          </div>
+        </div>
       }
     >
       <div className="space-y-4">
         <div className="grid gap-3 sm:grid-cols-2">
-          {fields.map((f) => (
-            <div key={f.key} className={f.key === "counterpartyLegalName" || f.key === "candidateName" || f.key === "stakeholderName" || f.key === "vendorName" ? "sm:col-span-2" : ""}>
-              <label className="block text-[11px] font-medium uppercase tracking-wider text-ink-500">
-                {f.label}
-                {f.required && <span className="ml-0.5 text-rose-500">*</span>}
-              </label>
-              <input
-                type={f.type}
-                value={values[f.key] ?? ""}
-                onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
-                placeholder={f.placeholder}
-                className="mt-1 h-9 w-full rounded-lg border border-ink-200 bg-white px-3 text-sm placeholder:text-ink-400 focus:border-ink-400 focus:outline-none"
-              />
-            </div>
-          ))}
+          {fields.map((f, i) => {
+            const isWide = f.key === "counterpartyLegalName" || f.key === "candidateName" || f.key === "stakeholderName" || f.key === "vendorName";
+            const isMissing = f.required && (!values[f.key] || String(values[f.key]).trim().length === 0);
+            return (
+              <div key={f.key} className={isWide ? "sm:col-span-2" : ""}>
+                <label className="block text-[11px] font-medium uppercase tracking-wider text-ink-500">
+                  {f.label}
+                  {f.required && <span className="ml-0.5 text-rose-500">*</span>}
+                </label>
+                <input
+                  ref={i === 0 ? firstInputRef : undefined}
+                  type={f.type}
+                  value={values[f.key] ?? ""}
+                  onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
+                  placeholder={f.placeholder}
+                  aria-required={f.required || undefined}
+                  className={`mt-1 h-9 w-full rounded-lg border bg-white px-3 text-sm placeholder:italic placeholder:text-ink-300 focus:outline-none ${
+                    isMissing
+                      ? "border-amber-300 focus:border-amber-500"
+                      : "border-ink-200 focus:border-ink-400"
+                  }`}
+                />
+              </div>
+            );
+          })}
         </div>
 
         <div className="rounded-lg border border-ink-100 bg-ink-50/40 px-3 py-2.5 text-[11px] text-ink-600">
           <span className="demo-note mr-1.5">What happens on Add</span>
           The record is saved to local state, the picker auto-selects it, and step 3 (Confirm details) prefills these values into the intake form. Clause checks + routing fire against the same engine as any imported record. In production this also writes a "manual record" stub to the source system of record (so a Salesforce admin can later attach the deal if needed).
         </div>
-
-        {!canSubmit && missingRequired.length > 0 && (
-          <div className="text-[11px] text-ink-500">
-            Required: {missingRequired.map((f) => f.label).join(", ")}
-          </div>
-        )}
       </div>
     </Modal>
   );
