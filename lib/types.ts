@@ -262,7 +262,20 @@ export interface RogueTemplate {
 
 export interface Template {
   id: TemplateId;
+  /**
+   * Short name shown in the template gallery and contract subtitles
+   * (e.g. "MSA", "MSA: Pilot", "Mutual NDA"). Kept compact so cards don't
+   * truncate. For the formal docx heading + signature legal body, use
+   * `formalName` when set.
+   */
   name: string;
+  /**
+   * Optional formal legal name used for the docx preview heading and the
+   * "By signing below, each party agrees to be bound by..." line. Falls
+   * back to `name` when absent. Lets the gallery show "MSA" while the
+   * generated document still reads "MASTER SERVICES AGREEMENT".
+   */
+  formalName?: string;
   version: string;
   type: DocumentType;
   risk: Risk;

@@ -85,7 +85,8 @@ export const TEMPLATES: Template[] = [
   },
   {
     id: "msa_v4_2",
-    name: "Master Services Agreement",
+    name: "MSA",
+    formalName: "Master Services Agreement",
     version: "v4.2",
     type: "MSA",
     risk: "medium",
@@ -601,6 +602,7 @@ export const TEMPLATES: Template[] = [
   {
     id: "msa_pilot_v1_0",
     name: "MSA: Pilot",
+    formalName: "Master Services Agreement (Pilot)",
     version: "v1.0",
     type: "MSA",
     risk: "low",

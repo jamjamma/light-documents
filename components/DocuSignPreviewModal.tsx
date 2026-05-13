@@ -231,7 +231,7 @@ function PageBody({
           </div>
         </div>
         <p className="text-[12px] text-ink-700">
-          By signing below, each party agrees to be bound by the terms of this {template.name}. Each party warrants
+          By signing below, each party agrees to be bound by the terms of this {template.formalName ?? template.name}. Each party warrants
           authority to sign on behalf of the entity named.
         </p>
         <div className="mt-6 grid gap-6 sm:grid-cols-2">
@@ -252,7 +252,7 @@ function PageBody({
     return (
       <div className="space-y-4 font-sans">
         <div className="text-center">
-          <div className="text-[18px] font-semibold tracking-tight">{template.name.toUpperCase()}</div>
+          <div className="text-[18px] font-semibold tracking-tight">{(template.formalName ?? template.name).toUpperCase()}</div>
           <div className="mt-1 text-[11px] uppercase tracking-widest text-ink-500">
             {template.version} · {f.lightEntity ?? "Light ApS"}
           </div>
@@ -572,7 +572,7 @@ function buildEnvelopePayload(contract: Contract, template: Template, signers: S
 
   return {
     emailSubject: `Please sign: ${contract.name}`,
-    emailBlurb: `Please review and sign the attached ${template.name}. Reach out to ${signers[0]?.email} for questions.`,
+    emailBlurb: `Please review and sign the attached ${template.formalName ?? template.name}. Reach out to ${signers[0]?.email} for questions.`,
     status: "sent",
     documents: [
       {
