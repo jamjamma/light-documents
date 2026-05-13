@@ -211,8 +211,16 @@ export function ReassignModal({ open, approval, onClose, onConfirm }: Props) {
         </div>
 
         <div className="rounded-lg border border-ink-100 bg-ink-50/40 px-3 py-2.5 text-[11px] text-ink-600">
-          <span className="demo-note mr-1.5">Workflow</span>
-          On confirm: the chain updates, an audit event records the override + reason, and a simulated Slack DM is sent to the new approver. In production, that DM has inline Approve / Reject buttons; the override is also visible to {currentName} in their notifications.
+          <span className="demo-note mr-1.5">Notification fan-out</span>
+          {intent === "reassign" ? (
+            <>
+              <strong>Reassign</strong> sends Slack DMs to: <strong>the new approver</strong> (action required), <strong>{currentName}</strong> (removed from queue), and <strong>the contract owner</strong> (chain changed FYI).
+            </>
+          ) : (
+            <>
+              <strong>Pass on</strong> sends Slack DMs to: <strong>the new approver</strong> (action required, with note "covering for {currentName}"), <strong>the contract owner</strong> (chain changed FYI), and <strong>Head of Finance &amp; Ops</strong> (queue-management signal). Pass-on patterns get aggregated to surface workload + specialty imbalances over time.
+            </>
+          )}
         </div>
 
         <div className="rounded-lg border border-dashed border-ink-200 bg-white px-3 py-2.5 text-[11px] text-ink-500">

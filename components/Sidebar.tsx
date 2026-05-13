@@ -10,13 +10,13 @@ import {
   Info,
   RefreshCw,
   Archive,
-  Menu,
   X,
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { resetDemo } from "@/lib/contract-store";
+import { useMobileNav } from "./MobileNavContext";
 
 const NAV = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -29,19 +29,20 @@ const COLLAPSED_KEY = "sidebar-collapsed";
 
 /**
  * Responsive sidebar:
- *   - Mobile (< md): hidden by default. Fixed hamburger button (top-left) opens
- *     a slide-in drawer with backdrop. Tapping the backdrop or a nav link closes it.
+ *   - Mobile (< md): hidden by default. Slides in from the left when the
+ *     MobileTopBar hamburger toggles `useMobileNav().open`. Tapping the
+ *     backdrop or a nav link closes it.
  *   - Desktop (>= md): static sidebar with collapse-to-icons toggle. Collapsed
  *     state persists in localStorage. Nav items show tooltips via title attr
  *     when collapsed.
  *
- * State management is local: no context provider needed because the hamburger
- * button lives inside this component (rendered as a fixed overlay on mobile).
+ * Drawer state lives in MobileNavContext so the hamburger can live in a
+ * separate sticky top bar (not floating over content).
  */
 export function Sidebar() {
   const pathname = usePathname();
   const [resetState, setResetState] = useState<"idle" | "done">("idle");
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { open: mobileOpen, setOpen: setMobileOpen } = useMobileNav();
   const [collapsed, setCollapsed] = useState(false);
 
   // Hydrate collapsed state from localStorage on mount.
@@ -53,21 +54,6 @@ export function Sidebar() {
       // localStorage unavailable; ignore
     }
   }, []);
-
-  // Close mobile drawer when the user navigates.
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
-
-  // Lock body scroll while mobile drawer is open.
-  useEffect(() => {
-    if (!mobileOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [mobileOpen]);
 
   const toggleCollapsed = () => {
     setCollapsed((c) => {
@@ -91,19 +77,8 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile hamburger — visible only on mobile, only when drawer is closed */}
-      {!mobileOpen && (
-        <button
-          type="button"
-          onClick={() => setMobileOpen(true)}
-          aria-label="Open menu"
-          className="fixed left-3 top-10 z-40 inline-flex h-9 w-9 items-center justify-center rounded-md border border-ink-200 bg-white text-ink-700 shadow-sm hover:bg-ink-50 md:hidden"
-        >
-          <Menu className="h-4 w-4" />
-        </button>
-      )}
-
-      {/* Mobile backdrop */}
+      {/* Mobile backdrop. The hamburger that opens the drawer lives in
+          <MobileTopBar />, rendered by the layout. */}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-40 bg-ink-950/40 md:hidden"

@@ -64,15 +64,15 @@ export function ContractsTable({ contracts, filter, onFilterChange, awaitingRole
 
   return (
     <section className="panel overflow-hidden">
-      <header className="flex flex-wrap items-center justify-between gap-2 border-b border-ink-100 px-5 py-3">
-        <div className="flex items-center gap-1">
+      <header className="flex flex-col gap-2 border-b border-ink-100 px-4 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:px-5">
+        <div className="-mx-4 flex items-center gap-1 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {FILTERS.map((f) => (
             <button
               key={f.id}
               onClick={() => onFilterChange(f.id)}
               title={f.tooltip}
               className={clsx(
-                "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                "shrink-0 whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
                 filter === f.id ? "bg-ink-900 text-white" : "text-ink-600 hover:bg-ink-100",
               )}
             >
@@ -213,7 +213,7 @@ function TypeLegend({
   for (const c of contracts) counts.set(c.type, (counts.get(c.type) ?? 0) + 1);
   const entries = DOC_TYPE_ORDER.filter((t) => counts.has(t)).map((t) => [t, counts.get(t)!] as [DocumentType, number]);
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-ink-100 bg-ink-50/40 px-5 py-2.5 text-[11px] text-ink-500">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-ink-100 bg-ink-50/40 px-4 py-2.5 text-[11px] text-ink-500 sm:px-5">
       <span className="font-medium uppercase tracking-wider">Mix:</span>
       {entries.map(([type, n]) => {
         const active = activeType === type;

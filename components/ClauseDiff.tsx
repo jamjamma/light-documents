@@ -25,16 +25,82 @@ export function ClauseDiff({ results }: Props) {
 
   return (
     <div>
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="text-sm text-ink-700">{summarizeChecks(results)}</div>
-        <div className="flex items-center gap-3 text-[11px] text-ink-500">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-ink-500">
           <span className="inline-flex items-center gap-1.5"><Check className="h-3 w-3 text-sage-500" /> standard</span>
           <span className="inline-flex items-center gap-1.5"><AlertTriangle className="h-3 w-3 text-accent-500" /> warn</span>
           <span className="inline-flex items-center gap-1.5"><OctagonAlert className="h-3 w-3 text-rose-500" /> block</span>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-ink-100">
+      {/* Mobile: stacked cards (4-column table squeezes badly under ~480px) */}
+      <ul className="space-y-2 sm:hidden">
+        {results.map((r) => {
+          const isDeviation = r.status === "deviation";
+          const meta = isDeviation ? SEVERITY_META[r.severity] : SEVERITY_META.info;
+          const isOpen = expanded === r.key;
+          return (
+            <li
+              key={r.key}
+              className={clsx(
+                "overflow-hidden rounded-lg border border-ink-100 bg-white text-[13px]",
+                isDeviation && meta.row,
+              )}
+            >
+              <button
+                type="button"
+                onClick={() => setExpanded(isOpen ? null : r.key)}
+                className="flex w-full items-start gap-2.5 px-3 py-2.5 text-left"
+              >
+                <span className={clsx("mt-0.5 shrink-0", meta.tone)}>
+                  {isDeviation ? meta.icon : <Check className="h-3.5 w-3.5 text-sage-500" />}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium text-ink-900">{r.label}</div>
+                  <div className="mt-1 grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5 text-[12px]">
+                    <span className="text-ink-500">Master expects</span>
+                    <span className="text-ink-700">{r.expected}</span>
+                    <span className="text-ink-500">Observed</span>
+                    <span className={clsx(isDeviation ? "font-medium text-ink-900" : "text-ink-700")}>
+                      {r.observed}
+                    </span>
+                  </div>
+                </div>
+                <ChevronDown
+                  className={clsx(
+                    "mt-0.5 h-4 w-4 shrink-0 text-ink-400 transition-transform",
+                    isOpen && "rotate-180",
+                  )}
+                />
+              </button>
+              {isOpen && (
+                <div className="border-t border-ink-100 px-3 py-2.5">
+                  {isDeviation ? (
+                    <div className="space-y-1">
+                      <div className="flex items-start gap-1.5 text-[12px]">
+                        <span className={meta.tone}>{meta.icon}</span>
+                        <span className="font-medium text-ink-900">
+                          {r.severity === "block" ? "Blocking" : r.severity === "warn" ? "Warning" : "Note"}: deviates from master
+                        </span>
+                      </div>
+                      {r.reason && <div className="ml-5 text-[12px] text-ink-700">{r.reason}</div>}
+                    </div>
+                  ) : (
+                    <div className="flex items-start gap-1.5 text-[12px]">
+                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-sage-500" />
+                      <span className="text-ink-700">Standard. Matches the master template.</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* Desktop / tablet: keep the table */}
+      <div className="hidden overflow-hidden rounded-lg border border-ink-100 sm:block">
         <table className="text-sm">
           <thead className="bg-ink-50/60">
             <tr className="border-b border-ink-100">

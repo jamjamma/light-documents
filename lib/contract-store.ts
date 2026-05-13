@@ -357,7 +357,10 @@ export function reassignApproval(input: {
 
   const intent = input.intent ?? "reassign";
   const verb = intent === "pass_on" ? "passed on" : "reassigned";
-  const withOverride = appendAudit(
+  const channel = approvals.find((a) => a.role === input.role)?.channel ?? "Slack DM";
+
+  // 1. Override event itself.
+  let working = appendAudit(
     { ...contract, approvals: next },
     {
       at: now(),
@@ -366,14 +369,50 @@ export function reassignApproval(input: {
       meta: input.reason,
     },
   );
-  const withNotification = appendAudit(withOverride, {
+
+  // 2. Notification fan-out. The matrix:
+  //   Reassign: new approver (action) + previous assignee (removed from queue) + contract owner (chain changed).
+  //   Pass on:  new approver (action + "covering for X") + contract owner (FYI) + Head of F&O (queue-mgmt signal).
+  // The operator who initiated a Reassign is presumed present (they clicked the button); same for the assignee who passed on.
+  const newDm = intent === "pass_on"
+    ? `Slack DM sent to ${newMember.name} (${input.role}) — covering for ${oldName}`
+    : `Slack DM sent to ${newMember.name} (${input.role})`;
+  working = appendAudit(working, {
     at: now(),
     actor: "system",
-    event: `Slack DM sent to ${newMember.name} (${input.role})`,
-    meta: `Channel: ${approvals.find((a) => a.role === input.role)?.channel ?? "Slack DM"}`,
+    event: newDm,
+    meta: `Channel: ${channel}`,
   });
 
-  return saveContract(withNotification);
+  if (intent === "reassign") {
+    // Tell the previous assignee they're off the hook.
+    working = appendAudit(working, {
+      at: now(),
+      actor: "system",
+      event: `Slack DM sent to ${oldName} — removed from your queue`,
+      meta: `Reassigned to ${newMember.name} by ${input.byUserName}`,
+    });
+  } else {
+    // Pass-on: surface to Head of F&O for queue management.
+    working = appendAudit(working, {
+      at: now(),
+      actor: "system",
+      event: `Slack DM sent to Head of Finance & Ops — pass-on logged`,
+      meta: `${oldName} passed ${input.role} to ${newMember.name}. Workload + specialty signal.`,
+    });
+  }
+
+  // Contract owner always gets a chain-changed FYI when they didn't initiate the action.
+  if (working.owner !== input.byUserName) {
+    working = appendAudit(working, {
+      at: now(),
+      actor: "system",
+      event: `Slack DM sent to ${working.owner} — approval chain updated`,
+      meta: `${input.role}: ${oldName} → ${newMember.name} (${intent === "pass_on" ? "pass-on" : "reassign"})`,
+    });
+  }
+
+  return saveContract(working);
 }
 
 /**

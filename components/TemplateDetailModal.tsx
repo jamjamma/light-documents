@@ -156,7 +156,29 @@ export function TemplateDetailModal({
             <Workflow className="h-3 w-3" />
             Clause rules ({template.clauseRules.length})
           </div>
-          <div className="overflow-hidden rounded-lg border border-ink-100">
+
+          {/* Mobile: stacked cards (table cells wrap one word per line at this width) */}
+          <ul className="space-y-2 sm:hidden">
+            {template.clauseRules.map((rule) => (
+              <li key={rule.key} className="rounded-lg border border-ink-100 bg-white p-3 text-[12px]">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="font-medium text-ink-900">{rule.label}</div>
+                  <span className="inline-flex shrink-0 items-center gap-1.5">
+                    {SEVERITY_ICON[rule.severity]}
+                    <span className="capitalize text-ink-600">{rule.severity}</span>
+                  </span>
+                </div>
+                <div className="mt-1 text-ink-700">
+                  <span className="demo-note mr-1 normal-case">Expected:</span>
+                  {rule.expected}
+                </div>
+                <div className="mt-1 text-ink-500">{rule.reason}</div>
+              </li>
+            ))}
+          </ul>
+
+          {/* Desktop / tablet: table */}
+          <div className="hidden overflow-hidden rounded-lg border border-ink-100 sm:block">
             <table className="text-[12px]">
               <thead className="bg-ink-50/60">
                 <tr>
