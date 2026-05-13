@@ -123,10 +123,20 @@ export function Sidebar() {
           collapsed ? "md:w-16" : "md:w-60",
         )}
       >
-        <div className={clsx("flex items-center justify-between gap-2 px-3 py-5", collapsed ? "md:px-2.5" : "md:px-5")}>
+        <div
+          className={clsx(
+            "flex items-center px-3 py-5",
+            collapsed
+              ? "md:flex-col md:gap-3 md:px-2 md:py-4"
+              : "justify-between gap-2 md:px-5",
+          )}
+        >
           <Link
             href="/"
-            className="flex min-w-0 items-center gap-2"
+            className={clsx(
+              "flex min-w-0 items-center gap-2",
+              collapsed && "md:justify-center md:gap-0",
+            )}
             title={collapsed ? "Light Documents" : undefined}
           >
             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-ink-900">
@@ -152,7 +162,7 @@ export function Sidebar() {
             <X className="h-4 w-4" />
           </button>
 
-          {/* Desktop collapse toggle */}
+          {/* Desktop collapse toggle — sibling of logo, stacks below when collapsed */}
           <button
             type="button"
             onClick={toggleCollapsed}

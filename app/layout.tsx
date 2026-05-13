@@ -15,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <DemoBanner />
         <div className="flex">
           <Sidebar />
-          <main className="min-h-[calc(100vh-32px)] flex-1">{children}</main>
+          <main className="min-h-[calc(100vh-32px)] min-w-0 flex-1">{children}</main>
         </div>
       </body>
     </html>

@@ -32,6 +32,7 @@ import { ArrowLeft, FileSignature, Eye, AlertTriangle, Save } from "lucide-react
 import { formatEur, formatDateTime } from "@/lib/format";
 import { ReassignModal } from "@/components/ReassignModal";
 import { RejectModal } from "@/components/RejectModal";
+import { BackButton } from "@/components/BackButton";
 
 // Operator persona who appears in the audit trail as the actor for overrides.
 // In production this comes from auth (the logged-in user); for the demo it
@@ -160,11 +161,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
           { label: contract.name },
           { label: "In flight" },
         ]}
-        actions={
-          <Link href="/">
-            <Button variant="ghost" size="sm" leadingIcon={<ArrowLeft className="h-3.5 w-3.5" />}>Dashboard</Button>
-          </Link>
-        }
+        actions={<BackButton fallback="/" label="Back" />}
       />
 
       <div className="space-y-4 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">

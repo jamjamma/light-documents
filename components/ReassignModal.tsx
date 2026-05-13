@@ -214,6 +214,11 @@ export function ReassignModal({ open, approval, onClose, onConfirm }: Props) {
           <span className="demo-note mr-1.5">Workflow</span>
           On confirm: the chain updates, an audit event records the override + reason, and a simulated Slack DM is sent to the new approver. In production, that DM has inline Approve / Reject buttons; the override is also visible to {currentName} in their notifications.
         </div>
+
+        <div className="rounded-lg border border-dashed border-ink-200 bg-white px-3 py-2.5 text-[11px] text-ink-500">
+          <span className="demo-note mr-1.5">Out of scope here</span>
+          To <strong>add or remove members</strong> from the {approval.role} group, or to mark yourself out-of-office, use <strong>Settings → Approvers</strong> (Head of Finance &amp; Ops only). Reassign is for routing within an existing group; membership lives in the directory.
+        </div>
       </div>
     </Modal>
   );

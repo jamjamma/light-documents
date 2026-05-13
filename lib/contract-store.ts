@@ -15,6 +15,12 @@ const STATE_VERSION = 6;
 interface StoredState {
   version: number;
   contracts: Record<string, Contract>;
+  /**
+   * Source records added at runtime via "Add manually" in the new-contract
+   * flow. Persisted separately from the seed SOURCE_RECORDS so reset clears
+   * them without touching the mock data.
+   */
+  manualSourceRecords?: import("./types").SourceRecord[];
   seededAt: string;
 }
 
@@ -106,6 +112,45 @@ export function listContracts(): Contract[] {
 export function getContract(id: string): Contract | undefined {
   const state = ensureSeeded();
   return state.contracts[id];
+}
+
+// ── Source records (mock + manually added) ───────────────────────────────────
+
+import type { SourceRecord } from "./types";
+import { SOURCE_RECORDS } from "./mock-data";
+
+/** All source records: seeded mock data plus any manual entries from localStorage. */
+export function listAllSourceRecords(): SourceRecord[] {
+  const state = ensureSeeded();
+  return [...SOURCE_RECORDS, ...(state.manualSourceRecords ?? [])];
+}
+
+export function listSourceRecordsByType(type: SourceRecord["type"]): SourceRecord[] {
+  return listAllSourceRecords().filter((r) => r.type === type);
+}
+
+/**
+ * Persist a new manually-entered source record. Generates an id + syncedAt
+ * if not provided. New records show up immediately in the picker.
+ *
+ * In production this would also write a Salesforce/HRIS "manual record"
+ * placeholder so downstream systems see the source-of-truth.
+ */
+export function addManualSourceRecord(input: Omit<SourceRecord, "id" | "syncedAt" | "system"> & { system?: SourceRecord["system"] }): SourceRecord {
+  const state = ensureSeeded();
+  const id = `src_manual_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const record: SourceRecord = {
+    ...input,
+    id,
+    system: input.system ?? "Manual entry",
+    syncedAt: now(),
+  };
+  const next: StoredState = {
+    ...state,
+    manualSourceRecords: [...(state.manualSourceRecords ?? []), record],
+  };
+  writeState(next);
+  return record;
 }
 
 // ── Commands (each returns the updated contract, never mutates) ──────────────

@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import clsx from "clsx";
 import { Search, Plug, Plus, Check } from "lucide-react";
-import { SOURCE_RECORDS } from "@/lib/mock-data";
+import { listAllSourceRecords } from "@/lib/contract-store";
 import type { SourceRecord, Template, SourceSystem } from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
 import { EmptyState } from "./ui/EmptyState";
 import { Button } from "./ui/Button";
+import { ManualEntryModal } from "./ManualEntryModal";
 
 interface Props {
   template: Template;
@@ -36,9 +37,22 @@ function recordTypeForTemplate(t: Template): SourceRecord["type"] {
 export function RecordPicker({ template, selected, onSelect }: Props) {
   const [q, setQ] = useState("");
   const [systemFilter, setSystemFilter] = useState<SourceSystem | "all">("all");
+  const [manualOpen, setManualOpen] = useState(false);
+  // Bump to force re-read after the manual-entry modal saves.
+  const [revision, setRevision] = useState(0);
 
   const wanted = recordTypeForTemplate(template);
-  const eligible = useMemo(() => SOURCE_RECORDS.filter((r) => r.type === wanted), [wanted]);
+  const allRecords = useMemo(() => listAllSourceRecords(), [revision]);
+  const eligible = useMemo(() => allRecords.filter((r) => r.type === wanted), [allRecords, wanted]);
+
+  // Listen for cross-tab updates (e.g., reset demo) so the picker stays fresh.
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "light-documents-state") setRevision((r) => r + 1);
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   const systemCounts = useMemo(() => {
     const counts = new Map<SourceSystem, number>();
@@ -94,7 +108,12 @@ export function RecordPicker({ template, selected, onSelect }: Props) {
             className="h-9 w-full rounded-lg border border-ink-200 bg-white pl-9 pr-3 text-sm placeholder:text-ink-400 focus:border-ink-400 focus:outline-none"
           />
         </div>
-        <Button variant="secondary" size="sm" leadingIcon={<Plus className="h-3.5 w-3.5" />}>
+        <Button
+          variant="secondary"
+          size="sm"
+          leadingIcon={<Plus className="h-3.5 w-3.5" />}
+          onClick={() => setManualOpen(true)}
+        >
           Add manually
         </Button>
       </div>
@@ -113,12 +132,20 @@ export function RecordPicker({ template, selected, onSelect }: Props) {
               <>
                 <Button variant="secondary" size="sm">Connect Salesforce</Button>
                 <Button variant="secondary" size="sm">Connect HubSpot</Button>
-                <Button variant="ghost" size="sm" leadingIcon={<Plus className="h-3.5 w-3.5" />}>Add manually</Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  leadingIcon={<Plus className="h-3.5 w-3.5" />}
+                  onClick={() => setManualOpen(true)}
+                >
+                  Add manually
+                </Button>
               </>
             ) : null
           }
         />
       ) : (
+        <>
         <div className="grid gap-2 sm:grid-cols-2">
           {filtered.map((r) => {
             const active = selected?.id === r.id;
@@ -175,7 +202,18 @@ export function RecordPicker({ template, selected, onSelect }: Props) {
             );
           })}
         </div>
+        </>
       )}
+
+      <ManualEntryModal
+        open={manualOpen}
+        template={template}
+        onClose={() => setManualOpen(false)}
+        onCreated={(record) => {
+          setRevision((r) => r + 1);
+          onSelect(record);
+        }}
+      />
     </div>
   );
 }
