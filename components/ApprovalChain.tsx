@@ -20,6 +20,13 @@ interface Props {
    */
   onUndoApprove?: (approval: Approval) => void;
   canUndoApprove?: (approval: Approval) => boolean;
+  /**
+   * Logged-in operator's display name (e.g. "Martina Holst" in this demo).
+   * Used to distinguish the operator's own approval row (where the action is
+   * a real "Approve" since they're already in the app) from approvals
+   * assigned to others (where we simulate them clicking Approve in Slack).
+   */
+  operatorName?: string;
 }
 
 /**
@@ -39,6 +46,7 @@ export function ApprovalChain({
   onReject,
   onUndoApprove,
   canUndoApprove,
+  operatorName,
 }: Props) {
   if (approvals.length === 0) {
     return null;
@@ -124,20 +132,29 @@ export function ApprovalChain({
               </div>
             </div>
 
-            {a.status === "pending" && onSimulateApprove && (
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-ink-100 pt-3">
-                <div className="text-[11px] text-ink-500">
-                  <span className="demo-note mr-1.5">Demo</span>
-                  Real product Slacks {personName} with one-click Approve / Reject buttons.
+            {a.status === "pending" && onSimulateApprove && (() => {
+              const isOperator = operatorName !== undefined && personName === operatorName;
+              return (
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-ink-100 pt-3">
+                  <div className="text-[11px] text-ink-500">
+                    {isOperator ? (
+                      <>You are signed in as {personName}. Approving here is real.</>
+                    ) : (
+                      <>
+                        <span className="demo-note mr-1.5">Demo</span>
+                        Real product Slacks {personName} with one-click Approve / Reject buttons.
+                      </>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => onSimulateApprove(a)}
+                    className="rounded-md bg-ink-900 px-3 py-1.5 text-[11px] font-medium text-white hover:bg-ink-800"
+                  >
+                    {isOperator ? "Approve" : `Simulate ${personName.split(" ")[0]} approves`}
+                  </button>
                 </div>
-                <button
-                  onClick={() => onSimulateApprove(a)}
-                  className="rounded-md bg-ink-900 px-3 py-1.5 text-[11px] font-medium text-white hover:bg-ink-800"
-                >
-                  Simulate {personName.split(" ")[0]} approves
-                </button>
-              </div>
-            )}
+              );
+            })()}
 
             {a.status === "rejected" && a.decidedBy && (
               <div className="mt-2 flex items-start gap-1.5 rounded-md bg-rose-50 px-2.5 py-1.5 text-[11px] text-rose-700 ring-1 ring-inset ring-rose-200">

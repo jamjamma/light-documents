@@ -23,6 +23,12 @@ interface Props {
   contract: Contract;
   template: Template;
   onSend: () => Promise<void>;
+  /**
+   * True only when the approval chain is fully satisfied and the contract is
+   * ready to send. When false the modal still opens (so the operator can
+   * inspect the populated envelope) but the Send button is disabled.
+   */
+  canSend: boolean;
 }
 
 const SIDE_COLOR: Record<SignerDef["side"], { bg: string; ring: string; text: string; tab: string; tabText: string }> = {
@@ -31,7 +37,7 @@ const SIDE_COLOR: Record<SignerDef["side"], { bg: string; ring: string; text: st
   witness: { bg: "bg-purple-50", ring: "ring-purple-300", text: "text-purple-800", tab: "bg-purple-300", tabText: "text-purple-950" },
 };
 
-export function DocuSignPreviewModal({ open, onClose, contract, template, onSend }: Props) {
+export function DocuSignPreviewModal({ open, onClose, contract, template, onSend, canSend }: Props) {
   const [sending, setSending] = useState(false);
   const [showApi, setShowApi] = useState(false);
   const [page, setPage] = useState(1);
@@ -39,6 +45,7 @@ export function DocuSignPreviewModal({ open, onClose, contract, template, onSend
   const signers = resolveSigners(contract, template);
   const envelopeId = contract.envelopeId ?? "DS-XXXXX (preview)";
   const subject = `Please sign: ${contract.name}`;
+  const pendingApprovals = (contract.approvals ?? []).filter((a) => a.status === "pending").length;
 
   const handleSend = async () => {
     setSending(true);
@@ -69,7 +76,12 @@ export function DocuSignPreviewModal({ open, onClose, contract, template, onSend
             {showApi ? "Hide" : "Show"} API call
           </Button>
           <Button variant="ghost" onClick={onClose} disabled={sending}>Close</Button>
-          <Button onClick={handleSend} leadingIcon={sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />} disabled={sending}>
+          <Button
+            onClick={handleSend}
+            leadingIcon={sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+            disabled={sending || !canSend}
+            title={!canSend ? `Send blocked until all approvals complete (${pendingApprovals} pending).` : undefined}
+          >
             {sending ? "Creating envelope..." : "Send via DocuSign"}
           </Button>
         </>
@@ -78,6 +90,11 @@ export function DocuSignPreviewModal({ open, onClose, contract, template, onSend
       <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
         <RecipientSidebar signers={signers} template={template} />
         <div className="space-y-3">
+          {!canSend && (
+            <div className="rounded-lg border border-accent-200 bg-accent-50 px-3 py-2 text-[12px] text-ink-700">
+              <strong>Send blocked.</strong> {pendingApprovals} approval(s) still pending. You can inspect the populated envelope here, but the Send button stays disabled until the approval chain is complete.
+            </div>
+          )}
           <DocumentPage
             page={page}
             totalPages={totalPages}

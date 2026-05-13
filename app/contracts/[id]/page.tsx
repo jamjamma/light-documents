@@ -219,6 +219,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
               onReject={(a) => setRejectFor(a)}
               onUndoApprove={handleUndoApprove}
               canUndoApprove={canUndoApprove}
+              operatorName={OPERATOR_NAME}
             />
           </Card>
         )}
@@ -284,6 +285,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
         contract={contract}
         template={template}
         onSend={handleSend}
+        canSend={canSend}
       />
 
       <ReassignModal
