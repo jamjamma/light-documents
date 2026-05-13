@@ -81,7 +81,7 @@ Storage: single `localStorage` key `light-documents-state` holding `{version, co
 
 ### Templates (`lib/mock-data.ts`)
 
-5 templates, each with:
+8 templates, each with:
 - `clauseRules: ClauseRule[]` (drives the clause checker)
 - `docusignFeatures: { qesRequired, smsVerification, witnessRequired, powerFormCapable, bulkSendCapable, expiryDays, reminderDays, signingOrder }` (per-template DocuSign config)
 - `conditionalSections: ConditionalSection[]` (exhibits attached based on field values, e.g., commission plan exhibit for sales roles)
@@ -94,7 +94,7 @@ CRM-agnostic: a `SourceRecord` carries a `system` field. Mock data spans Salesfo
 
 ### Seed contracts
 
-8 pre-seeded contracts spanning all lifecycle stages. Pre-hydrated at module load: contracts past `draft` stage have their `clauseResults` and `approvals` pre-computed by running the actual engines, so the detail page renders meaningful data on first open.
+14 pre-seeded contracts spanning all lifecycle stages. Pre-hydrated at module load: contracts past `draft` stage have their `clauseResults` and `approvals` pre-computed by running the actual engines, so the detail page renders meaningful data on first open.
 
 ## How Word documents connect
 

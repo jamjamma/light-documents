@@ -10,7 +10,7 @@ Open `http://localhost:3000`. Point at the AboutWidget on the Dashboard. Read th
 
 ## 0:30 to 1:30 — Dashboard + the high-risk path (Bolt MSA)
 
-> "Dashboard shows 6 contracts in flight, 2 blocked, average cycle 3 days. Let me click into the high-risk one."
+> "Dashboard shows 10 contracts in flight, 4 blocked, 3 signed this week, average cycle 3 days. Let me click into the high-risk one."
 
 Click Bolt MSA.
 
@@ -60,7 +60,7 @@ Point at the Audit Trail.
 
 Click Templates in sidebar.
 
-> "Five templates supported: NDA, MSA, Employment, Warrant, Vendor. Each has its own clause rules, DocuSign feature config, and conditional sections. NDAs can use PowerForms for recruitment funnels. Warrants require eIDAS QES and a witness signer. Employment offers use SMS identity verification. The pattern is the same: counsel keeps Word, we read it, DocuSign signs it, the ledger absorbs it."
+> "Eight templates supported: NDA, MSA, MSA Pilot, Order Form, Employment DK, Employment UK, Warrant, Advisor Warrant. Each has its own clause rules, DocuSign feature config, and conditional sections. Warrants require eIDAS QES and a witness signer. Employment offers use SMS identity verification. The pattern is the same: counsel keeps Word, we read it, DocuSign signs it, the ledger absorbs it."
 
 Click About in sidebar (briefly), then close.
 

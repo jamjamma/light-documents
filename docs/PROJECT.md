@@ -95,7 +95,7 @@ The four exits (Slack / DocuSign / Email / Ledger) are the four real-world surfa
         │  contract-store    state machine + journey commands +           │
         │                    localStorage adapter (the operating core)    │
         │                                                                 │
-        │  mock-data         8 templates, 8 source records, 8 seed        │
+        │  mock-data         8 templates, 14 source records, 14 seed     │
         │                    contracts hydrated through the real engines  │
         │                                                                 │
         │  format.ts         EUR / date / initials helpers                │

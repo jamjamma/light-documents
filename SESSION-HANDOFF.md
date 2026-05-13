@@ -9,8 +9,8 @@
 runs with `npm run dev`. Build is green, no console errors, no horizontal
 overflow at iPhone 14 Pro width.
 
-- 7 templates (NDA, MSA, MSA Pilot, Order Form, Employment DK, Employment UK, Warrant, Advisor Warrant).
-- 11 in-flight + 4 signed seed contracts spanning every dashboard filter.
+- 8 templates (NDA, MSA, MSA Pilot, Order Form, Employment DK, Employment UK, Warrant, Advisor Warrant).
+- 10 in-flight + 4 signed seed contracts spanning every dashboard filter.
 - 8 routes, all 200, typecheck clean, production build clean.
 - `STATE_VERSION = 7`. localStorage shape: `{version, contracts, manualSourceRecords?, rogueActions?, seededAt}`.
 
@@ -153,7 +153,7 @@ light-documents/
     └── PART-3-DAY-ONE.md
 ```
 
-## Templates (7)
+## Templates (8)
 
 | Type | Templates |
 |---|---|
@@ -169,7 +169,7 @@ conditional sections, and anchor tags.
 
 | Filter | Count |
 |---|---|
-| All in-flight | 11 |
+| All in-flight | 10 |
 | Awaiting me (Head of F&O) | 3 |
 | Blocked | 4 |
 | Signed this month | 4 |

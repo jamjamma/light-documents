@@ -64,18 +64,18 @@ Requires Node 20+. No env vars, no auth, no database. State persists in localSto
 
 | Step | What you click | What happens |
 |---|---|---|
-| 1 | Land on Dashboard | KPI strip (6 in-flight, 2 blocked, avg cycle 3 days), AboutWidget with the reframe, contracts table with filter chips |
+| 1 | Land on Dashboard | KPI strip (10 in-flight, 4 blocked, 3 signed this week, avg cycle 3 days), AboutWidget with the reframe, contracts table with filter tabs |
 | 2 | Click "Bolt MSA" (high-risk, in review) | Detail page renders with 3 clause deviations flagged (Net 60, unlimited liability, customer-only indemnity) and 3 approval chips pending (Legal, Head of Finance, CFO) |
 | 3 | Click "Simulate: Legal approves" | Legal chip flips green. Status updates. Audit trail appends event |
 | 4 | Click "Preview envelope" | Modal opens with populated MSA, variables highlighted, anchor tags highlighted, DocuSign features listed (sequential signing, 30-day expiry, day-3-7-14 reminders), conditional sections listed (Service Level Exhibit, DPA, eIDAS QES because €180k EU) |
 | 5 | Approve remaining chips, click "Send via DocuSign" | Simulated 1.5-second loading, then routes to Signed Record page with audit trail and Light ledger writeback (MRR, ARR, renewal alert) |
-| 6 | Click "+ New contract" | Three-step intake: pick template (7 options), pick source record (filtered by template type, shows source system badge; or switch to **Manual entry** to add a record that isn't in any CRM), confirm details (form prefilled, live validation warnings) |
-| 7 | Click into "Templates" in sidebar | All 7 templates with their clause rules visible, sync metadata from Drive shown. Expand "Rogue templates detected in Drive" → 4 rogue files with Archive + Notify owner actions wired end-to-end (Notify shows the actual Slack DM body) |
+| 6 | Click "+ New contract" | Three-step intake: pick template (8 options), pick source record (filtered by template type, shows source system badge; or switch to **Manual entry** to add a record that isn't in any CRM), confirm details (form prefilled, live validation warnings) |
+| 7 | Click into "Templates" in sidebar | All 8 templates with their clause rules visible, sync metadata from Drive shown. Expand "Rogue templates detected in Drive" → 4 rogue files with Archive + Notify owner actions wired end-to-end (Notify shows the actual Slack DM body) |
 | 8 | Mid-flow, change mind on an approval you just made | Each row you approved shows an **Undo my approval** pill. Click it → row goes back to pending. If yours was the last vote, the contract walks back from ready_to_send → awaiting_approval. |
 | 9 | Resize to mobile width | Sidebar disappears; a sticky top bar holds the hamburger + brand. KPIs stack 2x2. Clause review becomes stacked cards. Every action bar wraps cleanly. |
 | 10 | Click "About this build" in sidebar | Full submission memo in-app, including a "Legal keeps Word, not us" callout and a cast list naming every demo persona (Sara Friis, Martina Holst, Tom Bauer, etc.) as illustrative. |
 
-11 in-flight + 4 signed contracts pre-seeded across all dashboard filters. Personas (Sara Friis, Martina Holst, Tom Bauer, Sara Lindberg, Anna Lind, Pia Andersen, Plesner, Astrid/Christian/Emma) are stand-ins, called out explicitly on `/about`.
+10 in-flight + 4 signed contracts pre-seeded across all dashboard filters. Personas (Sara Friis, Martina Holst, Tom Bauer, Sara Lindberg, Anna Lind, Pia Andersen, Plesner, Astrid/Christian/Emma) are stand-ins, called out explicitly on `/about`.
 
 ## What works vs what is stubbed (honest)
 
@@ -106,7 +106,7 @@ app/
 ├── globals.css                              Tailwind base + design tokens
 ├── layout.tsx                               Shell (DemoBanner + Sidebar + main)
 ├── page.tsx                                 Dashboard
-├── templates/page.tsx                       Templates library (all 5 templates with clause rules)
+├── templates/page.tsx                       Templates library (all 7 templates with clause rules + rogue panel)
 ├── about/page.tsx                           In-app submission memo
 └── contracts/
     ├── new/page.tsx                         3-step intake (template → record → confirm)
@@ -135,7 +135,7 @@ components/
 
 lib/
 ├── types.ts                                 Full TypeScript types (Template, Contract, ClauseRule, RoutingRule, RogueTemplate, ...)
-├── mock-data.ts                             7 templates with clause rules + DocuSign config + conditional sections, 14 source records across CRM/HRIS systems, 11 in-flight + 4 signed seed contracts, 4 rogue templates
+├── mock-data.ts                             8 templates with clause rules + DocuSign config + conditional sections, 14 source records across CRM/HRIS systems, 10 in-flight + 4 signed seed contracts, 4 rogue templates
 ├── clause-checker.ts                        Pure deterministic rules engine
 ├── routing-rules.ts                         13 typed routing rules with reasons + channels
 ├── approver-directory.ts                    6 approver groups + specialty matching + PTO delegations
