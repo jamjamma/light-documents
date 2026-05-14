@@ -268,10 +268,13 @@ export default function ArchivePage() {
 }
 
 function SignedRow({ contract: c }: { contract: Contract }) {
+  const isHero = c.id === "c_bolt_msa";
   return (
     <Link
       href={`/contracts/${c.id}/signed`}
-      className="group flex items-start gap-3 px-3 py-3 hover:bg-ink-50/60 sm:px-4"
+      className={`group flex items-start gap-3 px-3 py-3 hover:bg-ink-50/60 sm:px-4 ${
+        isHero ? "tour-anchor-archive-bolt-row" : ""
+      }`}
     >
       <DocumentTypeIcon type={c.type} size="sm" />
       <div className="min-w-0 flex-1">

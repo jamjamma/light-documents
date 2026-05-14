@@ -59,7 +59,18 @@ export type TourEffect =
   | "archive:filter:all"
   | "archive:filter:customer"
   | "archive:filter:people"
-  | "archive:filter:equity";
+  | "archive:filter:equity"
+  // Open the DocuSign envelope preview modal on the contract detail page.
+  // Idempotent: firing this when the modal is already open is a no-op.
+  | "modal:open"
+  // Programmatically expand the Envelope-configuration <details> in the
+  // preview modal so driver.js highlights the full disclosure, not the
+  // collapsed 1-line summary.
+  | "modal:expand-config"
+  // Scroll the modal's overflow-y-auto container so the anchor-tags bar is
+  // visible. driver.js's smoothScroll handles window scrolling but not
+  // nested scroll containers.
+  | "modal:scroll-anchortags";
 
 export interface TourStep {
   /** Stable id, used for de-dupe in the controller render guard. */
@@ -255,15 +266,15 @@ export const TOUR_STEPS: TourStep[] = [
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-approval-chain",
     side: "top",
-    title: "Approve all the approvers",
+    title: "Approve every approver",
     description: `
       <ul>
         <li>Find the <strong>Martina Holst</strong> row. Click <strong>Approve</strong>.</li>
         <li>Pill flips green; <strong>Undo</strong> appears next to it.</li>
         <li>For the other rows, click <strong>Simulate X approves</strong>. They represent Slack DM responses.</li>
-        <li>Once everyone is green, the Send button unlocks.</li>
+        <li>Once every row is green, the Send button unlocks.</li>
       </ul>
-      <p class="muted"><em>Click Next when all rows are approved.</em></p>
+      <p class="muted"><strong>Don't skip rows.</strong> If you click Next with pending approvals, the Send button will be greyed out at the next step and you'll have to come back here.</p>
     `,
     next: "advance",
   },
@@ -274,10 +285,12 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Preview the envelope",
     description: `
-      <p>Click <strong>Preview envelope</strong> below to open the DocuSign envelope modal.</p>
-      <p class="muted">We'll walk through its features inside.</p>
+      <p>The DocuSign envelope preview opens. We'll walk through what's inside before sending.</p>
+      <p class="muted"><strong>Send is greyed out?</strong> Approvals are not complete. Click <strong>Back</strong> and finish the chain (every row green) before re-opening the preview.</p>
     `,
     next: "advance",
+    // Auto-open the modal so the next step's anchors exist when polled.
+    effect: "modal:open",
   },
 
   // ── Act 4: DocuSign preview modal walk ────────────────────────────────
@@ -296,6 +309,7 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted">Sequential routing; reminders kick in by day 3.</p>
     `,
     next: "advance",
+    effect: "modal:open",
   },
   {
     id: "modal-config",
@@ -304,10 +318,13 @@ export const TOUR_STEPS: TourStep[] = [
     side: "right",
     title: "Envelope configuration",
     description: `
-      <p>Audit-view disclosure. Click <strong>Expand</strong> to see expiry, reminder schedule, signing order, and any extras (eIDAS QES, SMS OTP, witness).</p>
+      <p>Audit-view disclosure. Expiry, reminder schedule, signing order, and any extras (eIDAS QES, SMS OTP, witness).</p>
       <p class="muted">Defaults come from the template's DocuSign feature config.</p>
     `,
     next: "advance",
+    // Pre-expand the <details> before driver.js anchors so the highlight
+    // wraps the open panel, not the collapsed 1-line summary.
+    effect: "modal:expand-config",
   },
   {
     id: "modal-document",
@@ -320,6 +337,7 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted">Use the page nav below to flip through. Page numbers vary by template type.</p>
     `,
     next: "advance",
+    effect: "modal:open",
   },
   {
     id: "modal-anchortags",
@@ -332,6 +350,8 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted">Counsel types these once into the master. Zero per-contract dragging.</p>
     `,
     next: "advance",
+    // Scrolls the inner overflow-y-auto modal container so the bar is in view.
+    effect: "modal:scroll-anchortags",
   },
   {
     id: "modal-send",
@@ -340,10 +360,11 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Send via DocuSign",
     description: `
-      <p>Click <strong>Send via DocuSign</strong>. The envelope fires, the contract advances to signed, and the page auto-redirects to the signed record.</p>
-      <p class="muted"><em>If the modal closed, click Preview envelope again and find this button in the footer.</em></p>
+      <p>Click <strong>Send via DocuSign</strong>. The envelope fires, the contract advances to signed, and the page redirects to the signed record. The tour will follow.</p>
+      <p class="muted"><strong>Send still disabled?</strong> Approvals are incomplete. Click <strong>Back</strong> (or close this modal) and return to the approval chain. Approve every row, then re-open the preview from the contract page.</p>
     `,
     next: "advance",
+    effect: "modal:open",
   },
 
   // ── Act 5: Bolt's signed page ─────────────────────────────────────────
@@ -378,12 +399,14 @@ export const TOUR_STEPS: TourStep[] = [
     side: "right",
     title: "Audit trail",
     description: `
+      <p>Append-only event log: every state transition the contract went through, from intake to filed.</p>
       <ul>
-        <li>Every state transition timestamped.</li>
-        <li>Actor recorded: user, system, or counterparty.</li>
-        <li>Notification channel (Slack DM, email, DocuSign) attached.</li>
+        <li><strong>Timestamps.</strong> Every transition recorded to the second.</li>
+        <li><strong>Actor.</strong> Real person (Martina, Magnus, Sara) for human decisions; system for automated transitions (routing fired, clauses checked, envelope completed); counterparty for external events.</li>
+        <li><strong>Channel.</strong> How the notification fired (Slack DM, email, DocuSign Connect webhook).</li>
+        <li><strong>Why-line.</strong> Each row carries the rule or rationale that triggered it.</li>
       </ul>
-      <p class="muted">7-year retention. Append-only. WORM compliant.</p>
+      <p class="muted"><em>Append-only. Even Undo writes a new row ("withdrew approval") rather than mutating the prior one. 7-year retention. WORM compliant for finance regulators.</em></p>
     `,
     next: "advance",
   },
@@ -412,11 +435,13 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "archive-overview",
     path: "/archive",
-    title: "Signed contracts archive",
+    selector: ".tour-anchor-archive-bolt-row",
+    side: "bottom",
+    title: "Bolt MSA, now filed",
     description: `
-      <p>Bolt is now alongside the other signed records.</p>
+      <p>Bolt sits alongside the other signed records (highlighted here). The journal-entry line beneath shows what the writeback emitted.</p>
       <ul>
-        <li><strong>KPI tiles.</strong> Counts by category, not financial totals.</li>
+        <li><strong>KPI tiles above.</strong> Counts by category, not financial totals.</li>
         <li><strong>Filter chips.</strong> All, Customer, People, Equity.</li>
         <li><strong>Section view</strong> when All is selected, grouped by category.</li>
       </ul>
@@ -532,10 +557,12 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "templates-counsel",
     path: "/templates",
+    selector: ".tour-anchor-counsel-section",
+    side: "bottom",
     title: "Counsel keeps Word for authoring",
     description: `
-      <p>Master templates stay as Word docs in Drive, edited where Counsel already edits.</p>
-      <p class="muted">Counsel may still log in to approve a clause deviation when one is routed to them. What stays out is authoring, not review.</p>
+      <p>This panel explains how Word documents connect. Master templates stay as <code>.docx</code> in Drive, edited where Counsel already edits. The Drive Watch API fires a webhook on every save; our platform parses the docx, extracts <code>{{variables}}</code> and <code>\\sig:anchor\\</code> tags, and caches.</p>
+      <p class="muted">The Legal team (illustrated in this demo by Sara Friis) may still log in to approve a clause deviation when one is routed to them. What stays out is authoring, not review.</p>
     `,
     next: "advance",
   },

@@ -30,6 +30,7 @@ import { getTemplate } from "@/lib/mock-data";
 import { allApproved } from "@/lib/routing-rules";
 import { lightSignerRationale } from "@/lib/signer-routing";
 import type { Contract, Approval } from "@/lib/types";
+import type { TourEffect } from "@/lib/tour-steps";
 import { ArrowLeft, FileSignature, Eye, AlertTriangle, Save } from "lucide-react";
 import { formatEur, formatDateTime } from "@/lib/format";
 import { ReassignModal } from "@/components/ReassignModal";
@@ -65,6 +66,47 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
     }
     refresh();
   }, [id]);
+
+  // Tour-driven side-effects: the controller dispatches `tour:effect` events
+  // when a step renders. We act on the modal-related ones so the preview modal
+  // is open (and its <details> is expanded, and its anchor-tags bar is
+  // scrolled into view) by the time driver.js polls for the step's anchor
+  // inside the modal. Idempotent — re-firing a modal:open while the modal is
+  // already open is a no-op.
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ effect?: TourEffect }>).detail;
+      switch (detail?.effect) {
+        case "modal:open":
+          setShowPreview(true);
+          break;
+        case "modal:expand-config":
+          setShowPreview(true);
+          // Defer so the modal is mounted, then expand the disclosure so the
+          // highlight stage wraps the open panel rather than the 1-line summary.
+          window.setTimeout(() => {
+            const details = document.querySelector(
+              ".tour-anchor-modal-config",
+            ) as HTMLDetailsElement | null;
+            if (details && !details.open) details.open = true;
+          }, 50);
+          break;
+        case "modal:scroll-anchortags":
+          setShowPreview(true);
+          // The anchor-tags bar lives below the document preview inside the
+          // modal's overflow-y-auto container. driver.js's smoothScroll only
+          // scrolls the window; scrollIntoView walks scrollable ancestors so
+          // it scrolls the inner modal correctly.
+          window.setTimeout(() => {
+            const el = document.querySelector(".tour-anchor-modal-anchortags");
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 100);
+          break;
+      }
+    };
+    window.addEventListener("tour:effect", handler);
+    return () => window.removeEventListener("tour:effect", handler);
+  }, []);
 
   if (contract === null) {
     return (

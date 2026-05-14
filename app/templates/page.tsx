@@ -70,6 +70,7 @@ export default function TemplatesPage() {
         }
       />
       <div className="space-y-4 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+        <div className="tour-anchor-counsel-section">
         <Card>
           <div className="flex items-start gap-4">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ink-900 text-accent-300">
@@ -101,6 +102,7 @@ export default function TemplatesPage() {
             </div>
           </div>
         </Card>
+        </div>
 
         {recentlyUpdated.length > 0 && (
           <div className="rounded-xl border border-sage-500/30 bg-sage-50/60 px-4 py-3">

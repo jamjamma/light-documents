@@ -87,9 +87,28 @@ export function TourController() {
         return;
       }
 
+      // Fire the optional side-effect ONCE, before the retry-poll begins.
+      // Listeners (the contract detail page, the dashboard) may need to mount
+      // new DOM in response to the effect — e.g. open the DocuSign preview
+      // modal, expand a <details>, scroll into view — and the polling below
+      // will wait up to ~2.5s for the resulting anchor to appear. Firing this
+      // before the poll is what makes "modal:open" + selector inside modal
+      // work in a single step.
+      let effectFired = false;
+      const fireEffectOnce = () => {
+        if (effectFired) return;
+        effectFired = true;
+        if (step.effect) {
+          window.dispatchEvent(
+            new CustomEvent("tour:effect", { detail: { effect: step.effect } }),
+          );
+        }
+      };
+
       // Retry-poll for the anchor element. After a router.push we land on the
       // new page but the anchor might mount a few frames later.
       const tryRender = (attempts: number) => {
+        fireEffectOnce();
         const el = step.selector
           ? (document.querySelector(step.selector) as HTMLElement | null)
           : null;
@@ -147,16 +166,6 @@ export function TourController() {
         driverInstanceRef.current = d;
         renderedStepIdRef.current = step.id;
         d.drive();
-
-        // Fire the optional side-effect for this step. Page-level listeners
-        // (e.g. the dashboard filtering its table) act on this. Fired AFTER
-        // d.drive() so the popover is already mounted when downstream UI
-        // updates.
-        if (step.effect) {
-          window.dispatchEvent(
-            new CustomEvent("tour:effect", { detail: { effect: step.effect } }),
-          );
-        }
       };
 
       tryRender(25); // up to ~2.5s of retries at 100ms each
