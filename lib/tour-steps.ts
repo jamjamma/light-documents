@@ -323,3 +323,19 @@ export function markTourSeen(): void {
     // ignore
   }
 }
+
+/**
+ * Wipe every tour-related flag. Called from Reset demo data so a single
+ * click returns the operator to a first-visit-ever state (tour will
+ * auto-start again on next dashboard load).
+ */
+export function resetTourState(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(TOUR_STATE_KEY);
+    window.localStorage.removeItem(TOUR_DISMISSED_KEY);
+    window.localStorage.removeItem(TOUR_SEEN_KEY);
+  } catch {
+    // ignore
+  }
+}

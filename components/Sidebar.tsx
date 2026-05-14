@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { resetDemo } from "@/lib/contract-store";
+import { resetTourState } from "@/lib/tour-steps";
 import { useMobileNav } from "./MobileNavContext";
 
 const NAV = [
@@ -70,6 +71,9 @@ export function Sidebar() {
 
   const onReset = () => {
     resetDemo();
+    // Also clear the tour flags so a single click returns the operator to
+    // a first-visit state: tour will auto-start on the next dashboard load.
+    resetTourState();
     setResetState("done");
     setTimeout(() => {
       window.location.href = "/";
@@ -234,7 +238,7 @@ export function Sidebar() {
 
           <button
             onClick={onReset}
-            title={collapsed ? "Reset demo data" : "Clears localStorage and re-seeds the demo data"}
+            title={collapsed ? "Reset demo data" : "Clears the contracts, rogue-template decisions, manual entries, AND tour state (dismissal + seen flag). Reloads the dashboard."}
             className={clsx(
               "flex w-full items-center gap-2.5 rounded-lg text-xs text-ink-500 hover:bg-ink-50",
               collapsed ? "md:justify-center md:px-2 md:py-2" : "px-3 py-2",
