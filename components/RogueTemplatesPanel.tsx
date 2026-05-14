@@ -6,6 +6,7 @@ import { Badge } from "./ui/Badge";
 import { Button } from "./ui/Button";
 import type { RogueTemplate, TemplateId } from "@/lib/types";
 import { formatDateTime } from "@/lib/format";
+import { readTourState, TOUR_STEPS } from "@/lib/tour-steps";
 import {
   AlertTriangle,
   Archive as ArchiveIcon,
@@ -40,16 +41,22 @@ const OPERATOR_NAME = "Martina Holst";
 export function RogueTemplatesPanel({ rogues, templateNameById }: Props) {
   const [open, setOpen] = useState(false);
 
-  // The tour fires `rogue:expand` to force the collapsible open before the
-  // step that highlights the per-row actions renders. Idempotent.
+  // When the user opens the panel during the `templates-rogue-expand` tour
+  // step, auto-advance the tour. This mirrors the modal-open pattern: the
+  // user takes the in-app action, the tour follows. Guarded by fromStepId
+  // so opening/closing the panel later doesn't unexpectedly advance.
   useEffect(() => {
-    const handler = (event: Event) => {
-      const detail = (event as CustomEvent<{ effect?: string }>).detail;
-      if (detail?.effect === "rogue:expand") setOpen(true);
-    };
-    window.addEventListener("tour:effect", handler);
-    return () => window.removeEventListener("tour:effect", handler);
-  }, []);
+    if (!open) return;
+    const state = readTourState();
+    if (!state.active) return;
+    const step = TOUR_STEPS[state.stepIndex];
+    if (step?.id !== "templates-rogue-expand") return;
+    window.dispatchEvent(
+      new CustomEvent("tour:auto-next", {
+        detail: { fromStepId: "templates-rogue-expand" },
+      }),
+    );
+  }, [open]);
 
   if (rogues.length === 0) return null;
 
@@ -57,7 +64,7 @@ export function RogueTemplatesPanel({ rogues, templateNameById }: Props) {
     <Card className="border-rose-500/30">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="-m-5 flex w-[calc(100%+2.5rem)] items-start gap-3 px-5 py-4 text-left hover:bg-rose-50/30"
+        className="tour-anchor-rogue-header -m-5 flex w-[calc(100%+2.5rem)] items-start gap-3 px-5 py-4 text-left hover:bg-rose-50/30"
       >
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-rose-50 text-rose-500 ring-1 ring-inset ring-rose-500/30">
           <AlertTriangle className="h-4 w-4" />
@@ -182,6 +189,23 @@ function RogueRow({
     setAction(getRogueAction(rogue.driveFileId));
   }, [rogue.driveFileId]);
 
+  // Auto-advance the tour when the user clicks Notify on the FIRST row
+  // during the matching tour step. The next step anchors on the just-
+  // opened Slack DM preview. Guarded by isFirst (only the first row
+  // carries the tour anchors) + fromStepId.
+  useEffect(() => {
+    if (!isFirst || !showSlackPreview) return;
+    const state = readTourState();
+    if (!state.active) return;
+    const step = TOUR_STEPS[state.stepIndex];
+    if (step?.id !== "templates-rogue-notify") return;
+    window.dispatchEvent(
+      new CustomEvent("tour:auto-next", {
+        detail: { fromStepId: "templates-rogue-notify" },
+      }),
+    );
+  }, [showSlackPreview, isFirst]);
+
   const onArchive = () => {
     setAction(archiveRogue(rogue.driveFileId, OPERATOR_NAME));
   };
@@ -292,12 +316,14 @@ function RogueRow({
 
           {/* Slack DM preview (expands when Notify clicked, collapses after Send) */}
           {showSlackPreview && (
-            <SlackDmPreview
-              target={target}
-              message={buildSlackMessage(rogue, target, templateName)}
-              onSend={onSendDm}
-              onCancel={() => setShowSlackPreview(false)}
-            />
+            <div className={clsx(isFirst && "tour-anchor-rogue-slack-preview")}>
+              <SlackDmPreview
+                target={target}
+                message={buildSlackMessage(rogue, target, templateName)}
+                onSend={onSendDm}
+                onCancel={() => setShowSlackPreview(false)}
+              />
+            </div>
           )}
         </div>
 

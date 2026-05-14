@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { readTourState, TOUR_STEPS } from "@/lib/tour-steps";
 import { Modal } from "./ui/Modal";
 import { Button } from "./ui/Button";
 import { formatEur, formatDate, initials } from "@/lib/format";
@@ -59,6 +60,23 @@ export function DocuSignPreviewModal({ open, onClose, contract, template, onSend
     await onSend();
     setSending(false);
   };
+
+  // Auto-advance the tour when the operator pages through to the signature
+  // page. The `modal-pagenav` step hides its Next button; reaching the last
+  // page is the only forward path. Idempotent: only fires if the current
+  // tour step is `modal-pagenav` at the moment the user lands on the last
+  // page.
+  useEffect(() => {
+    if (!open) return;
+    if (page !== totalPages) return;
+    const state = readTourState();
+    if (!state.active) return;
+    const step = TOUR_STEPS[state.stepIndex];
+    if (step?.id !== "modal-pagenav") return;
+    window.dispatchEvent(
+      new CustomEvent("tour:auto-next", { detail: { fromStepId: "modal-pagenav" } }),
+    );
+  }, [open, page, totalPages]);
 
   return (
     <Modal
@@ -123,7 +141,9 @@ export function DocuSignPreviewModal({ open, onClose, contract, template, onSend
               signers={signers}
             />
           </div>
-          <PageNav page={page} totalPages={totalPages} onChange={setPage} />
+          <div className="tour-anchor-modal-pagenav">
+            <PageNav page={page} totalPages={totalPages} onChange={setPage} />
+          </div>
           <div className="tour-anchor-modal-anchortags">
             <AnchorTagBar template={template} />
           </div>

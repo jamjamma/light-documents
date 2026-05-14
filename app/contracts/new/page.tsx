@@ -11,6 +11,7 @@ import { IntakeForm } from "@/components/IntakeForm";
 import { DocumentTypeIcon } from "@/components/DocumentTypeIcon";
 import { createContract, runClauseChecks } from "@/lib/contract-store";
 import { getTemplate } from "@/lib/mock-data";
+import { readTourState, TOUR_STEPS } from "@/lib/tour-steps";
 import type { Template, SourceRecord, ContractFields } from "@/lib/types";
 import { ArrowLeft, ArrowRight, Check, FileType2, Database, FormInput, Pencil } from "lucide-react";
 import clsx from "clsx";
@@ -55,6 +56,33 @@ function NewContractInner() {
   useEffect(() => {
     // when source changes, reset fields to source data
     if (source) setFields({ ...source.data } as ContractFields);
+  }, [source]);
+
+  // Auto-advance the tour when the user takes the in-app action the
+  // current step asked them to take. Picking a template should advance
+  // intake-template -> intake-record; picking a record should advance
+  // intake-record -> intake-form. Each guarded by fromStepId so a stray
+  // step change in normal use doesn't unexpectedly bump the tour.
+  useEffect(() => {
+    if (!template) return;
+    const state = readTourState();
+    if (!state.active) return;
+    const cur = TOUR_STEPS[state.stepIndex];
+    if (cur?.id !== "intake-template") return;
+    window.dispatchEvent(
+      new CustomEvent("tour:auto-next", { detail: { fromStepId: "intake-template" } }),
+    );
+  }, [template]);
+
+  useEffect(() => {
+    if (!source) return;
+    const state = readTourState();
+    if (!state.active) return;
+    const cur = TOUR_STEPS[state.stepIndex];
+    if (cur?.id !== "intake-record") return;
+    window.dispatchEvent(
+      new CustomEvent("tour:auto-next", { detail: { fromStepId: "intake-record" } }),
+    );
   }, [source]);
 
   const [submitError, setSubmitError] = useState<string | null>(null);

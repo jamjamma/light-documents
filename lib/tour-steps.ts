@@ -388,9 +388,24 @@ export const TOUR_STEPS: TourStep[] = [
         <li>Mid pages: commercial terms, liability, indemnity.</li>
         <li><strong>Last page: signature blocks</strong> where the anchor tags resolve to actual signing fields.</li>
       </ul>
-      <p class="muted"><strong>Click the page nav below</strong> to flip to the last page and see the signature placement, then click Next here.</p>
     `,
     next: "advance",
+    effect: "modal:open",
+  },
+  {
+    id: "modal-pagenav",
+    chapter: "workflow",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-modal-pagenav",
+    side: "top",
+    title: "Flip to the signature page",
+    description: `
+      <p><strong>Click the last page number</strong> in the page nav below (or click Next on the nav repeatedly) to jump to the signature page.</p>
+      <p class="muted">The tour follows you forward as soon as you reach the last page.</p>
+    `,
+    // Only paging to the last page (in-app) or Back advances the tour. The
+    // modal dispatches `tour:auto-next` when page === totalPages.
+    hideNext: true,
     effect: "modal:open",
   },
   {
@@ -594,6 +609,19 @@ export const TOUR_STEPS: TourStep[] = [
 
   // ── Act 5: Signed contracts archive ───────────────────────────────────
   {
+    id: "archive-landing",
+    chapter: "archive",
+    path: "/archive",
+    selector: ".tour-anchor-sidebar-archive",
+    side: "right",
+    title: "We're in Signed contracts now",
+    description: `
+      <p>This is the <strong>Signed contracts</strong> section of the sidebar, now highlighted because we navigated here from Bolt's signed record.</p>
+      <p class="muted">Every filed contract from every template type lands here. The dashboard above is in-flight work; this is the past record.</p>
+    `,
+    next: "advance",
+  },
+  {
     id: "archive-overview",
     chapter: "archive",
     path: "/archive",
@@ -745,35 +773,87 @@ export const TOUR_STEPS: TourStep[] = [
     title: "Rogue templates governance",
     description: `
       <p>Daily scan flags docs outside <code>/Master Templates/</code> that look like masters but aren't.</p>
-      <p>Each flagged file is one signed contract away from quoting the wrong liability cap or payment terms. We'll expand the panel and look at the per-file actions.</p>
+      <p>Each flagged file is one signed contract away from quoting the wrong liability cap or payment terms.</p>
       <p class="muted"><em>Phase-2 governance demo. Audit log preserves every decision.</em></p>
     `,
     next: "advance",
-    // Open the collapsed panel so the next step's anchor on the action
-    // buttons (Archive / Notify owner) is mounted before driver.js polls.
-    effect: "rogue:expand",
   },
   {
-    id: "templates-rogue-actions",
+    id: "templates-rogue-expand",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-rogue-header",
+    side: "bottom",
+    title: "Open the panel",
+    description: `
+      <p><strong>Click the panel header below</strong> to expand the list of flagged files.</p>
+      <p class="muted">The tour follows you forward as soon as you open it.</p>
+    `,
+    // Only the in-app open advances. Page dispatches `tour:auto-next` when
+    // the collapsible flips from closed to open.
+    hideNext: true,
+  },
+  {
+    id: "templates-rogue-row",
     chapter: "templates",
     path: "/templates",
     selector: ".tour-anchor-rogue-actions",
     side: "left",
-    title: "Archive or notify the owner",
+    title: "What you see per file",
     description: `
-      <p>Two actions per flagged file:</p>
+      <p>Each flagged file shows:</p>
       <ul>
-        <li><strong>Archive.</strong> Mark out of policy. The file stays in Drive; we record the decision and surface it on any future use.</li>
-        <li><strong>Notify owner.</strong> Slack DM with the diff and a remediation link. The recipient is auto-routed: last editor when known, team channel when they left the company.</li>
+        <li><strong>Match %</strong> vs the closest master template.</li>
+        <li><strong>What's off</strong> (the diff summary).</li>
+        <li><strong>Last user</strong> and when, so notifications route to the right person.</li>
+        <li><strong>Recommended action</strong>: archive, block, or notify, based on context.</li>
       </ul>
-      <p class="muted">Both actions are undoable from the audit log.</p>
     `,
-    // Keep panel open while this step renders so the buttons stay visible
-    // after a Back/Next bounce.
-    effect: "rogue:expand",
-    next: "navigate",
-    goto: "/contracts/new",
-    nextLabel: "Next",
+    next: "advance",
+  },
+  {
+    id: "templates-rogue-notify",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-rogue-actions",
+    side: "left",
+    title: "Notify the owner",
+    description: `
+      <p><strong>Click Notify owner</strong> on the first flagged file (right side of the row) to open the Slack DM preview.</p>
+      <p class="muted">The recipient is auto-routed: last editor when known, team channel when they left the company.</p>
+    `,
+    // The in-app Notify click is the only forward path. Page dispatches
+    // `tour:auto-next` when SlackDmPreview mounts for the first row.
+    hideNext: true,
+  },
+  {
+    id: "templates-rogue-slack-preview",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-rogue-slack-preview",
+    side: "top",
+    title: "What gets sent",
+    description: `
+      <p>The Slack message previewed before send: file name, % match, the diff, the recommended action, and the recipient's rationale.</p>
+      <p>Click <strong>Cancel</strong> to back out without sending, or <strong>Send DM / Send post</strong> to dispatch. Either way the tour continues on Next.</p>
+      <p class="muted">In production we post via the Slack Web API with interactive Acknowledge / Reroute / Snooze buttons; replies thread back into the audit log.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "templates-to-intake",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-new-contract",
+    side: "right",
+    title: "Onward: new contract",
+    description: `
+      <p><strong>Click New contract</strong> in the sidebar to start the intake walk.</p>
+      <p class="muted">The tour follows you to the intake form. (You can also exit here, this is the last templates step.)</p>
+    `,
+    // In-app sidebar click navigates to /contracts/new; controller's future-
+    // step matcher then renders intake-stepper. No tour-level Next needed.
+    hideNext: true,
   },
 
   // ── Act 7: New contract intake (end-to-end) ───────────────────────────
@@ -803,9 +883,11 @@ export const TOUR_STEPS: TourStep[] = [
     title: "Step 1 · Pick a template",
     description: `
       <p>8 master templates synced from Drive or SharePoint. Each card shows version, jurisdictions, clause rules, and anchor-tag count.</p>
-      <p class="muted"><strong>Click any template card below</strong> to advance. The form auto-progresses to step 2.</p>
+      <p class="muted"><strong>Click any template card below.</strong> The form auto-progresses to step 2 and the tour follows you.</p>
     `,
-    next: "advance",
+    // In-app template click is the only forward path; page dispatches
+    // `tour:auto-next` when `template` is set.
+    hideNext: true,
   },
   {
     id: "intake-record",
@@ -816,9 +898,11 @@ export const TOUR_STEPS: TourStep[] = [
     title: "Step 2 · Pick a source record",
     description: `
       <p>Records pulled from <strong>Salesforce</strong>, <strong>HubSpot</strong>, or <strong>Personio</strong> per template type. Manual entry available for off-CRM records.</p>
-      <p class="muted"><strong>Click any record below.</strong> Variables (counterparty, value, terms, signer) auto-prefill from it. The form auto-progresses to step 3.</p>
+      <p class="muted"><strong>Click any record below.</strong> Variables (counterparty, value, terms, signer) auto-prefill from it. The form auto-progresses to step 3 and the tour follows.</p>
     `,
-    next: "advance",
+    // In-app record click is the only forward path; page dispatches
+    // `tour:auto-next` when `source` is set.
+    hideNext: true,
   },
   {
     id: "intake-form",

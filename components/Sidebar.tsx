@@ -21,10 +21,10 @@ import { resetTourState } from "@/lib/tour-steps";
 import { useMobileNav } from "./MobileNavContext";
 
 const NAV = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/templates", label: "Templates", icon: BookOpen },
-  { href: "/archive", label: "Signed contracts", icon: Archive },
-  { href: "/about", label: "About this build", icon: Info },
+  { href: "/", label: "Dashboard", icon: LayoutDashboard, anchorClass: "tour-anchor-sidebar-dashboard" },
+  { href: "/templates", label: "Templates", icon: BookOpen, anchorClass: "tour-anchor-sidebar-templates" },
+  { href: "/archive", label: "Signed contracts", icon: Archive, anchorClass: "tour-anchor-sidebar-archive" },
+  { href: "/about", label: "About this build", icon: Info, anchorClass: "tour-anchor-sidebar-about" },
 ];
 
 const COLLAPSED_KEY = "sidebar-collapsed";
@@ -156,7 +156,7 @@ export function Sidebar() {
 
         <nav className={clsx("flex-1", collapsed ? "md:px-1.5" : "px-3")}>
           <div className="tour-anchor-sidebar-nav">
-          {NAV.map(({ href, label, icon: Icon }) => {
+          {NAV.map(({ href, label, icon: Icon, anchorClass }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
               <Link
@@ -164,6 +164,7 @@ export function Sidebar() {
                 href={href}
                 title={collapsed ? label : undefined}
                 className={clsx(
+                  anchorClass,
                   "mb-0.5 flex items-center gap-2.5 rounded-lg text-sm transition-colors",
                   collapsed ? "md:justify-center md:px-2 md:py-2.5" : "px-3 py-2",
                   active ? "bg-ink-900 text-white" : "text-ink-700 hover:bg-ink-100",
