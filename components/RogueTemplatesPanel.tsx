@@ -253,6 +253,7 @@ function RogueRow({
       className={clsx(
         "rounded-lg border p-3 transition-opacity",
         isArchived ? "border-ink-200 bg-ink-50/60 opacity-70" : "border-ink-200 bg-white",
+        isFirst && "tour-anchor-rogue-row",
       )}
     >
       <div className="flex items-start gap-3">

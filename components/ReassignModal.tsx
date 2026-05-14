@@ -95,7 +95,7 @@ export function ReassignModal({ open, approval, onClose, onConfirm }: Props) {
       }
     >
       <div className="space-y-5">
-        <div className="rounded-lg border border-ink-200 bg-ink-50/40 p-2.5 text-[11px] text-ink-600">
+        <div className="tour-anchor-reassign-intent rounded-lg border border-ink-200 bg-ink-50/40 p-2.5 text-[11px] text-ink-600">
           <span className="demo-note mr-2">Intent</span>
           <label className="mr-3 inline-flex items-center gap-1.5">
             <input
@@ -119,7 +119,7 @@ export function ReassignModal({ open, approval, onClose, onConfirm }: Props) {
           </label>
         </div>
 
-        <div>
+        <div className="tour-anchor-reassign-picker">
           <div className="mb-2 text-[11px] font-medium uppercase tracking-wider text-ink-500">
             Pick a new approver
           </div>
@@ -181,7 +181,7 @@ export function ReassignModal({ open, approval, onClose, onConfirm }: Props) {
           </ul>
         </div>
 
-        <div>
+        <div className="tour-anchor-reassign-reason">
           <div className="mb-2 flex items-center justify-between">
             <label htmlFor="reassign-reason" className="text-[11px] font-medium uppercase tracking-wider text-ink-500">
               Reason

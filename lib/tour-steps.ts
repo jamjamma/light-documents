@@ -389,11 +389,14 @@ export const TOUR_STEPS: TourStep[] = [
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-preview-envelope",
-    side: "top",
+    // Anchor on the LEFT of the button: side="left" keeps the popover beside
+    // the button (with room in the left column of the contract page) instead
+    // of stacking above the action bar where a tall popover overflows and the
+    // arrow visually drifts toward the adjacent Send button.
+    side: "left",
     title: "Open the envelope preview",
     description: `
-      <p><strong>Click Preview envelope</strong> below. The DocuSign envelope opens and the tour follows you in.</p>
-      <p class="muted"><strong>Send is greyed out?</strong> Approvals are not complete. Close the modal, click <strong>Back</strong>, finish the chain (every row green), then re-open the preview.</p>
+      <p>Click <strong>Preview envelope</strong>. The DocuSign envelope opens and the tour follows you in.</p>
     `,
     // Only opening the preview (in-app) or Back advances from this step.
     // The contract page dispatches `tour:auto-next` when the modal mounts.
@@ -493,11 +496,14 @@ export const TOUR_STEPS: TourStep[] = [
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-modal-send",
-    side: "left",
+    // Anchor with side="top": the popover floats above the Send button
+    // inside the modal footer. side="left" pushed the popover off into
+    // empty space beside the modal, with the arrow appearing detached
+    // from the button. Top keeps the arrow tight against the target.
+    side: "top",
     title: "Send via DocuSign",
     description: `
-      <p>Click <strong>Send via DocuSign</strong> below. The envelope fires, the contract advances to signed, and the page redirects to the signed record. The tour will follow you there.</p>
-      <p class="muted"><strong>Send still disabled?</strong> Approvals are incomplete. Click <strong>Back</strong> (or close this modal) and finish the approval chain (every row green). Then re-open the preview.</p>
+      <p>Click <strong>Send via DocuSign</strong>. The envelope fires and the page redirects to the signed record. The tour follows.</p>
     `,
     next: "advance",
     effect: "modal:open",
@@ -881,16 +887,20 @@ export const TOUR_STEPS: TourStep[] = [
     id: "templates-rogue-row",
     chapter: "templates",
     path: "/templates",
-    selector: ".tour-anchor-rogue-actions",
-    side: "left",
-    title: "What you see per file",
+    // Anchor on the entire row, not just the action buttons. Previously the
+    // highlight covered Archive/Notify but the description called out fields
+    // that live on the left side of the row, so user saw a mismatch.
+    selector: ".tour-anchor-rogue-row",
+    side: "bottom",
+    title: "What's in each row",
     description: `
-      <p>Each flagged file shows:</p>
+      <p>Take the top row (<code>MSA template - John's draft (LATEST).docx</code>):</p>
       <ul>
-        <li><strong>Match %</strong> vs the closest master template.</li>
-        <li><strong>What's off</strong> (the diff summary).</li>
-        <li><strong>Last user</strong> and when, so notifications route to the right person.</li>
-        <li><strong>Recommended action</strong>: archive, block, or notify, based on context.</li>
+        <li><strong>78% match to MSA.</strong> Close enough to look real, not close enough to be safe.</li>
+        <li><strong>Diff:</strong> "Liability cap modified to EUR 100k. Custom-edited indemnity. No DPA exhibit."</li>
+        <li><strong>Last used by John (Sales, left company Q4 2025).</strong> Routing won't DM John; it'll fall through to the Sales team channel.</li>
+        <li><strong>Recommended: Archive.</strong> John left and the diff is material; archiving prevents reuse without escalating.</li>
+        <li><strong>Right-side actions:</strong> Archive (one-click) or Notify owner (Slack DM preview).</li>
       </ul>
     `,
     next: "advance",
@@ -914,14 +924,16 @@ export const TOUR_STEPS: TourStep[] = [
     id: "templates-rogue-undo-archive",
     chapter: "templates",
     path: "/templates",
-    // Anchor on the Undo button itself, not the whole archived stamp,
-    // so the popover arrow points at the actual control.
-    selector: ".tour-anchor-rogue-undo",
+    // Anchor on the row wrapper, not the Undo button. The Undo button lives
+    // inside the archived stamp; clicking Undo removes the stamp (row
+    // returns to rogue state) and orphans the popover. The row wrapper
+    // persists through both archived + un-archived states.
+    selector: ".tour-anchor-rogue-row",
     side: "bottom",
-    title: "Undo the archive",
+    title: "Undo: append-only audit",
     description: `
-      <p>The archived stamp carries an <strong>Undo</strong> link. Click it now if you want to restore the row to rogue status; the audit log keeps both decisions.</p>
-      <p class="muted">Every state change is append-only. Even Undo writes a new row; the original Archived row stays.</p>
+      <p>The archived stamp carries an <strong>Undo</strong> link (next to "Archived by Martina"). Clicking it restores the row to rogue status.</p>
+      <p class="muted">Every state change is append-only. Even Undo writes a new audit row; the original Archived row stays.</p>
     `,
     next: "advance",
   },
