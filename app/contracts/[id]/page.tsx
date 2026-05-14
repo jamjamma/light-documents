@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Header } from "@/components/Header";
@@ -203,21 +203,33 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
     return () => mo.disconnect();
   }, [contract]);
 
-  // Auto-advance the tour when the operator approves their own row during the
-  // approval-approve step. The next step (approval-undo) anchors on the just-
-  // appeared Undo chip on the operator row.
+  // Auto-advance the tour when the operator's approval TRANSITIONS to
+  // approved during either the approval-approve step (first approval) or
+  // the approval-undo step (re-approve after undo). The transition guard
+  // (hasMountedRef + prevApprovedRef) prevents a spurious fire on initial
+  // page mount when the row is already approved (e.g. user resumed the
+  // tour at the undo step).
+  const tourApproveHasMountedRef = useRef(false);
+  const tourPrevOperatorApprovedRef = useRef(false);
   useEffect(() => {
     if (!contract) return;
     const operatorApproval = contract.approvals?.find(
       (a) => a.assignedName === OPERATOR_NAME,
     );
-    if (!operatorApproval || operatorApproval.status !== "approved") return;
+    const isApproved = operatorApproval?.status === "approved";
+    const wasApproved = tourPrevOperatorApprovedRef.current;
+    const wasMounted = tourApproveHasMountedRef.current;
+    tourPrevOperatorApprovedRef.current = isApproved;
+    tourApproveHasMountedRef.current = true;
+    if (!wasMounted) return;
+    if (!isApproved) return;
+    if (wasApproved) return;
     const state = readTourState();
     if (!state.active) return;
     const step = TOUR_STEPS[state.stepIndex];
-    if (step?.id !== "approval-approve") return;
+    if (step?.id !== "approval-approve" && step?.id !== "approval-undo") return;
     window.dispatchEvent(
-      new CustomEvent("tour:auto-next", { detail: { fromStepId: "approval-approve" } }),
+      new CustomEvent("tour:auto-next", { detail: { fromStepId: step.id } }),
     );
   }, [contract]);
 

@@ -78,6 +78,37 @@ export default function TemplatesPage() {
     );
   }, [selectedTemplate]);
 
+  // Defensive: while the tour is on any templates-detail-* step (Source,
+  // Ownership, Clause rules, Features, Anchors, Versions), force the MSA
+  // modal open if it ever closes. The template:open-detail effect fires on
+  // each step's render but a stray modal close (X button, backdrop click,
+  // Escape) between steps would orphan the popover. This watcher polls
+  // tour state on a 250ms interval and re-opens the modal if needed. The
+  // modal anchor poll inside TourController has up to 2.5s to find the
+  // section, so re-opening here keeps the chain unbroken.
+  useEffect(() => {
+    const ensureModalOpen = () => {
+      const state = readTourState();
+      if (!state.active) return;
+      const step = TOUR_STEPS[state.stepIndex];
+      if (!step) return;
+      const isInsideDetail =
+        step.id === "templates-detail-source" ||
+        step.id === "templates-detail-ownership" ||
+        step.id === "templates-detail-clauserules" ||
+        step.id === "templates-detail-features" ||
+        step.id === "templates-detail-anchors" ||
+        step.id === "templates-detail-versions";
+      if (!isInsideDetail) return;
+      if (selectedTemplate?.id === "msa_v4_2") return;
+      const msa = TEMPLATES.find((t) => t.id === "msa_v4_2") ?? null;
+      if (msa) setSelectedTemplate(msa);
+    };
+    ensureModalOpen();
+    const interval = window.setInterval(ensureModalOpen, 250);
+    return () => window.clearInterval(interval);
+  }, [selectedTemplate]);
+
   const counts = useMemo(() => {
     const m: Record<Category, number> = { all: TEMPLATES.length, "Customer contracts": 0, People: 0, Equity: 0 };
     for (const t of TEMPLATES) m[TEMPLATE_CATEGORY[t.id]]++;

@@ -484,18 +484,24 @@ export const TOUR_STEPS: TourStep[] = [
     id: "approval-undo",
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
-    // Anchor on the Undo button itself. driver.js's overlay blocks every
-    // other button automatically. If the user clicks Undo the chip vanishes
-    // and the popover orphans for a moment, but the description tells them
-    // to re-Approve (which restores the chip and re-renders the anchor).
-    selector: ".tour-anchor-approval-undo",
+    // Anchor on the operator's row, NOT the Undo chip itself. The chip
+    // unmounts when the user clicks Undo (row returns to pending), so
+    // anchoring on the chip orphans the popover. The row stays in DOM
+    // through both states; the popover just stays beside it. The contract
+    // page auto-advances when the user re-Approves after undo, so the
+    // user never sits on a stale popover.
+    selector: ".tour-anchor-approval-operator-row",
     side: "left",
     title: "Undo: only before send",
     description: `
-      <p>This <strong>Undo</strong> chip withdraws your approval. Try it: click <strong>Undo</strong>, then click <strong>Approve</strong> again to restore the green state.</p>
+      <p>The <strong>Undo</strong> chip next to <em>Approved</em> withdraws your approval. The row flips back to pending and shows <strong>Approve</strong> again.</p>
+      <p>Click <strong>Undo</strong>, then click <strong>Approve</strong> to restore the green state. The tour follows automatically, then walks you to the other rows.</p>
       <p class="muted">Every Undo writes a new audit row; the original Approved row stays. Undo is refused once the envelope is in DocuSign.</p>
     `,
-    next: "advance",
+    // The contract page dispatches `tour:auto-next` when the operator
+    // approval becomes approved AGAIN (after Undo + re-Approve). hideNext
+    // keeps the user from skipping the cycle accidentally.
+    hideNext: true,
   },
   {
     id: "approval-simulate-others",
@@ -626,14 +632,17 @@ export const TOUR_STEPS: TourStep[] = [
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-modal-send",
-    // Anchor with side="top": the popover floats above the Send button
-    // inside the modal footer. side="left" pushed the popover off into
-    // empty space beside the modal, with the arrow appearing detached
-    // from the button. Top keeps the arrow tight against the target.
-    side: "top",
+    // side="left": the Send button lives at the bottom-right of the modal
+    // footer. "top" let driver.js auto-flip to the right when the popover
+    // didn't fit above, which placed the popover OUTSIDE the modal making
+    // the arrow look detached. "left" sits the popover inside the modal
+    // body next to the button so the highlight + arrow + popover read as
+    // one unit pointing at the modal's Send button (not the contract page
+    // Send button visible behind the modal).
+    side: "left",
     title: "Send via DocuSign",
     description: `
-      <p>Click <strong>Send via DocuSign</strong>. The envelope fires and the page redirects to the signed record. The tour follows.</p>
+      <p>Click <strong>Send via DocuSign</strong> in the modal footer. The envelope fires; the page redirects to the signed record; the tour follows.</p>
     `,
     next: "advance",
     effect: "modal:open",
@@ -1219,18 +1228,24 @@ export const TOUR_STEPS: TourStep[] = [
     id: "templates-rogue-slack-preview",
     chapter: "templates",
     path: "/templates",
-    // Centered popover (no selector): the SlackDmPreview component unmounts
-    // when the user clicks Send DM / Send post (replaced with a sent pill).
-    // Anchoring on the preview would orphan the popover after Send. A
-    // centered popover lets the user click either Cancel or Send and still
-    // click Next without breaking the tour.
+    // Anchor on the Slack DM preview itself so the highlight wraps the
+    // panel the user is reading about. The RogueTemplatesPanel watches for
+    // unmount of `showSlackPreview` while on this step and dispatches
+    // tour:auto-next, so clicking Send DM or Cancel both advance the tour
+    // cleanly instead of orphaning the popover.
+    selector: ".tour-anchor-rogue-slack-preview",
+    side: "top",
     title: "What gets sent",
     description: `
-      <p>The Slack message preview below shows: file name, % match, the diff, the recommended action, and the recipient's rationale.</p>
-      <p>Click <strong>Cancel</strong> to back out, or <strong>Send DM / Send post</strong> to dispatch. Either way, come back here and click <strong>Next</strong> to continue.</p>
+      <p>The Slack message previewed below: file name, % match, the diff, the recommended action, and the recipient's rationale.</p>
+      <p>Click <strong>Cancel</strong> to back out, or <strong>Send DM / Send post</strong> to dispatch. Either click advances the tour.</p>
       <p class="muted">In production we post via the Slack Web API with interactive Acknowledge / Reroute / Snooze buttons; replies thread back into the audit log.</p>
     `,
     next: "advance",
+    // Send DM / Cancel both unmount the preview and the page dispatches
+    // tour:auto-next. hideNext keeps the user from skipping ahead before
+    // seeing one of the two outcomes.
+    hideNext: true,
   },
   {
     id: "templates-to-intake",
@@ -1361,14 +1376,13 @@ export const TOUR_STEPS: TourStep[] = [
     path: "*",
     selector: ".tour-anchor-preview-envelope",
     // side="top": Preview envelope sits in the Send-via-DocuSign card's
-    // action bar near the bottom of the page. side="bottom" pushed the
-    // popover off the viewport on shorter windows. Top puts the arrow
-    // directly on the button with the popover floating above it.
+    // action bar. The popover floats above the button row with the arrow
+    // tight against the Preview envelope target.
     side: "top",
     title: "End of the workflow",
     description: `
       <p>From here the flow is identical to Bolt MSA: <strong>Preview envelope</strong>, inspect placement, then <strong>Send via DocuSign</strong>. The contract advances to <em>Filed</em>; structured writeback fires.</p>
-      <p class="muted">Click <strong>Next</strong> to wrap up.</p>
+      <p class="muted">Click <strong>Next</strong> to wrap up on the dashboard.</p>
     `,
     next: "advance",
   },
@@ -1401,8 +1415,20 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "About this build",
     description: `
-      <p>Read this for the submission memo: the reframe, what's real vs stubbed, and what I'd build next.</p>
-      <p class="muted">Re-take the tour or pick a chapter anytime from the sidebar.</p>
+      <p>One paragraph summary of the strategic reframe and a link into the full memo. The widget lives at the top of the dashboard and stays visible whenever you land here.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "about-this-build-sidebar",
+    chapter: "intake",
+    path: "/",
+    selector: ".tour-anchor-sidebar-about",
+    side: "right",
+    title: "Full submission memo",
+    description: `
+      <p>The <strong>About this build</strong> link in the sidebar opens the full memo: reframe, what's real vs stubbed, what I'd build next, and the cast-list note for the personas in this demo.</p>
+      <p class="muted">Re-take the tour or pick a single chapter anytime from the same sidebar.</p>
     `,
     next: "advance",
     nextLabel: "Finish",

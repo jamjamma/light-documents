@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card } from "./ui/Card";
 import { Badge } from "./ui/Badge";
 import { Button } from "./ui/Button";
@@ -205,6 +205,27 @@ function RogueRow({
     window.dispatchEvent(
       new CustomEvent("tour:auto-next", {
         detail: { fromStepId: "templates-rogue-notify" },
+      }),
+    );
+  }, [showSlackPreview, isFirst]);
+
+  // Auto-advance when the Slack DM preview unmounts (Send DM or Cancel)
+  // during the templates-rogue-slack-preview step. Use a transition guard:
+  // the effect should fire only when showSlackPreview flips from true to
+  // false, not on initial mount where it's already false.
+  const tourSlackPreviewRef = useRef(false);
+  useEffect(() => {
+    const wasOpen = tourSlackPreviewRef.current;
+    tourSlackPreviewRef.current = showSlackPreview;
+    if (!isFirst) return;
+    if (!wasOpen || showSlackPreview) return; // only on true → false
+    const state = readTourState();
+    if (!state.active) return;
+    const step = TOUR_STEPS[state.stepIndex];
+    if (step?.id !== "templates-rogue-slack-preview") return;
+    window.dispatchEvent(
+      new CustomEvent("tour:auto-next", {
+        detail: { fromStepId: "templates-rogue-slack-preview" },
       }),
     );
   }, [showSlackPreview, isFirst]);
