@@ -40,6 +40,17 @@ const OPERATOR_NAME = "Martina Holst";
 export function RogueTemplatesPanel({ rogues, templateNameById }: Props) {
   const [open, setOpen] = useState(false);
 
+  // The tour fires `rogue:expand` to force the collapsible open before the
+  // step that highlights the per-row actions renders. Idempotent.
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ effect?: string }>).detail;
+      if (detail?.effect === "rogue:expand") setOpen(true);
+    };
+    window.addEventListener("tour:effect", handler);
+    return () => window.removeEventListener("tour:effect", handler);
+  }, []);
+
   if (rogues.length === 0) return null;
 
   return (
@@ -78,8 +89,13 @@ export function RogueTemplatesPanel({ rogues, templateNameById }: Props) {
 
       {open && (
         <div className="mt-4 -mx-5 -mb-5 space-y-2 border-t border-ink-100 bg-ink-50/30 px-5 py-4">
-          {rogues.map((r) => (
-            <RogueRow key={r.driveFileId} rogue={r} templateName={templateNameById(r.matchesTemplate)} />
+          {rogues.map((r, i) => (
+            <RogueRow
+              key={r.driveFileId}
+              rogue={r}
+              templateName={templateNameById(r.matchesTemplate)}
+              isFirst={i === 0}
+            />
           ))}
         </div>
       )}
@@ -145,7 +161,16 @@ function buildSlackMessage(rogue: RogueTemplate, target: NotifyTarget, templateN
 
 // ── Row ──────────────────────────────────────────────────────────────────────
 
-function RogueRow({ rogue, templateName }: { rogue: RogueTemplate; templateName: string }) {
+function RogueRow({
+  rogue,
+  templateName,
+  isFirst = false,
+}: {
+  rogue: RogueTemplate;
+  templateName: string;
+  /** Only the first row carries the tour anchor for the action buttons. */
+  isFirst?: boolean;
+}) {
   const similarityPct = Math.round(rogue.similarity * 100);
   const target = resolveNotifyTarget(rogue);
 
@@ -277,7 +302,12 @@ function RogueRow({ rogue, templateName }: { rogue: RogueTemplate; templateName:
         </div>
 
         {/* Action buttons (right column on desktop, wraps under content on narrow) */}
-        <div className="flex shrink-0 flex-col gap-1.5">
+        <div
+          className={clsx(
+            "flex shrink-0 flex-col gap-1.5",
+            isFirst && "tour-anchor-rogue-actions",
+          )}
+        >
           {!isArchived && (
             <Button variant="secondary" size="sm" leadingIcon={<ArchiveIcon className="h-3.5 w-3.5" />} onClick={onArchive}>
               Archive

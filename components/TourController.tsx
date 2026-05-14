@@ -438,6 +438,26 @@ export function TourController() {
     return () => window.removeEventListener("tour:start", handler);
   }, [pathname, renderStep, router]);
 
+  // Listen for "tour:auto-next" events. Pages dispatch this when an in-app
+  // action (e.g. user clicks Preview envelope, opening the modal) should
+  // advance the tour without a popover-level Next click. The event detail
+  // optionally carries a `fromStepId` so the controller only advances when
+  // the current step matches — guards against accidental double-advance if
+  // the action also fires after the user has already clicked Next.
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ fromStepId?: string }>).detail;
+      const state = readTourState();
+      if (!state.active) return;
+      const step = TOUR_STEPS[state.stepIndex];
+      if (!step) return;
+      if (detail?.fromStepId && detail.fromStepId !== step.id) return;
+      handlersRef.current?.next(state.stepIndex, step);
+    };
+    window.addEventListener("tour:auto-next", handler);
+    return () => window.removeEventListener("tour:auto-next", handler);
+  }, []);
+
   // Re-render on path change.
   useEffect(() => {
     renderForCurrentState();

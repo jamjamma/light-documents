@@ -30,7 +30,7 @@ import { getTemplate } from "@/lib/mock-data";
 import { allApproved } from "@/lib/routing-rules";
 import { lightSignerRationale } from "@/lib/signer-routing";
 import type { Contract, Approval } from "@/lib/types";
-import type { TourEffect } from "@/lib/tour-steps";
+import { readTourState, TOUR_STEPS, type TourEffect } from "@/lib/tour-steps";
 import { ArrowLeft, FileSignature, Eye, AlertTriangle, Save } from "lucide-react";
 import { formatEur, formatDateTime } from "@/lib/format";
 import { ReassignModal } from "@/components/ReassignModal";
@@ -80,6 +80,9 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
         case "modal:open":
           setShowPreview(true);
           break;
+        case "modal:close":
+          setShowPreview(false);
+          break;
         case "modal:expand-config":
           setShowPreview(true);
           // Defer so the modal is mounted, then expand the disclosure so the
@@ -107,6 +110,22 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
     window.addEventListener("tour:effect", handler);
     return () => window.removeEventListener("tour:effect", handler);
   }, []);
+
+  // When the operator opens the preview themselves during the
+  // `preview-envelope` step, auto-advance the tour into the modal walk. The
+  // step itself has `hideNext: true` so this is the only forward path
+  // (besides Back). Guarded by `fromStepId` so it's a no-op if the user
+  // re-opens the modal at any other time.
+  useEffect(() => {
+    if (!showPreview) return;
+    const state = readTourState();
+    if (!state.active) return;
+    const step = TOUR_STEPS[state.stepIndex];
+    if (step?.id !== "preview-envelope") return;
+    window.dispatchEvent(
+      new CustomEvent("tour:auto-next", { detail: { fromStepId: "preview-envelope" } }),
+    );
+  }, [showPreview]);
 
   if (contract === null) {
     return (

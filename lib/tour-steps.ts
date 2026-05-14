@@ -77,6 +77,10 @@ export type TourEffect =
   // Open the DocuSign envelope preview modal on the contract detail page.
   // Idempotent: firing this when the modal is already open is a no-op.
   | "modal:open"
+  // Close the DocuSign envelope preview modal. Used when stepping BACK to
+  // `preview-envelope` from inside the modal walk, so the popover anchored
+  // on the Preview-envelope button isn't trapped behind a still-open modal.
+  | "modal:close"
   // Programmatically expand the Envelope-configuration <details> in the
   // preview modal so driver.js highlights the full disclosure, not the
   // collapsed 1-line summary.
@@ -84,7 +88,10 @@ export type TourEffect =
   // Scroll the modal's overflow-y-auto container so the anchor-tags bar is
   // visible. driver.js's smoothScroll handles window scrolling but not
   // nested scroll containers.
-  | "modal:scroll-anchortags";
+  | "modal:scroll-anchortags"
+  // Expand the Rogue Templates collapsible on /templates so its action
+  // buttons (Archive, Notify owner) are visible to highlight.
+  | "rogue:expand";
 
 export interface TourStep {
   /** Stable id, used for de-dupe in the controller render guard. */
@@ -318,14 +325,18 @@ export const TOUR_STEPS: TourStep[] = [
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-preview-envelope",
     side: "top",
-    title: "Preview the envelope",
+    title: "Open the envelope preview",
     description: `
-      <p>The DocuSign envelope preview opens. We'll walk through what's inside before sending.</p>
-      <p class="muted"><strong>Send is greyed out?</strong> Approvals are not complete. Click <strong>Back</strong> and finish the chain (every row green) before re-opening the preview.</p>
+      <p><strong>Click Preview envelope</strong> below. The DocuSign envelope opens and the tour follows you in.</p>
+      <p class="muted"><strong>Send is greyed out?</strong> Approvals are not complete. Close the modal, click <strong>Back</strong>, finish the chain (every row green), then re-open the preview.</p>
     `,
-    next: "advance",
-    // Auto-open the modal so the next step's anchors exist when polled.
-    effect: "modal:open",
+    // Only opening the preview (in-app) or Back advances from this step.
+    // The contract page dispatches `tour:auto-next` when the modal mounts.
+    hideNext: true,
+    // If the user stepped Back into this step from inside the modal walk,
+    // the modal is still open and would cover both the Preview button and
+    // this popover's anchor. Close it so the highlight is visible.
+    effect: "modal:close",
   },
 
   // ── Act 4: DocuSign preview modal walk ────────────────────────────────
@@ -637,12 +648,32 @@ export const TOUR_STEPS: TourStep[] = [
     title: "Rogue templates governance",
     description: `
       <p>Daily scan flags docs outside <code>/Master Templates/</code> that look like masters but aren't.</p>
-      <ul>
-        <li><strong>Archive.</strong> Mark out of policy.</li>
-        <li><strong>Notify Owner.</strong> Slack DM with the diff and a remediation link.</li>
-      </ul>
-      <p class="muted"><em>Phase-2 governance demo. Audit log preserves both decisions.</em></p>
+      <p>Each flagged file is one signed contract away from quoting the wrong liability cap or payment terms. We'll expand the panel and look at the per-file actions.</p>
+      <p class="muted"><em>Phase-2 governance demo. Audit log preserves every decision.</em></p>
     `,
+    next: "advance",
+    // Open the collapsed panel so the next step's anchor on the action
+    // buttons (Archive / Notify owner) is mounted before driver.js polls.
+    effect: "rogue:expand",
+  },
+  {
+    id: "templates-rogue-actions",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-rogue-actions",
+    side: "left",
+    title: "Archive or notify the owner",
+    description: `
+      <p>Two actions per flagged file:</p>
+      <ul>
+        <li><strong>Archive.</strong> Mark out of policy. The file stays in Drive; we record the decision and surface it on any future use.</li>
+        <li><strong>Notify owner.</strong> Slack DM with the diff and a remediation link. The recipient is auto-routed: last editor when known, team channel when they left the company.</li>
+      </ul>
+      <p class="muted">Both actions are undoable from the audit log.</p>
+    `,
+    // Keep panel open while this step renders so the buttons stay visible
+    // after a Back/Next bounce.
+    effect: "rogue:expand",
     next: "navigate",
     goto: "/contracts/new",
     nextLabel: "Next",
@@ -976,15 +1007,24 @@ export const CHAPTERS: ChapterMeta[] = [
     id: "templates",
     title: "Templates",
     blurb: "8 master Word docs in Drive, rogue-template governance, Counsel's editing workflow.",
-    estSeconds: 45,
+    estSeconds: 55,
   },
   {
     id: "intake",
     title: "New contract",
-    blurb: "3-step intake form.",
-    estSeconds: 20,
+    blurb: "End-to-end: pick template, pick record, confirm fields, run checks, land on the new contract.",
+    estSeconds: 75,
   },
 ];
+
+/** Total estimated duration across all chapters, in seconds. */
+export const TOTAL_TOUR_SECONDS = CHAPTERS.reduce((s, c) => s + c.estSeconds, 0);
+
+/** Total estimated duration formatted as "~N minutes" (rounded). */
+export function formatTotalTourDuration(): string {
+  const minutes = Math.max(1, Math.round(TOTAL_TOUR_SECONDS / 60));
+  return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+}
 
 /** First TOUR_STEPS index that belongs to a given chapter. */
 export function firstStepIndexOf(chapter: ChapterId): number {
