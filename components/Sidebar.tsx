@@ -214,26 +214,11 @@ export function Sidebar() {
 
           <button
             onClick={() => {
-              if (typeof window !== "undefined" && window.innerWidth < 768) {
-                alert(
-                  "The guided tour is desktop-first. Open on a wider screen, or click into Bolt MSA from the dashboard to walk the demo manually.",
-                );
-                return;
-              }
-              // Auto-reset demo data + tour state every time Take the tour is
-              // clicked. Without this, walking the tour once leaves Bolt MSA in
-              // a signed/filed state, and re-taking the tour breaks because the
-              // In-review / Approval-chain / Preview-envelope steps depend on
-              // Bolt being mid-flight. Hard reload to "/" so the dashboard
-              // mounts fresh state and the once-only auto-start gate (which we
-              // just wiped via resetTourState) fires the tour again.
-              resetDemo();
-              resetTourState();
-              if (typeof window !== "undefined") {
-                window.location.href = "/";
-              }
+              // Open the chapter chooser. TourMenu handles the rest (reset
+              // demo, set state, hard reload to landing path) per chapter.
+              window.dispatchEvent(new CustomEvent("tour:menu-open"));
             }}
-            title={collapsed ? "Take the tour" : "Resets demo data and walks the full build (~2 min). Repeatable."}
+            title={collapsed ? "Take the tour" : "Open the tour menu. Pick a chapter or walk everything."}
             className={clsx(
               "mb-1 flex w-full items-center gap-2.5 rounded-lg border border-accent-200 bg-accent-50 text-[13px] font-medium text-accent-700 transition-colors hover:bg-accent-100 hover:text-accent-700",
               collapsed ? "md:justify-center md:px-2 md:py-2" : "px-3 py-2",

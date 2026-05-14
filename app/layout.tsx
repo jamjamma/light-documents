@@ -5,6 +5,7 @@ import { DemoBanner } from "@/components/DemoBanner";
 import { MobileNavProvider } from "@/components/MobileNavContext";
 import { MobileTopBar } from "@/components/MobileTopBar";
 import { TourController } from "@/components/TourController";
+import { TourMenu } from "@/components/TourMenu";
 
 export const metadata: Metadata = {
   title: "Light Documents",
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main className="min-h-[calc(100vh-32px)] min-w-0 flex-1">{children}</main>
           </div>
           <TourController />
+          <TourMenu />
         </MobileNavProvider>
       </body>
     </html>

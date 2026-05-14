@@ -34,6 +34,20 @@
 
 import type { Side } from "driver.js";
 
+/**
+ * Chapter ids. The tour is split into 6 chapters that can be run individually
+ * via the chapter chooser menu, OR walked end-to-end as one flow ("Walk
+ * everything"). Each TOUR_STEP carries its `chapter` so the controller can
+ * detect chapter boundaries in "chapter" mode and end cleanly.
+ */
+export type ChapterId =
+  | "dashboard"
+  | "workflow"
+  | "signed"
+  | "archive"
+  | "templates"
+  | "intake";
+
 export const HERO_CONTRACT_ID = "c_bolt_msa";
 /**
  * Bolt becomes signed during the tour (the user clicks through Approve →
@@ -75,6 +89,8 @@ export type TourEffect =
 export interface TourStep {
   /** Stable id, used for de-dupe in the controller render guard. */
   id: string;
+  /** Which chapter this step belongs to. */
+  chapter: ChapterId;
   /** Pathname the step is bound to. `*` matches any. */
   path: string;
   /** CSS selector for the anchor element. If absent, popover floats centred. */
@@ -112,6 +128,7 @@ export const TOUR_STEPS: TourStep[] = [
   // ── Act 1: Orient (dashboard chrome) ──────────────────────────────────
   {
     id: "welcome",
+    chapter: "dashboard",
     path: "/",
     title: "Welcome",
     description: `
@@ -124,6 +141,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "kpis",
+    chapter: "dashboard",
     path: "/",
     selector: ".tour-anchor-kpis",
     side: "bottom",
@@ -141,6 +159,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "table-filters",
+    chapter: "dashboard",
     path: "/",
     selector: ".tour-anchor-table-filters",
     side: "bottom",
@@ -156,6 +175,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "sidebar-overview",
+    chapter: "dashboard",
     path: "/",
     selector: ".tour-anchor-sidebar-nav",
     side: "right",
@@ -175,6 +195,7 @@ export const TOUR_STEPS: TourStep[] = [
   // ── Act 2: Filter walk ────────────────────────────────────────────────
   {
     id: "filter-awaiting-me",
+    chapter: "dashboard",
     path: "/",
     selector: ".tour-anchor-kpi-awaiting",
     side: "bottom",
@@ -188,6 +209,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "filter-blocked",
+    chapter: "dashboard",
     path: "/",
     selector: ".tour-anchor-kpi-blocked",
     side: "bottom",
@@ -201,6 +223,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "filter-in-review",
+    chapter: "dashboard",
     path: "/",
     selector: ".tour-anchor-kpi-in-review",
     side: "bottom",
@@ -213,6 +236,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "hero-row",
+    chapter: "workflow",
     path: "/",
     selector: ".tour-anchor-hero-row",
     side: "top",
@@ -229,6 +253,7 @@ export const TOUR_STEPS: TourStep[] = [
   // ── Act 3: Walk Bolt MSA to signed ────────────────────────────────────
   {
     id: "clause-diff",
+    chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-clause-diff",
     side: "top",
@@ -246,6 +271,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "routing",
+    chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-routing",
     side: "top",
@@ -263,6 +289,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "approval-chain",
+    chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-approval-chain",
     side: "top",
@@ -280,6 +307,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "preview-envelope",
+    chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-preview-envelope",
     side: "top",
@@ -296,6 +324,7 @@ export const TOUR_STEPS: TourStep[] = [
   // ── Act 4: DocuSign preview modal walk ────────────────────────────────
   {
     id: "modal-recipients",
+    chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-modal-recipients",
     side: "right",
@@ -313,6 +342,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "modal-config",
+    chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-modal-config",
     side: "right",
@@ -328,6 +358,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "modal-document",
+    chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-modal-document",
     side: "left",
@@ -341,6 +372,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "modal-anchortags",
+    chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-modal-anchortags",
     side: "top",
@@ -355,6 +387,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "modal-send",
+    chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-modal-send",
     side: "top",
@@ -370,6 +403,7 @@ export const TOUR_STEPS: TourStep[] = [
   // ── Act 5: Bolt's signed page ─────────────────────────────────────────
   {
     id: "signed-banner",
+    chapter: "signed",
     path: `/contracts/${HERO_CONTRACT_ID}/signed`,
     selector: ".tour-anchor-signed-banner",
     side: "bottom",
@@ -382,6 +416,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "signed-document",
+    chapter: "signed",
     path: `/contracts/${HERO_CONTRACT_ID}/signed`,
     selector: ".tour-anchor-signed-document",
     side: "right",
@@ -394,6 +429,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "audit-trail",
+    chapter: "signed",
     path: `/contracts/${HERO_CONTRACT_ID}/signed`,
     selector: ".tour-anchor-audit-trail",
     side: "right",
@@ -412,6 +448,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "structured-writeback",
+    chapter: "signed",
     path: `/contracts/${HERO_CONTRACT_ID}/signed`,
     selector: ".tour-anchor-ledger",
     side: "left",
@@ -434,6 +471,7 @@ export const TOUR_STEPS: TourStep[] = [
   // ── Act 5: Signed contracts archive ───────────────────────────────────
   {
     id: "archive-overview",
+    chapter: "archive",
     path: "/archive",
     selector: ".tour-anchor-archive-bolt-row",
     side: "bottom",
@@ -451,6 +489,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "archive-customer",
+    chapter: "archive",
     path: "/archive",
     selector: ".tour-anchor-archive-filters",
     side: "bottom",
@@ -464,6 +503,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "archive-people",
+    chapter: "archive",
     path: "/archive",
     selector: ".tour-anchor-archive-filters",
     side: "bottom",
@@ -477,6 +517,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "archive-equity",
+    chapter: "archive",
     path: "/archive",
     selector: ".tour-anchor-archive-filters",
     side: "bottom",
@@ -494,6 +535,7 @@ export const TOUR_STEPS: TourStep[] = [
   // ── Act 6: Templates walked section by section ────────────────────────
   {
     id: "templates-overview",
+    chapter: "templates",
     path: "/templates",
     title: "Templates catalog",
     description: `
@@ -509,6 +551,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "templates-customer",
+    chapter: "templates",
     path: "/templates",
     selector: ".tour-anchor-templates-customer",
     side: "top",
@@ -526,6 +569,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "templates-people",
+    chapter: "templates",
     path: "/templates",
     selector: ".tour-anchor-templates-people",
     side: "top",
@@ -541,6 +585,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "templates-equity",
+    chapter: "templates",
     path: "/templates",
     selector: ".tour-anchor-templates-equity",
     side: "top",
@@ -556,6 +601,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "templates-counsel",
+    chapter: "templates",
     path: "/templates",
     selector: ".tour-anchor-counsel-section",
     side: "bottom",
@@ -568,6 +614,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     id: "templates-rogue",
+    chapter: "templates",
     path: "/templates",
     selector: ".tour-anchor-rogue",
     side: "top",
@@ -588,6 +635,7 @@ export const TOUR_STEPS: TourStep[] = [
   // ── Act 7: New contract intake ────────────────────────────────────────
   {
     id: "intake-walk",
+    chapter: "intake",
     path: "/contracts/new",
     selector: ".tour-anchor-intake-steps",
     side: "bottom",
@@ -608,6 +656,7 @@ export const TOUR_STEPS: TourStep[] = [
   // ── Wrap up ───────────────────────────────────────────────────────────
   {
     id: "done",
+    chapter: "intake",
     path: "*",
     title: "Tour complete",
     description: `
@@ -631,24 +680,41 @@ export const TOUR_STEPS: TourStep[] = [
 export const TOUR_STATE_KEY = "tour-state";
 export const TOUR_DISMISSED_KEY = "tour-dismissed";
 export const TOUR_SEEN_KEY = "tour-seen";
+export const TOUR_CHAPTERS_DONE_KEY = "tour-chapters-done";
+export const TOUR_CHAPTER_PROGRESS_KEY = "tour-chapter-progress";
 
+/**
+ * The active tour state.
+ *
+ * - `mode: "all"` walks all 33 steps end-to-end (one big tour).
+ * - `mode: "chapter"` walks only the steps in `chapter`. The controller stops
+ *   cleanly when the next step would belong to a different chapter.
+ *
+ * When `mode === "chapter"`, `chapter` MUST be set.
+ */
 export interface TourState {
   active: boolean;
   stepIndex: number;
+  mode: "all" | "chapter";
+  chapter?: ChapterId;
 }
 
+const DEFAULT_TOUR_STATE: TourState = { active: false, stepIndex: 0, mode: "all" };
+
 export function readTourState(): TourState {
-  if (typeof window === "undefined") return { active: false, stepIndex: 0 };
+  if (typeof window === "undefined") return DEFAULT_TOUR_STATE;
   try {
     const raw = window.localStorage.getItem(TOUR_STATE_KEY);
-    if (!raw) return { active: false, stepIndex: 0 };
+    if (!raw) return DEFAULT_TOUR_STATE;
     const parsed = JSON.parse(raw) as Partial<TourState>;
     return {
       active: Boolean(parsed.active),
       stepIndex: typeof parsed.stepIndex === "number" ? parsed.stepIndex : 0,
+      mode: parsed.mode === "chapter" ? "chapter" : "all",
+      chapter: typeof parsed.chapter === "string" ? (parsed.chapter as ChapterId) : undefined,
     };
   } catch {
-    return { active: false, stepIndex: 0 };
+    return DEFAULT_TOUR_STATE;
   }
 }
 
@@ -656,6 +722,68 @@ export function writeTourState(state: TourState): void {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(TOUR_STATE_KEY, JSON.stringify(state));
+  } catch {
+    // ignore
+  }
+}
+
+// ── Chapter progress + completion tracking ───────────────────────────────
+
+/** Record of completed chapters. Survives Reset Tour but not Reset Demo. */
+export function readChaptersDone(): ChapterId[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(TOUR_CHAPTERS_DONE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as ChapterId[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function markChapterDone(chapter: ChapterId): void {
+  if (typeof window === "undefined") return;
+  try {
+    const set = new Set(readChaptersDone());
+    set.add(chapter);
+    window.localStorage.setItem(TOUR_CHAPTERS_DONE_KEY, JSON.stringify([...set]));
+  } catch {
+    // ignore
+  }
+}
+
+/** Map of chapter → step index of last viewed step, for Resume. */
+export function readChapterProgress(): Partial<Record<ChapterId, number>> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(TOUR_CHAPTER_PROGRESS_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (typeof parsed === "object" && parsed !== null) return parsed;
+    return {};
+  } catch {
+    return {};
+  }
+}
+
+export function writeChapterProgress(chapter: ChapterId, stepIndex: number): void {
+  if (typeof window === "undefined") return;
+  try {
+    const prog = readChapterProgress();
+    prog[chapter] = stepIndex;
+    window.localStorage.setItem(TOUR_CHAPTER_PROGRESS_KEY, JSON.stringify(prog));
+  } catch {
+    // ignore
+  }
+}
+
+export function clearChapterProgress(chapter: ChapterId): void {
+  if (typeof window === "undefined") return;
+  try {
+    const prog = readChapterProgress();
+    delete prog[chapter];
+    window.localStorage.setItem(TOUR_CHAPTER_PROGRESS_KEY, JSON.stringify(prog));
   } catch {
     // ignore
   }
@@ -718,7 +846,78 @@ export function resetTourState(): void {
     window.localStorage.removeItem(TOUR_STATE_KEY);
     window.localStorage.removeItem(TOUR_DISMISSED_KEY);
     window.localStorage.removeItem(TOUR_SEEN_KEY);
+    window.localStorage.removeItem(TOUR_CHAPTERS_DONE_KEY);
+    window.localStorage.removeItem(TOUR_CHAPTER_PROGRESS_KEY);
   } catch {
     // ignore
   }
+}
+
+// ── Chapter metadata ──────────────────────────────────────────────────────
+
+export interface ChapterMeta {
+  id: ChapterId;
+  title: string;
+  blurb: string;
+  /** Approximate duration in seconds; informational only. */
+  estSeconds: number;
+}
+
+export const CHAPTERS: ChapterMeta[] = [
+  {
+    id: "dashboard",
+    title: "Dashboard",
+    blurb: "Operator KPIs, stage filters, sidebar.",
+    estSeconds: 45,
+  },
+  {
+    id: "workflow",
+    title: "Workflow walk",
+    blurb: "Bolt MSA from in-review to sent. Clause check, routing, approvals, envelope preview.",
+    estSeconds: 90,
+  },
+  {
+    id: "signed",
+    title: "Signed record",
+    blurb: "Signed banner, PDF retention, audit trail, structured writeback.",
+    estSeconds: 40,
+  },
+  {
+    id: "archive",
+    title: "Signed archive",
+    blurb: "All filed contracts, by category.",
+    estSeconds: 30,
+  },
+  {
+    id: "templates",
+    title: "Templates",
+    blurb: "8 master Word docs in Drive, rogue-template governance, Counsel's editing workflow.",
+    estSeconds: 45,
+  },
+  {
+    id: "intake",
+    title: "New contract",
+    blurb: "3-step intake form.",
+    estSeconds: 20,
+  },
+];
+
+/** First TOUR_STEPS index that belongs to a given chapter. */
+export function firstStepIndexOf(chapter: ChapterId): number {
+  const idx = TOUR_STEPS.findIndex((s) => s.chapter === chapter);
+  return idx === -1 ? 0 : idx;
+}
+
+/** Total step count in a chapter. */
+export function chapterLength(chapter: ChapterId): number {
+  return TOUR_STEPS.filter((s) => s.chapter === chapter).length;
+}
+
+/** Step index within the chapter (1-based for display). */
+export function stepIndexWithinChapter(
+  chapter: ChapterId,
+  globalStepIndex: number,
+): number {
+  const first = firstStepIndexOf(chapter);
+  return Math.max(0, globalStepIndex - first);
 }

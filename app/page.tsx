@@ -12,7 +12,6 @@ import { listContracts, computeKpis } from "@/lib/contract-store";
 import {
   hasSeenTour,
   markTourSeen,
-  writeTourState,
   type TourEffect,
 } from "@/lib/tour-steps";
 import type { Contract } from "@/lib/types";
@@ -26,19 +25,15 @@ export default function DashboardPage() {
   useEffect(() => {
     setContracts(listContracts());
 
-    // Auto-show the tour ONCE per browser, ever. After the first auto-start
-    // (or any manual trigger), we set `tour-seen` and never auto-start again.
-    // Users can still re-trigger via the sidebar button.
+    // Auto-open the chapter chooser ONCE per browser. After it opens, we
+    // mark seen so it doesn't pop again on subsequent dashboard visits. The
+    // user can still re-open the menu via the sidebar.
     const isFirstEver = !hasSeenTour();
     const isDesktop = typeof window !== "undefined" && window.innerWidth >= 768;
     if (isFirstEver && isDesktop) {
-      // Mark seen IMMEDIATELY so a refresh during the auto-start delay
-      // doesn't queue a second tour.
       markTourSeen();
-      // Brief delay so the page has hydrated and anchors are mounted.
       const t = window.setTimeout(() => {
-        writeTourState({ active: true, stepIndex: 0 });
-        window.dispatchEvent(new CustomEvent("tour:start"));
+        window.dispatchEvent(new CustomEvent("tour:menu-open"));
       }, 600);
       return () => window.clearTimeout(t);
     }

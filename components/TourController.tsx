@@ -11,6 +11,9 @@ import {
   writeTourState,
   setTourDismissed,
   markTourSeen,
+  markChapterDone,
+  writeChapterProgress,
+  clearChapterProgress,
 } from "@/lib/tour-steps";
 
 /**
@@ -183,9 +186,7 @@ export function TourController() {
     let stepIndex = state.stepIndex;
     let step = TOUR_STEPS[stepIndex];
     if (!step) {
-      // Walked past the last step (e.g. localStorage out of sync after a
-      // STATE_VERSION bump). End cleanly.
-      writeTourState({ active: false, stepIndex: 0 });
+      writeTourState({ ...state, active: false, stepIndex: 0 });
       setTourDismissed(true);
       destroyDriver();
       return;
@@ -199,13 +200,34 @@ export function TourController() {
         (s, i) => i > stepIndex && s.path === pathname,
       );
       if (futureMatch !== -1) {
+        const matchedStep = TOUR_STEPS[futureMatch];
+        // Chapter boundary check: when running a single chapter, do not
+        // jump into a different chapter's territory just because the user
+        // navigated. End the chapter cleanly and open the menu so the user
+        // can pick the next chapter.
+        if (
+          state.mode === "chapter" &&
+          state.chapter &&
+          matchedStep.chapter !== state.chapter
+        ) {
+          markChapterDone(state.chapter);
+          clearChapterProgress(state.chapter);
+          writeTourState({ ...state, active: false, stepIndex: 0 });
+          destroyDriver();
+          window.dispatchEvent(new CustomEvent("tour:menu-open"));
+          return;
+        }
         stepIndex = futureMatch;
         step = TOUR_STEPS[stepIndex];
-        writeTourState({ active: true, stepIndex });
+        writeTourState({ ...state, active: true, stepIndex });
       } else {
         destroyDriver();
         return;
       }
+    }
+    // Save chapter progress on every render so Resume works after a dismiss.
+    if (state.mode === "chapter" && state.chapter) {
+      writeChapterProgress(state.chapter, stepIndex);
     }
     renderStep(stepIndex, step);
   }, [pathname, destroyDriver, renderStep]);
@@ -215,26 +237,49 @@ export function TourController() {
   // time, so they always see the freshest closures.
   handlersRef.current = {
     next: (idx, step) => {
+      const state = readTourState();
       const nextIdx = idx + 1;
-      // Finishing the tour: persist completion + dismissed.
-      if (nextIdx >= TOUR_STEPS.length) {
-        writeTourState({ active: false, stepIndex: 0 });
+      const nextStep = TOUR_STEPS[nextIdx];
+
+      // Finished the entire tour (mode === "all" reaches the last step).
+      if (!nextStep) {
+        writeTourState({ ...state, active: false, stepIndex: 0 });
         setTourDismissed(true);
         markTourSeen();
+        if (state.mode === "chapter" && state.chapter) {
+          markChapterDone(state.chapter);
+          clearChapterProgress(state.chapter);
+        } else {
+          // Walk-everything: mark all chapters done.
+          (["dashboard", "workflow", "signed", "archive", "templates", "intake"] as const).forEach(markChapterDone);
+        }
         destroyDriver();
         return;
       }
-      writeTourState({ active: true, stepIndex: nextIdx });
 
-      // The CURRENT step decides how navigation happens. If it says
-      // "navigate", we push the new route and let the path-change effect
-      // render the next step once the new page hydrates.
+      // Chapter boundary: in chapter mode, ending the chapter opens the menu.
+      if (
+        state.mode === "chapter" &&
+        state.chapter &&
+        nextStep.chapter !== state.chapter
+      ) {
+        markChapterDone(state.chapter);
+        clearChapterProgress(state.chapter);
+        writeTourState({ ...state, active: false, stepIndex: 0 });
+        destroyDriver();
+        window.dispatchEvent(new CustomEvent("tour:menu-open"));
+        return;
+      }
+
+      writeTourState({ ...state, active: true, stepIndex: nextIdx });
+      if (state.mode === "chapter" && state.chapter) {
+        writeChapterProgress(state.chapter, nextIdx);
+      }
+
+      // The CURRENT step decides how navigation happens.
       if (step.next === "navigate" && step.goto) {
         destroyDriver();
-        // If we're already on the goto path, skip the router push (no-op
-        // routes can sometimes not trigger a re-render in dev).
         if (pathname === step.goto) {
-          const nextStep = TOUR_STEPS[nextIdx];
           if (nextStep.path === "*" || nextStep.path === pathname) {
             renderStep(nextIdx, nextStep);
           }
@@ -244,56 +289,65 @@ export function TourController() {
         return;
       }
 
-      // Same-page advance. Defer one tick so driver.js can finish its
-      // current click-handler event loop before we tear down + remount.
-      const nextStep = TOUR_STEPS[nextIdx];
+      // Same-page advance. Defer so driver.js finishes its click handler.
       if (nextStep.path === "*" || nextStep.path === pathname) {
         window.setTimeout(() => renderStep(nextIdx, nextStep), 0);
       } else {
-        // Next step is on a different path and no auto-navigate directive.
-        // Sit dormant; user will navigate manually.
         destroyDriver();
       }
     },
     prev: (idx) => {
+      const state = readTourState();
       const prevIdx = Math.max(0, idx - 1);
-      writeTourState({ active: true, stepIndex: prevIdx });
       const prevStep = TOUR_STEPS[prevIdx];
+      // Back across chapter boundary: don't escape chapter; sit dormant.
+      if (
+        state.mode === "chapter" &&
+        state.chapter &&
+        prevStep.chapter !== state.chapter
+      ) {
+        return;
+      }
+      writeTourState({ ...state, active: true, stepIndex: prevIdx });
+      if (state.mode === "chapter" && state.chapter) {
+        writeChapterProgress(state.chapter, prevIdx);
+      }
       if (prevStep.path === "*" || prevStep.path === pathname) {
-        // Defer to next tick so driver.js can finish its click-handler event
-        // loop before we tear down its instance and remount a new one. Without
-        // this defer, destroying the driver from inside its own button handler
-        // can leave the popover in a half-dismissed state and Back appears
-        // broken.
         window.setTimeout(() => renderStep(prevIdx, prevStep), 0);
       } else {
-        // Back across page boundaries: push to the prev step's path.
         destroyDriver();
         router.push(prevStep.path);
       }
     },
     close: () => {
-      writeTourState({ active: false, stepIndex: 0 });
+      const state = readTourState();
+      // Persist progress so Resume offers continue. Don't mark chapter done
+      // (user dismissed mid-flow). Mark seen so auto-start doesn't fire.
+      if (state.mode === "chapter" && state.chapter) {
+        writeChapterProgress(state.chapter, state.stepIndex);
+      }
+      writeTourState({ ...state, active: false, stepIndex: 0 });
       setTourDismissed(true);
       markTourSeen();
       destroyDriver();
     },
   };
 
-  // Listen for explicit "tour:start" events from the sidebar / callout.
+  // Listen for "tour:start" events. The CALLER (TourMenu, auto-start) is
+  // responsible for setting tour-state correctly BEFORE firing this event.
+  // We just look at the persisted state and render the right step.
   useEffect(() => {
     const handler = () => {
-      writeTourState({ active: true, stepIndex: 0 });
+      const state = readTourState();
+      if (!state.active) return;
       markTourSeen();
-      const first = TOUR_STEPS[0];
-      // Tour always starts on step 0's path (typically "/"). If we're
-      // already there, render immediately; otherwise push the route and
-      // let the path-change effect render it.
-      if (first.path !== "*" && first.path !== pathname) {
-        router.push(first.path);
+      const step = TOUR_STEPS[state.stepIndex];
+      if (!step) return;
+      if (step.path !== "*" && step.path !== pathname) {
+        router.push(step.path);
         return;
       }
-      renderStep(0, first);
+      renderStep(state.stepIndex, step);
     };
     window.addEventListener("tour:start", handler);
     return () => window.removeEventListener("tour:start", handler);
