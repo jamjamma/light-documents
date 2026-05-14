@@ -308,31 +308,31 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
 function ContractSummary({ contract }: { contract: Contract }) {
   return (
     <Card>
-      <div className="flex flex-wrap items-center gap-3 text-[12px]">
-        <StatusBadge stage={contract.stage} />
-        <RiskBadge risk={contract.risk} />
-        <Badge tone="slate">{contract.type}</Badge>
-        <div className="text-ink-500">·</div>
-        <div className="text-ink-700">
-          <span className="text-ink-500">Counterparty: </span>
-          <span className="font-medium">{contract.counterparty}</span>
-        </div>
-        {contract.valueEur !== undefined && (
-          <>
-            <div className="text-ink-500">·</div>
-            <div className="text-ink-700">
-              <span className="text-ink-500">Value: </span>
-              <span className="font-medium tabular-nums">{formatEur(contract.valueEur)}</span>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
+          <div>
+            <div className="text-[10px] uppercase tracking-wider text-ink-400">Counterparty</div>
+            <div className="text-[18px] font-semibold tracking-tight text-ink-900">{contract.counterparty}</div>
+          </div>
+          {contract.valueEur !== undefined && (
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-ink-400">Value</div>
+              <div className="text-[18px] font-semibold tabular-nums tracking-tight text-ink-900">{formatEur(contract.valueEur)}</div>
             </div>
-          </>
-        )}
-        <div className="text-ink-500">·</div>
-        <div className="text-ink-700">
-          <span className="text-ink-500">Owner: </span>
-          <span className="font-medium">{contract.owner}</span> <span className="text-ink-500">({contract.ownerTeam})</span>
+          )}
         </div>
-        <div className="text-ink-500">·</div>
-        <div className="text-ink-500">Updated {formatDateTime(contract.updatedAt)}</div>
+        <div className="flex flex-wrap items-center gap-2 text-[11px] text-ink-500 sm:justify-end">
+          <StatusBadge stage={contract.stage} />
+          <RiskBadge risk={contract.risk} />
+          <Badge tone="slate">{contract.type}</Badge>
+        </div>
+      </div>
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-ink-100 pt-3 text-[11px] text-ink-500">
+        <span>
+          Owner <span className="font-medium text-ink-700">{contract.owner}</span> ({contract.ownerTeam})
+        </span>
+        <span>·</span>
+        <span>Updated {formatDateTime(contract.updatedAt)}</span>
       </div>
     </Card>
   );
