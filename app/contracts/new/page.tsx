@@ -57,17 +57,29 @@ function NewContractInner() {
     if (source) setFields({ ...source.data } as ContractFields);
   }, [source]);
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const handleRunChecks = () => {
     if (!template || !source) return;
-    const contract = createContract({
-      templateId: template.id,
-      sourceRecordId: source.id,
-      owner: ownerForType(template),
-      ownerTeam: ownerTeamForType(template),
-      fields,
-    });
-    runClauseChecks(contract.id);
-    router.push(`/contracts/${contract.id}`);
+    setSubmitError(null);
+    try {
+      const contract = createContract({
+        templateId: template.id,
+        sourceRecordId: source.id,
+        owner: ownerForType(template),
+        ownerTeam: ownerTeamForType(template),
+        fields,
+      });
+      runClauseChecks(contract.id);
+      router.push(`/contracts/${contract.id}`);
+    } catch (err: unknown) {
+      // Surface failures instead of letting the click silently no-op. Common
+      // causes: source record not found (e.g. localStorage cleared between
+      // selection and submit), template lookup failure, or a clause rule
+      // throwing on a malformed field.
+      const message = err instanceof Error ? err.message : "Unexpected error";
+      setSubmitError(message);
+    }
   };
 
   return (
@@ -116,6 +128,11 @@ function NewContractInner() {
                 }
               >
                 <IntakeForm template={template} source={source} onChange={setFields} />
+                {submitError && (
+                  <div className="mt-4 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-[12px] text-rose-800">
+                    <strong>Could not run checks:</strong> {submitError}
+                  </div>
+                )}
                 <div className="mt-5 space-y-2">
                   <div className="rounded-lg border border-ink-200 bg-ink-50/40 px-4 py-3 text-[11px] text-ink-500">
                     <span className="demo-note mr-2">Demo</span>

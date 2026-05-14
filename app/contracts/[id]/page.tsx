@@ -24,8 +24,9 @@ import {
   rejectApproval,
   saveDraftAndExit,
   undoApproval,
+  findSourceRecord,
 } from "@/lib/contract-store";
-import { getTemplate, getSourceRecord } from "@/lib/mock-data";
+import { getTemplate } from "@/lib/mock-data";
 import { allApproved } from "@/lib/routing-rules";
 import { lightSignerRationale } from "@/lib/signer-routing";
 import type { Contract, Approval } from "@/lib/types";
@@ -84,7 +85,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
   }
 
   const template = getTemplate(contract.templateId);
-  const source = getSourceRecord(contract.sourceRecordId);
+  const source = findSourceRecord(contract.sourceRecordId);
   if (!template || !source) return null;
 
   const handleApprove = (a: Approval) => {

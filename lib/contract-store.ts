@@ -1,7 +1,7 @@
 "use client";
 
 import type { Contract, Stage, Approval, AuditEvent, ContractFields, LedgerImpact } from "./types";
-import { SEED_CONTRACTS, getTemplate, getSourceRecord } from "./mock-data";
+import { SEED_CONTRACTS, getTemplate } from "./mock-data";
 import { runChecks } from "./clause-checker";
 import { computeRouting, allApproved } from "./routing-rules";
 import { primaryLightSignerActor } from "./signer-routing";
@@ -138,6 +138,17 @@ import { SOURCE_RECORDS } from "./mock-data";
 export function listAllSourceRecords(): SourceRecord[] {
   const state = ensureSeeded();
   return [...SOURCE_RECORDS, ...(state.manualSourceRecords ?? [])];
+}
+
+/**
+ * Look up a source record by id across BOTH the seeded mock data and any
+ * manually entered records persisted in localStorage. The plain
+ * `getSourceRecord` exported by `mock-data.ts` only sees the seed array, so
+ * any caller that may receive a manual-entry id must use this function
+ * instead. (Contract creation and the contract detail page both qualify.)
+ */
+export function findSourceRecord(id: string): SourceRecord | undefined {
+  return listAllSourceRecords().find((r) => r.id === id);
 }
 
 export function listSourceRecordsByType(type: SourceRecord["type"]): SourceRecord[] {
@@ -287,7 +298,7 @@ export function createContract(input: {
   fields: ContractFields;
 }): Contract {
   const template = getTemplate(input.templateId);
-  const sourceRecord = getSourceRecord(input.sourceRecordId);
+  const sourceRecord = findSourceRecord(input.sourceRecordId);
   if (!template) throw new Error(`Unknown template: ${input.templateId}`);
   if (!sourceRecord) throw new Error(`Unknown source record: ${input.sourceRecordId}`);
 
