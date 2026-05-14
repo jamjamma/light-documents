@@ -3,6 +3,10 @@
 > Case study submission for the AI Strategy & Operations Associate role at Light (light.inc).
 > Part 1 of 3: scope what to build or buy to fix Light's manual document workflow, and prototype the core.
 
+**Live demo:** https://light-documents-sigma.vercel.app/
+**Repo:** https://github.com/jamjamma/light-documents
+**Suggested review path:** README reframe → live demo (Bolt MSA block path → Acme MSA happy path → signed page) → `docs/decisions.md` for the ADRs.
+
 ## The problem (reframed)
 
 The visible pain Light described:

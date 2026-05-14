@@ -177,7 +177,17 @@ The key architectural and product decisions, with alternatives considered and wh
 
 **Channel collision:** when two rules for the same role declare different notification channels, the most-restrictive one wins (`Email magic link` > `Slack DM` > `Slack channel` > `In-app only`). The merged Approval surfaces the collision in its reason text so the rules-engine owner can see when their rule set is over-prescribing channels.
 
-## 14. What we deliberately did NOT build
+## 14. NDAs do not write to the ledger (added 2026-05-14)
+
+**Decision:** NDAs are filed for retention only. They do not produce a Light ledger entry. The audit trail is the system of record (who signed, when, on which template version). The signed-record page surfaces this explicitly: "NDAs do not write to the ledger by design. There is no MRR, headcount, or equity to record."
+
+**Why this exists:** ADR 2 says contracts are first-class ledger objects. The implicit assumption — that every contract type maps to a ledger object — is wrong for NDAs. An NDA has no commercial value, no headcount, no cap-table impact, and no obligation worth posting to the GL. Forcing one in would create a phantom record that downstream consumers (renewal alerts, MRR rollups, board reporting) would have to filter out anyway. Better to keep the ledger clean and let the audit trail carry the retention story.
+
+**Where it lives in code:** `buildLedgerImpact()` in `lib/contract-store.ts` short-circuits with `null` for `type === "NDA"`. `simulateSigned()` only attaches `contract.ledger` when the result is non-null, and the audit event reads "Filed to Drive (retention only, no ledger writeback)" instead of the standard "Filed to Drive, ledger updated".
+
+**General rule this implies:** when a strategic claim is type-conditional ("contracts are ledger objects"), the catch-all path in code must distinguish "real exception" from "type we forgot to handle". Generic fallthroughs in dispatch logic are a smell: they tend to absorb cases that should have been explicit exceptions, producing copy that contradicts the narrative elsewhere in the product.
+
+## 15. What we deliberately did NOT build
 
 Each cut listed below was deliberate, to keep the case study right-sized.
 

@@ -22,9 +22,9 @@ Scroll to Routing.
 
 Scroll to Approval chain.
 
-> "Approvers are notified via Slack DM. Demo affordance: let me simulate Legal approving."
+> "Approvers are notified via Slack DM. Demo affordance: let me simulate Legal approving. Note my own row says 'Approve' instead of 'Simulate', because I'm signed in as Martina — the product is honest about who's actually clicking what."
 
-Click "Simulate: Legal approves". Chip flips green.
+Click "Simulate Sara approves" (Legal). Chip flips green.
 
 ## 1:30 to 2:30 — The DocuSign envelope (the field placement answer)
 
