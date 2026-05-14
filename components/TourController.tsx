@@ -14,6 +14,7 @@ import {
   markChapterDone,
   writeChapterProgress,
   clearChapterProgress,
+  chapterProgressLabel,
 } from "@/lib/tour-steps";
 
 /**
@@ -130,12 +131,16 @@ export function TourController() {
       const startWithEffect = () => {
         fireEffectOnce();
         // For steps that mount substantial new DOM (modal:open), give React
-        // an extra paint cycle before the first poll. Without this, the
-        // first attempts of the poll all see `null` and we burn time before
-        // the modal even mounts. 150ms is enough for a setState → render →
-        // commit on a typical machine; the existing retry loop covers
-        // slower cases.
-        const initialDelay = step.effect?.startsWith("modal:") ? 150 : 0;
+        // multiple paint cycles before the first poll: the modal animates in,
+        // its contents lay out, the inner overflow-y-auto positions itself.
+        // 300ms is conservative for typical machines but is paid only once
+        // per modal-effect step (the retry-poll itself handles slower cases).
+        // approval:open-actions also mounts new DOM (the menu pop-out) so it
+        // benefits from the same initial wait.
+        const initialDelay =
+          step.effect?.startsWith("modal:") || step.effect === "approval:open-actions"
+            ? 300
+            : 0;
         window.setTimeout(() => tryRender(25), initialDelay);
       };
 
@@ -181,7 +186,10 @@ export function TourController() {
 
         const d = driver({
           showProgress: true,
-          progressText: `${idx + 1} of ${TOUR_STEPS.length}`,
+          // Section-by-section count keeps the "60 total" out of sight. The
+          // operator sees "Workflow · 5 of 12", which reads as progress
+          // within the current part rather than a long way to go.
+          progressText: chapterProgressLabel(idx),
           allowClose: true,
           allowKeyboardControl: true,
           smoothScroll: true,
@@ -223,6 +231,29 @@ export function TourController() {
             ro = new ResizeObserver(refresh);
             ro.observe(el);
             stepCleanupRef.current.push(() => ro?.disconnect());
+          }
+          // MutationObserver: catches attribute changes that don't
+          // necessarily change the bounding rect (e.g. <details open>
+          // toggled before content layout reflows, aria-expanded on a
+          // menu button). ResizeObserver covers the eventual size change;
+          // this fires earlier so the popover settles before the user
+          // notices a stale anchor.
+          if (typeof MutationObserver !== "undefined") {
+            const mo = new MutationObserver(refresh);
+            mo.observe(el, {
+              attributes: true,
+              attributeFilter: ["open", "class", "aria-expanded"],
+            });
+            stepCleanupRef.current.push(() => mo.disconnect());
+          }
+          // Native <details> toggle event: fires the instant the open
+          // attribute flips, which is earlier than ResizeObserver in some
+          // browsers. Cheap and idempotent with the other observers.
+          if (el.tagName === "DETAILS") {
+            el.addEventListener("toggle", refresh);
+            stepCleanupRef.current.push(() =>
+              el.removeEventListener("toggle", refresh),
+            );
           }
           // Window resize.
           window.addEventListener("resize", refresh);

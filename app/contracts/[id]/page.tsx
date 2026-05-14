@@ -105,6 +105,23 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
             if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
           }, 100);
           break;
+        case "approval:open-actions":
+          // Programmatically click the "..." button inside the operator's
+          // actions-menu wrapper so the menu is visibly open while the tour
+          // popover narrates its contents. ApprovalActionsMenu owns its own
+          // open state; a real click toggles it the same as a user click.
+          // Defer so the click lands AFTER any previous mousedown listeners
+          // (the menu has a click-away mousedown listener; a click in the
+          // same tick would close it).
+          window.setTimeout(() => {
+            const btn = document.querySelector<HTMLButtonElement>(
+              ".tour-anchor-approval-actions-menu button[aria-haspopup='menu']",
+            );
+            if (btn && btn.getAttribute("aria-expanded") !== "true") {
+              btn.click();
+            }
+          }, 50);
+          break;
       }
     };
     window.addEventListener("tour:effect", handler);

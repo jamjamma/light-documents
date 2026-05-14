@@ -91,7 +91,11 @@ export type TourEffect =
   | "modal:scroll-anchortags"
   // Expand the Rogue Templates collapsible on /templates so its action
   // buttons (Archive, Notify owner) are visible to highlight.
-  | "rogue:expand";
+  | "rogue:expand"
+  // Programmatically open the per-row actions menu (the "..." button) on
+  // the operator's approval row. Used so the tour shows the actual menu
+  // content (Reassign / Re-ping / Reject) instead of just describing it.
+  | "approval:open-actions";
 
 export interface TourStep {
   /** Stable id, used for de-dupe in the controller render guard. */
@@ -331,12 +335,16 @@ export const TOUR_STEPS: TourStep[] = [
     id: "approval-undo",
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
-    selector: ".tour-anchor-approval-undo",
+    // Anchor on the operator's row, not the Undo chip itself. Clicking Undo
+    // removes the chip (row returns to pending), which would orphan the
+    // popover if it anchored on the disappearing chip. The row stays in DOM
+    // through both approved + pending states.
+    selector: ".tour-anchor-approval-operator-row",
     side: "left",
     title: "Undo: only before send",
     description: `
-      <p>The <strong>Undo</strong> chip lets the operator withdraw their own approval. A new audit row gets appended (the original Approved row stays).</p>
-      <p>Click <strong>Undo</strong> now if you want to see the withdrawal flow, then click Approve again to restore the green state before continuing.</p>
+      <p>The <strong>Undo</strong> chip next to <em>Approved</em> withdraws your own approval. A new audit row gets appended; the original Approved row stays.</p>
+      <p>Try it: click <strong>Undo</strong>, then click <strong>Approve</strong> again to restore the green state before continuing.</p>
       <p class="muted">Undo is refused once the envelope is in DocuSign. That's the line.</p>
     `,
     next: "advance",
@@ -349,15 +357,18 @@ export const TOUR_STEPS: TourStep[] = [
     side: "left",
     title: "Reassign, Re-ping, Reject",
     description: `
-      <p>Each pending row has a <strong>...</strong> menu (top right). Three actions:</p>
+      <p>We just opened the <strong>...</strong> menu on Martina's row for you. Three actions:</p>
       <ul>
-        <li><strong>Reassign / Pass on...</strong> Switch the approver to someone else (out of office, conflict of interest).</li>
-        <li><strong>Re-ping</strong> Resend the Slack DM if it's been sitting too long.</li>
+        <li><strong>Reassign / Pass on...</strong> Switch the approver (out of office, conflict of interest).</li>
+        <li><strong>Re-ping.</strong> Resend the Slack DM if it's been sitting too long.</li>
         <li><strong>Reject...</strong> Block the contract and return it to the owner with a reason.</li>
       </ul>
-      <p class="muted">Click the <strong>...</strong> on Martina's row to try it. Every action writes a row to the audit trail.</p>
+      <p class="muted">Every action writes a row to the audit trail.</p>
     `,
     next: "advance",
+    // Programmatically open the menu so the popover describes what's
+    // actually on screen, not what would be on screen if the user clicked.
+    effect: "approval:open-actions",
   },
   {
     id: "approval-simulate-others",
@@ -835,7 +846,10 @@ export const TOUR_STEPS: TourStep[] = [
     id: "templates-rogue",
     chapter: "templates",
     path: "/templates",
-    selector: ".tour-anchor-rogue",
+    // Anchor on the header (not the whole panel wrapper) so the highlight
+    // is focused on the title + count + scan cadence, not a vague box that
+    // includes the not-yet-rendered list.
+    selector: ".tour-anchor-rogue-header",
     side: "top",
     title: "Rogue templates governance",
     description: `
@@ -849,11 +863,14 @@ export const TOUR_STEPS: TourStep[] = [
     id: "templates-rogue-expand",
     chapter: "templates",
     path: "/templates",
-    selector: ".tour-anchor-rogue-header",
-    side: "right",
+    // Anchor on the chevron icon (top-right of the panel header) so the
+    // popover sits next to the actual click target rather than floating
+    // off the side of the full-width header button.
+    selector: ".tour-anchor-rogue-chevron",
+    side: "bottom",
     title: "Open the panel",
     description: `
-      <p><strong>Click the panel header below</strong> to expand the list of flagged files.</p>
+      <p><strong>Click the chevron</strong> (or anywhere on the panel header) to expand the list of flagged files.</p>
       <p class="muted">The tour follows you forward as soon as you open it.</p>
     `,
     // Only the in-app open advances. Page dispatches `tour:auto-next` when
@@ -897,7 +914,9 @@ export const TOUR_STEPS: TourStep[] = [
     id: "templates-rogue-undo-archive",
     chapter: "templates",
     path: "/templates",
-    selector: ".tour-anchor-rogue-archived-stamp",
+    // Anchor on the Undo button itself, not the whole archived stamp,
+    // so the popover arrow points at the actual control.
+    selector: ".tour-anchor-rogue-undo",
     side: "bottom",
     title: "Undo the archive",
     description: `
@@ -1013,12 +1032,8 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Step 3 · Confirm details",
     description: `
-      <p>Fields grouped by section (Counterparty / Commercial / Legal / Signer for MSAs; Candidate / Compensation / Terms for Employment; Grant for Warrants).</p>
-      <ul>
-        <li><strong>Pre-filled</strong> from the source record. Non-standard fields are flagged inline.</li>
-        <li><strong>Adjust anything.</strong> Variable changes go through this form, not Word.</li>
-        <li><strong>Bespoke redline lane.</strong> For full-blown legal markup, download the doc, edit in Word with Track Changes, upload back; AI diffs vs master and routes to Legal.</li>
-      </ul>
+      <p>Pre-filled from the source record. Non-standard values flag inline.</p>
+      <p class="muted">For full legal markup, download to Word with Track Changes and upload back; AI diffs vs the master.</p>
     `,
     next: "advance",
   },
@@ -1326,4 +1341,20 @@ export function stepIndexWithinChapter(
 ): number {
   const first = firstStepIndexOf(chapter);
   return Math.max(0, globalStepIndex - first);
+}
+
+/**
+ * Section-by-section progress label for the popover. Renders as e.g.
+ * "Workflow · 5 of 12" instead of "12 of 60", so the operator sees how far
+ * into the current chapter they are rather than facing the full 60-step
+ * total. Used by TourController.progressText.
+ */
+export function chapterProgressLabel(globalStepIndex: number): string {
+  const step = TOUR_STEPS[globalStepIndex];
+  if (!step) return "";
+  const meta = CHAPTERS.find((c) => c.id === step.chapter);
+  const local = stepIndexWithinChapter(step.chapter, globalStepIndex) + 1;
+  const total = chapterLength(step.chapter);
+  const label = meta?.title ?? step.chapter;
+  return `${label} · ${local} of ${total}`;
 }

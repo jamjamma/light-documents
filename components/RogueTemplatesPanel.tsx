@@ -90,7 +90,10 @@ export function RogueTemplatesPanel({ rogues, templateNameById }: Props) {
           </div>
         </div>
         <ChevronDown
-          className={clsx("mt-1 h-4 w-4 shrink-0 text-ink-400 transition-transform", open && "rotate-180")}
+          className={clsx(
+            "tour-anchor-rogue-chevron mt-1 h-4 w-4 shrink-0 text-ink-400 transition-transform",
+            open && "rotate-180",
+          )}
         />
       </button>
 
@@ -311,7 +314,10 @@ function RogueRow({
                   <button
                     type="button"
                     onClick={onUndoArchive}
-                    className="ml-1 inline-flex items-center gap-0.5 text-ink-500 hover:text-ink-900"
+                    className={clsx(
+                      "ml-1 inline-flex items-center gap-0.5 text-ink-500 hover:text-ink-900",
+                      isFirst && "tour-anchor-rogue-undo",
+                    )}
                   >
                     <Undo2 className="h-3 w-3" /> Undo
                   </button>
