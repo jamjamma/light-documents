@@ -154,7 +154,7 @@ export function Sidebar() {
           </button>
         </div>
 
-        <nav className={clsx("flex-1", collapsed ? "md:px-1.5" : "px-3")}>
+        <nav className={clsx("tour-anchor-sidebar-nav flex-1", collapsed ? "md:px-1.5" : "px-3")}>
           {NAV.map(({ href, label, icon: Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
@@ -228,11 +228,11 @@ export function Sidebar() {
             }}
             title={collapsed ? "Take the tour" : "Take a guided tour of the build (~90s)"}
             className={clsx(
-              "flex w-full items-center gap-2.5 rounded-lg text-xs text-ink-700 hover:bg-ink-50",
+              "mb-1 flex w-full items-center gap-2.5 rounded-lg border border-accent-200 bg-accent-50 text-[13px] font-medium text-accent-700 transition-colors hover:bg-accent-100 hover:text-accent-700",
               collapsed ? "md:justify-center md:px-2 md:py-2" : "px-3 py-2",
             )}
           >
-            <Play className="h-3.5 w-3.5 shrink-0" />
+            <Play className="h-4 w-4 shrink-0" />
             <span className={clsx(collapsed && "md:hidden")}>Take the tour</span>
           </button>
 

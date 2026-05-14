@@ -2,37 +2,33 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus, ArrowRight, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Header } from "@/components/Header";
 import { KpiStrip } from "@/components/KpiStrip";
 import { AboutWidget } from "@/components/AboutWidget";
 import { ContractsTable } from "@/components/ContractsTable";
 import { Button } from "@/components/ui/Button";
 import { listContracts, computeKpis } from "@/lib/contract-store";
-import { hasSeenTour, markTourSeen, writeTourState } from "@/lib/tour-steps";
+import {
+  hasSeenTour,
+  markTourSeen,
+  writeTourState,
+  type TourEffect,
+} from "@/lib/tour-steps";
 import type { Contract } from "@/lib/types";
 
 type Filter = "all" | "awaiting_me" | "blocked" | "in_review";
 
-const CALLOUT_DISMISS_KEY = "callout-msa-flow-dismissed";
-const HERO_MSA_HREF = "/contracts/c_bolt_msa";
-
 export default function DashboardPage() {
   const [contracts, setContracts] = useState<Contract[] | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
-  const [calloutDismissed, setCalloutDismissed] = useState<boolean>(true);
 
   useEffect(() => {
     setContracts(listContracts());
-    try {
-      setCalloutDismissed(window.localStorage.getItem(CALLOUT_DISMISS_KEY) === "true");
-    } catch {
-      setCalloutDismissed(false);
-    }
 
     // Auto-show the tour ONCE per browser, ever. After the first auto-start
     // (or any manual trigger), we set `tour-seen` and never auto-start again.
-    // Users can still re-trigger via the sidebar / callout buttons.
+    // Users can still re-trigger via the sidebar button.
     const isFirstEver = !hasSeenTour();
     const isDesktop = typeof window !== "undefined" && window.innerWidth >= 768;
     if (isFirstEver && isDesktop) {
@@ -48,14 +44,30 @@ export default function DashboardPage() {
     }
   }, []);
 
-  const dismissCallout = () => {
-    setCalloutDismissed(true);
-    try {
-      window.localStorage.setItem(CALLOUT_DISMISS_KEY, "true");
-    } catch {
-      // ignore
-    }
-  };
+  // Listen for tour effect events so filter-walk steps can actually
+  // drive the table filter while the popover narrates. The TourController
+  // dispatches these on step render; we map them onto setFilter.
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ effect?: TourEffect }>).detail;
+      switch (detail?.effect) {
+        case "filter:all":
+          setFilter("all");
+          break;
+        case "filter:awaiting_me":
+          setFilter("awaiting_me");
+          break;
+        case "filter:blocked":
+          setFilter("blocked");
+          break;
+        case "filter:in_review":
+          setFilter("in_review");
+          break;
+      }
+    };
+    window.addEventListener("tour:effect", handler);
+    return () => window.removeEventListener("tour:effect", handler);
+  }, []);
 
   if (contracts === null) {
     return (
@@ -124,31 +136,6 @@ export default function DashboardPage() {
             Signed contracts →
           </Link>
         </div>
-
-        {!calloutDismissed && (
-          <div className="tour-anchor-callout flex items-start gap-3 rounded-xl border border-accent-200 bg-accent-50/60 px-4 py-3">
-            <div className="flex-1 text-[13px] text-ink-700">
-              <span className="font-medium text-ink-900">New here?</span>{" "}
-              Open <strong>Bolt MSA</strong> below: a €180k MSA in review with 3 clause deviations and pending approvals. Or take the guided tour from the sidebar.
-            </div>
-            <Link
-              href={HERO_MSA_HREF}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-ink-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-ink-800"
-            >
-              Open Bolt MSA
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-            <button
-              type="button"
-              onClick={dismissCallout}
-              aria-label="Dismiss"
-              className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-ink-500 hover:bg-ink-100"
-              title="Dismiss"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        )}
 
         <AboutWidget />
 

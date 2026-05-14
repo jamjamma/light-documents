@@ -644,3 +644,124 @@ Existing anchors reused unchanged: `.tour-anchor-kpis`,
 - Manual navigation during the tour → path-change effect goes dormant
   if the new pathname doesn't match the current step. User can manually
   resume by clicking Take the Tour (restarts from step 0). ✓
+
+---
+
+## Tour restructure: menu-by-menu walk 2026-05-14
+
+Driven by friend QA: the previous workflow-end-to-end tour jumped from
+Bolt MSA's Preview envelope step directly to Acme MSA's signed page, which
+read as a non-sequitur (different contract, no narrative bridge). Also,
+the In review stage filter never got a moment in the walk-through, and the
+welcome popover typography read as cramped.
+
+**New tour shape: 17 steps, 5 acts**
+
+- **Act 1, Orient (4):** welcome (centered), KPI tiles, stage tabs + type
+  chips, sidebar nav.
+- **Act 2, Filter walk (3):** Awaiting me, Blocked, In review. Each step
+  fires a `tour:effect` event the dashboard listens to; the table actually
+  filters as the popover narrates. In review's last step navigates into
+  Bolt MSA.
+- **Act 3, Workflow walk (4):** clause checker, routing rules, approval
+  chain (try Approve + Undo on Martina's row), preview envelope. Preview
+  step instructs the user to open the modal manually and close it before
+  clicking Next; no inside-modal anchor, no forced Send.
+- **Act 4, Outputs (2):** signed-contracts archive at `/archive`, then
+  navigate into Acme MSA signed to show structured writeback. The
+  transition is now natural because the user explicitly clicked Next on
+  the archive step.
+- **Act 5, New contract intake + templates (2 + wrap):** new-contract
+  3-step form, then templates page with rogue governance panel, then
+  finish.
+
+**Effect plumbing**
+
+- `lib/tour-steps.ts` defines `TourEffect` (`"filter:all" | "filter:awaiting_me" | "filter:blocked" | "filter:in_review"`).
+- `TourStep.effect` is optional.
+- `components/TourController.tsx` dispatches `window` event `tour:effect`
+  with `{ effect }` in the detail when a step renders.
+- `app/page.tsx` listens for `tour:effect` and maps onto `setFilter`.
+- Effects are idempotent; clicking Back re-fires the earlier step's effect
+  with no ill consequence.
+
+**Counsel-never-logs-in overclaim swept**
+
+The earlier copy across README, About, architecture.md, decisions.md, and
+the tour Templates step claimed "Counsel never logs into Light Documents."
+This was an overclaim because Counsel may still log in to approve a clause
+deviation when the routing engine routes one to them. Reworded everywhere
+to "Counsel doesn't author contracts inside Light Documents" with an
+explicit "what stays out is authoring, not review" clarification.
+
+**Dashboard callout removed**
+
+The yellow "New here?" banner on the dashboard was duplicating the tour's
+job. Removed entirely. The tour auto-starts once per browser via the
+`tour-seen` flag and stays the single first-time CTA. Sidebar "Take the
+tour" is the only manual re-trigger.
+
+**Sidebar Take the tour emphasized**
+
+"Take the tour" button in the sidebar bottom-left is now accent-tinted
+(`bg-accent-50 border-accent-200 text-accent-700`) and slightly larger
+(`text-[13px] font-medium`, `h-4 w-4` play icon) so it visually outranks
+the muted "Reset demo data" sibling.
+
+**Welcome popover typography pass**
+
+`app/globals.css` `.light-tour-popover` rewritten:
+
+- Wider (`max-width: 400px`), more padding (`22px 24px 18px`).
+- Bigger title (17px, weight 600) with a 1px ink-100 divider beneath it.
+- 3px accent-gradient stripe at the top (#fbbf24 → #ffd544) so the
+  popover visually connects to the brand palette.
+- Body description supports `<p class="lead">` and `<p class="muted">`
+  hierarchy.
+- `<code>` and `<kbd>` get visible styling (background + border + mono
+  font) so inline references look intentional, not raw HTML.
+- Bullet list spacing tightened.
+
+**New anchor**
+
+`.tour-anchor-sidebar-nav` added to the `<nav>` in `components/Sidebar.tsx`
+so the new "sidebar overview" step has something to anchor.
+
+Existing anchors reused unchanged: `.tour-anchor-kpis`,
+`.tour-anchor-table-filters`, `.tour-anchor-clause-diff`,
+`.tour-anchor-routing`, `.tour-anchor-approval-chain`,
+`.tour-anchor-preview-envelope`, `.tour-anchor-ledger`,
+`.tour-anchor-intake-steps`.
+
+Dead anchors left in place (harmless): `.tour-anchor-new-contract` on the
+sidebar's New contract button, `.tour-anchor-callout` (the callout block
+itself is removed, so the class no longer renders).
+
+**Devil's-advocate mental walk**
+
+- Filter-walk Back navigation: pressing Back from "Blocked" to
+  "Awaiting me" re-renders the earlier step and re-fires `filter:awaiting_me`.
+  Idempotent. ✓
+- User manually clicks a KPI tile mid-tour: table filters, but the popover
+  still shows the previous filter step's copy. Minor inconsistency,
+  acceptable. ✓
+- Welcome popover on a narrow desktop window: max-width 400px so it
+  doesn't overflow at 768px. ✓
+- Mobile: `tour:effect` events still fire from the controller, but on
+  mobile the controller short-circuits in `renderStep` so the popover
+  never mounts and the filter sequence doesn't run. Acceptable. ✓
+- Reset demo data mid-tour: `resetTourState()` wipes all three flags;
+  the dashboard reloads at `/` and auto-starts the tour from step 0. ✓
+- User clicks Preview envelope in step 11 then doesn't close the modal
+  before clicking Next: Next still fires `handlers.next()`, the
+  controller pushes `/archive` and the modal is unmounted by the
+  contract page being unmounted. ✓
+
+**Verification done in-session**
+
+- `npm run build` returns 0 with no TS errors.
+- Em-dash audit on user-visible prose clean (only non-prose remnants:
+  table placeholder cells in README and one code comment).
+- All 9 tour anchor classes referenced in `lib/tour-steps.ts` are
+  rendered in the codebase.
+- All 6 tour-visited routes return 200 on dev server.

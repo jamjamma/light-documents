@@ -134,6 +134,16 @@ export function TourController() {
         driverInstanceRef.current = d;
         renderedStepIdRef.current = step.id;
         d.drive();
+
+        // Fire the optional side-effect for this step. Page-level listeners
+        // (e.g. the dashboard filtering its table) act on this. Fired AFTER
+        // d.drive() so the popover is already mounted when downstream UI
+        // updates.
+        if (step.effect) {
+          window.dispatchEvent(
+            new CustomEvent("tour:effect", { detail: { effect: step.effect } }),
+          );
+        }
       };
 
       tryRender(25); // up to ~2.5s of retries at 100ms each

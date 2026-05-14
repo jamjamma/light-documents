@@ -40,7 +40,7 @@ The key architectural and product decisions, with alternatives considered and wh
 3. Closes the loop on obligations (renewal alerts, payment schedules, vesting tracking).
 4. Sets up Light Documents to ship as a customer-facing module after internal use proves it.
 
-## 3. Counsel never leaves Word
+## 3. Counsel keeps Word for authoring
 
 **Decision:** Master templates live as Word docs in Google Drive (or SharePoint), owned by Legal. Counsel uses `{{variables}}` and `\sig:tags\` typed directly into the document as text. Our platform reads the docx, never hosts the editing.
 

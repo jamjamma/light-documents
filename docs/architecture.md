@@ -103,7 +103,7 @@ Master templates live as Word docs in Google Drive (or SharePoint), owned by Leg
 Per-contract substitution in production uses `docxtemplater` (Node) or `python-docx`. Output is still a valid docx that opens in Word. Anchor tags are formatted as white-on-white text so invisible to signers but findable by DocuSign API `searchString` tabs.
 
 This means:
-- Counsel never logs into our tool to author a contract.
+- Counsel doesn't author contracts inside our tool. (Counsel may still log in to approve a clause deviation when the rules engine routes one to them; authoring stays in Word.)
 - No vendor lock: templates are plain docx files in Drive. We just read them.
 - Version-pinned at create time: counsel updates mid-flow do not disrupt in-flight contracts.
 

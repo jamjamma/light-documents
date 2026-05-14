@@ -82,10 +82,11 @@ export default function AboutPage() {
             extract variables and anchor tags, version-pin at contract create time.
           </p>
           <p className="text-[13px] text-ink-500">
-            <strong className="text-ink-700">Legal keeps Word, not us.</strong>{" "}
-            Counsel never has to open Light Documents. They edit master templates the same way they do today:
+            <strong className="text-ink-700">Legal keeps Word for authoring.</strong>{" "}
+            Counsel doesn't draft inside Light Documents. They edit master templates the same way they do today:
             Word in Drive, with Track Changes and comments. Our platform watches that folder via the Drive Watch API
-            and syncs the latest version automatically. No new editor, no new login, no migration. Everyone else
+            and syncs the latest version automatically. No new editor, no migration. Counsel may still log in to
+            approve a clause deviation when one is flagged; what stays out is authoring, not review. Everyone else
             (Sales, People Ops, Finance) uses Light Documents to <em>execute</em> against those templates.
           </p>
           <p className="text-[13px] text-ink-500">

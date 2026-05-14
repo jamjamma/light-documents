@@ -53,7 +53,7 @@ Source records (Salesforce / HubSpot / Attio / Personio / Ashby / Manual entry)
 
 ## Why Counsel will adopt this
 
-Counsel never logs into Light Documents. Master templates stay as Word docs in Drive, edited where Counsel already edits. Light reads what Counsel writes; it does not host the editing. This is the single largest reason CLM rollouts fail, and the reason we are not building one.
+Counsel doesn't author contracts inside Light Documents. Master templates stay as Word docs in Drive, edited where Counsel already edits. Light reads what Counsel writes; it does not host the editing. (Counsel may still log in to approve a clause deviation or sit on an approval chain. What stays out of the tool is authoring, not review.) Forcing Counsel into a new editor is the single largest reason CLM rollouts fail, and the reason we are not building one.
 
 ## The one key decision
 
