@@ -117,6 +117,13 @@ export interface TourStep {
   /** Suppress the Back button (e.g. on the welcome step). */
   hideBack?: boolean;
   /**
+   * Suppress the Next button. Use when the in-app UI is the only way to
+   * advance (e.g. the modal-send step expects the user to click DocuSign's
+   * Send button which triggers a navigation; offering a tour-level Next
+   * would be confusing).
+   */
+  hideNext?: boolean;
+  /**
    * Side-effect to fire when this step renders. The controller dispatches
    * a `tour:effect` custom event with `{ effect }` in the detail. Listeners
    * (e.g. the dashboard) act on it.
@@ -393,11 +400,14 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Send via DocuSign",
     description: `
-      <p>Click <strong>Send via DocuSign</strong>. The envelope fires, the contract advances to signed, and the page redirects to the signed record. The tour will follow.</p>
-      <p class="muted"><strong>Send still disabled?</strong> Approvals are incomplete. Click <strong>Back</strong> (or close this modal) and return to the approval chain. Approve every row, then re-open the preview from the contract page.</p>
+      <p>Click <strong>Send via DocuSign</strong> below. The envelope fires, the contract advances to signed, and the page redirects to the signed record. The tour will follow you there.</p>
+      <p class="muted"><strong>Send still disabled?</strong> Approvals are incomplete. Click <strong>Back</strong> (or close this modal) and finish the approval chain (every row green). Then re-open the preview.</p>
     `,
     next: "advance",
     effect: "modal:open",
+    // Only Send (in-app) or Back advances the tour from this step. A
+    // separate tour Next button is confusing here.
+    hideNext: true,
   },
 
   // ── Act 5: Bolt's signed page ─────────────────────────────────────────
@@ -433,16 +443,22 @@ export const TOUR_STEPS: TourStep[] = [
     path: `/contracts/${HERO_CONTRACT_ID}/signed`,
     selector: ".tour-anchor-audit-trail",
     side: "right",
-    title: "Audit trail",
+    title: "Audit trail · every event explained",
     description: `
-      <p>Append-only event log: every state transition the contract went through, from intake to filed.</p>
+      <p>Append-only event log of every state transition the contract went through. Each row type below is one you'll see on this contract:</p>
       <ul>
-        <li><strong>Timestamps.</strong> Every transition recorded to the second.</li>
-        <li><strong>Actor.</strong> Real person (Martina, Magnus, Sara) for human decisions; system for automated transitions (routing fired, clauses checked, envelope completed); counterparty for external events.</li>
-        <li><strong>Channel.</strong> How the notification fired (Slack DM, email, DocuSign Connect webhook).</li>
-        <li><strong>Why-line.</strong> Each row carries the rule or rationale that triggered it.</li>
+        <li><strong>Created.</strong> Contract drafted from a template + source record. Captures who created it and which version of the template was pinned.</li>
+        <li><strong>Clause check ran.</strong> Automated rules engine compared populated terms against the master. Recorded with deviation count and which rules fired.</li>
+        <li><strong>Awaiting all three approvers.</strong> Routing computed who needs to approve based on contract fields (value, deviations, type) and recorded the rule that fired for each.</li>
+        <li><strong>Slack DM sent to X.</strong> Each approver got a DM in their channel. Recorded per approver with their name + role.</li>
+        <li><strong>Approved.</strong> A specific approver (Martina, Magnus, Sara) clicked Approve. Records the person, role, decided-at timestamp.</li>
+        <li><strong>Withdrew approval.</strong> If the operator clicked Undo before send, this writes a new row (the prior Approved row stays, the new row supersedes). Both visible forever.</li>
+        <li><strong>All approvals satisfied. Ready to send.</strong> System row, fires when the last approver clicks through.</li>
+        <li><strong>Envelope sent.</strong> DocuSign API returned 201 Created with an envelopeId. Recorded with the envelopeId.</li>
+        <li><strong>Envelope completed.</strong> DocuSign Connect webhook fired with all signers complete. Triggers the structured writeback below.</li>
+        <li><strong>Filed.</strong> PDF + Certificate of Completion stored to Drive + S3 WORM cold storage. Records storage location and retention period.</li>
       </ul>
-      <p class="muted"><em>Append-only. Even Undo writes a new row ("withdrew approval") rather than mutating the prior one. 7-year retention. WORM compliant for finance regulators.</em></p>
+      <p class="muted"><em>Append-only. Even Undo writes a new row; nothing is mutated. 7-year retention. WORM compliant for finance regulators.</em></p>
     `,
     next: "advance",
   },

@@ -54,6 +54,9 @@ export function TourController() {
   const driverInstanceRef = useRef<Driver | null>(null);
   // De-dupe guard so we don't re-render the same step from the same path.
   const renderedStepIdRef = useRef<string | null>(null);
+  // Cleanup callbacks registered by the active step (resize/scroll listeners,
+  // observers). Drained on destroyDriver().
+  const stepCleanupRef = useRef<Array<() => void>>([]);
 
   // Handlers ref: rewritten on every render so the callbacks closed-over by
   // driver.js always invoke the freshest pathname / router / state. The
@@ -66,6 +69,17 @@ export function TourController() {
   const handlersRef = useRef<Handlers | null>(null);
 
   const destroyDriver = useCallback(() => {
+    // Drain any per-step cleanups (resize / scroll listeners, observers)
+    // before destroying the driver instance so they don't fire against a
+    // destroyed popover.
+    while (stepCleanupRef.current.length > 0) {
+      const fn = stepCleanupRef.current.pop();
+      try {
+        fn?.();
+      } catch {
+        // ignore
+      }
+    }
     if (driverInstanceRef.current) {
       try {
         driverInstanceRef.current.destroy();
@@ -109,9 +123,23 @@ export function TourController() {
       };
 
       // Retry-poll for the anchor element. After a router.push we land on the
-      // new page but the anchor might mount a few frames later.
-      const tryRender = (attempts: number) => {
+      // new page but the anchor might mount a few frames later. When a step
+      // has an effect that mounts new DOM (modal:open, modal:expand-config),
+      // we also want to fire the effect, give React a render cycle to mount
+      // the modal, and only then start polling.
+      const startWithEffect = () => {
         fireEffectOnce();
+        // For steps that mount substantial new DOM (modal:open), give React
+        // an extra paint cycle before the first poll. Without this, the
+        // first attempts of the poll all see `null` and we burn time before
+        // the modal even mounts. 150ms is enough for a setState → render →
+        // commit on a typical machine; the existing retry loop covers
+        // slower cases.
+        const initialDelay = step.effect?.startsWith("modal:") ? 150 : 0;
+        window.setTimeout(() => tryRender(25), initialDelay);
+      };
+
+      const tryRender = (attempts: number) => {
         const el = step.selector
           ? (document.querySelector(step.selector) as HTMLElement | null)
           : null;
@@ -134,15 +162,17 @@ export function TourController() {
         // previous to go back to and greys out the Prev button regardless of
         // our onPrevClick handler. Spreading an empty array here overrides
         // that auto-disable so Back fires normally.
+        const buttons: ("close" | "next" | "previous")[] = ["close"];
+        if (!step.hideBack) buttons.push("previous");
+        if (!step.hideNext) buttons.push("next");
+
         const driveStep: DriveStep = {
           element: el ?? undefined,
           popover: {
             title: step.title,
             description: step.description,
             ...(el ? { side: step.side ?? "bottom" } : {}),
-            showButtons: step.hideBack
-              ? ["close", "next"]
-              : ["close", "previous", "next"],
+            showButtons: buttons,
             disableButtons: [],
             nextBtnText: step.nextLabel ?? (idx === TOUR_STEPS.length - 1 ? "Finish" : "Next"),
             prevBtnText: "Back",
@@ -169,9 +199,64 @@ export function TourController() {
         driverInstanceRef.current = d;
         renderedStepIdRef.current = step.id;
         d.drive();
+
+        // Recompute popover + highlight position on relevant DOM events.
+        // driver.js anchors to getBoundingClientRect at render time and does
+        // not auto-track layout changes. When an anchor lives inside a
+        // scrollable modal or expands/collapses (<details>), the popover
+        // drifts away from its anchor without a manual refresh.
+        if (el) {
+          const refresh = () => {
+            // driver.js's public `refresh()` re-runs the positioning code
+            // for the active step using the same DriveStep config. Safe to
+            // call frequently.
+            try {
+              d.refresh();
+            } catch {
+              // ignore
+            }
+          };
+          // ResizeObserver: catches <details> expand/collapse + any other
+          // size change of the anchor.
+          let ro: ResizeObserver | null = null;
+          if (typeof ResizeObserver !== "undefined") {
+            ro = new ResizeObserver(refresh);
+            ro.observe(el);
+            stepCleanupRef.current.push(() => ro?.disconnect());
+          }
+          // Window resize.
+          window.addEventListener("resize", refresh);
+          stepCleanupRef.current.push(() =>
+            window.removeEventListener("resize", refresh),
+          );
+          // Walk every scrollable ancestor of the anchor. driver.js's
+          // smoothScroll only handles the window; nested scrolling
+          // containers (the modal's max-h overflow-y-auto box) need their
+          // own listeners so the popover follows when the user scrolls.
+          const scrollAncestors: Element[] = [];
+          let p: Element | null = el.parentElement;
+          while (p) {
+            const cs = window.getComputedStyle(p);
+            const overflowY = cs.overflowY;
+            if (
+              overflowY === "auto" ||
+              overflowY === "scroll" ||
+              overflowY === "overlay"
+            ) {
+              scrollAncestors.push(p);
+            }
+            p = p.parentElement;
+          }
+          for (const ancestor of scrollAncestors) {
+            ancestor.addEventListener("scroll", refresh, { passive: true });
+            stepCleanupRef.current.push(() =>
+              ancestor.removeEventListener("scroll", refresh),
+            );
+          }
+        }
       };
 
-      tryRender(25); // up to ~2.5s of retries at 100ms each
+      startWithEffect();
     },
     [destroyDriver],
   );
