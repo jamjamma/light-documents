@@ -279,10 +279,13 @@ export function TourController() {
     // If the current step's path doesn't match the pathname, look for a
     // later step whose path DOES match. This lets in-app side-effects (e.g.
     // the user clicking "Send via DocuSign" which auto-redirects to the
-    // signed page) advance the tour past the action step automatically.
+    // signed page, or "Run checks" which navigates to the freshly-created
+    // contract's detail page) advance the tour past the action step
+    // automatically. A future step with `path: "*"` is treated as matching
+    // any pathname.
     if (step.path !== "*" && step.path !== pathname) {
       const futureMatch = TOUR_STEPS.findIndex(
-        (s, i) => i > stepIndex && s.path === pathname,
+        (s, i) => i > stepIndex && (s.path === "*" || s.path === pathname),
       );
       if (futureMatch !== -1) {
         const matchedStep = TOUR_STEPS[futureMatch];

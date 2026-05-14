@@ -383,7 +383,12 @@ export const TOUR_STEPS: TourStep[] = [
     title: "Populated document",
     description: `
       <p>The signed PDF preview. All variables substituted; signature fields auto-placed by anchor tags.</p>
-      <p class="muted">Use the page nav below to flip through. Page numbers vary by template type.</p>
+      <ul>
+        <li>Page 1: parties, recitals, definitions.</li>
+        <li>Mid pages: commercial terms, liability, indemnity.</li>
+        <li><strong>Last page: signature blocks</strong> where the anchor tags resolve to actual signing fields.</li>
+      </ul>
+      <p class="muted"><strong>Click the page nav below</strong> to flip to the last page and see the signature placement, then click Next here.</p>
     `,
     next: "advance",
     effect: "modal:open",
@@ -449,27 +454,119 @@ export const TOUR_STEPS: TourStep[] = [
     next: "advance",
   },
   {
-    id: "audit-trail",
+    id: "audit-trail-intro",
     chapter: "signed",
     path: `/contracts/${HERO_CONTRACT_ID}/signed`,
     selector: ".tour-anchor-audit-trail",
-    side: "right",
-    title: "Audit trail · every event explained",
+    side: "left",
+    title: "Audit trail",
     description: `
-      <p>Append-only event log of every state transition the contract went through. Each row type below is one you'll see on this contract:</p>
-      <ul>
-        <li><strong>Created.</strong> Contract drafted from a template + source record. Captures who created it and which version of the template was pinned.</li>
-        <li><strong>Clause check ran.</strong> Automated rules engine compared populated terms against the master. Recorded with deviation count and which rules fired.</li>
-        <li><strong>Awaiting all three approvers.</strong> Routing computed who needs to approve based on contract fields (value, deviations, type) and recorded the rule that fired for each.</li>
-        <li><strong>Slack DM sent to X.</strong> Each approver got a DM in their channel. Recorded per approver with their name + role.</li>
-        <li><strong>Approved.</strong> A specific approver (Martina, Magnus, Sara) clicked Approve. Records the person, role, decided-at timestamp.</li>
-        <li><strong>Withdrew approval.</strong> If the operator clicked Undo before send, this writes a new row (the prior Approved row stays, the new row supersedes). Both visible forever.</li>
-        <li><strong>All approvals satisfied. Ready to send.</strong> System row, fires when the last approver clicks through.</li>
-        <li><strong>Envelope sent.</strong> DocuSign API returned 201 Created with an envelopeId. Recorded with the envelopeId.</li>
-        <li><strong>Envelope completed.</strong> DocuSign Connect webhook fired with all signers complete. Triggers the structured writeback below.</li>
-        <li><strong>Filed.</strong> PDF + Certificate of Completion stored to Drive + S3 WORM cold storage. Records storage location and retention period.</li>
-      </ul>
-      <p class="muted"><em>Append-only. Even Undo writes a new row; nothing is mutated. 7-year retention. WORM compliant for finance regulators.</em></p>
+      <p>Append-only event log of every state transition this contract went through. The next steps walk each row type one at a time.</p>
+      <p class="muted">7-year retention, WORM compliant for finance regulators.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "audit-created",
+    chapter: "signed",
+    path: `/contracts/${HERO_CONTRACT_ID}/signed`,
+    selector: ".tour-anchor-audit-trail [data-event-kind='created']",
+    side: "right",
+    title: "1. Created",
+    description: `
+      <p>Contract drafted from a template + source record.</p>
+      <p class="muted">Captures who created it and which version of the template was pinned (so future template edits don't disrupt this in-flight contract).</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "audit-clause-check",
+    chapter: "signed",
+    path: `/contracts/${HERO_CONTRACT_ID}/signed`,
+    selector: ".tour-anchor-audit-trail [data-event-kind='clause-check']",
+    side: "right",
+    title: "2. Clause check",
+    description: `
+      <p>Automated rules engine compared the populated terms against the master template.</p>
+      <p class="muted">Recorded with deviation count and which rules fired (Net 60, unlimited liability, customer-only indemnity).</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "audit-routed",
+    chapter: "signed",
+    path: `/contracts/${HERO_CONTRACT_ID}/signed`,
+    selector: ".tour-anchor-audit-trail [data-event-kind='routed']",
+    side: "right",
+    title: "3. Routed for approval",
+    description: `
+      <p>Routing engine computed who must approve, based on the contract fields and clause deviations.</p>
+      <p class="muted">Each approver row records the rule that fired (e.g. ARR &gt; 100k routes CFO).</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "audit-notification",
+    chapter: "signed",
+    path: `/contracts/${HERO_CONTRACT_ID}/signed`,
+    selector: ".tour-anchor-audit-trail [data-event-kind='notification']",
+    side: "right",
+    title: "4. Slack DM sent",
+    description: `
+      <p>Each approver got a Slack DM in their channel with the contract link and a one-click Approve action.</p>
+      <p class="muted">Recorded per approver with name + role. In production, Slack thread replies are mirrored back here too.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "audit-approved",
+    chapter: "signed",
+    path: `/contracts/${HERO_CONTRACT_ID}/signed`,
+    selector: ".tour-anchor-audit-trail [data-event-kind='approved']",
+    side: "right",
+    title: "5. Approved",
+    description: `
+      <p>A specific approver clicked Approve.</p>
+      <p class="muted">Records the person, role, decided-at timestamp. If the operator clicks Undo before send, a separate <em>withdrew</em> row is appended; the original Approved row stays. Append-only forever.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "audit-sent",
+    chapter: "signed",
+    path: `/contracts/${HERO_CONTRACT_ID}/signed`,
+    selector: ".tour-anchor-audit-trail [data-event-kind='sent']",
+    side: "right",
+    title: "6. Envelope sent",
+    description: `
+      <p>DocuSign API returned <code>201 Created</code> with an <code>envelopeId</code>.</p>
+      <p class="muted">From this row on, Undo is refused because the envelope is live with signers.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "audit-completed",
+    chapter: "signed",
+    path: `/contracts/${HERO_CONTRACT_ID}/signed`,
+    selector: ".tour-anchor-audit-trail [data-event-kind='completed']",
+    side: "right",
+    title: "7. Envelope completed",
+    description: `
+      <p>DocuSign Connect webhook fired with all signers complete.</p>
+      <p class="muted">This is the event that triggers the structured writeback (ledger / HRIS / cap table) on the right.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "audit-filed",
+    chapter: "signed",
+    path: `/contracts/${HERO_CONTRACT_ID}/signed`,
+    selector: ".tour-anchor-audit-trail [data-event-kind='filed']",
+    side: "right",
+    title: "8. Filed",
+    description: `
+      <p>PDF + DocuSign Certificate of Completion stored to Drive/SharePoint plus S3 WORM cold storage.</p>
+      <p class="muted">Records storage location and retention period. WORM (write-once-read-many) is the compliance primitive for finance regulators.</p>
     `,
     next: "advance",
   },
@@ -566,7 +663,7 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/templates",
     title: "Templates catalog",
     description: `
-      <p>8 master Word docs in Drive, grouped into three categories:</p>
+      <p>8 master Word docs (Drive or SharePoint), grouped into three categories:</p>
       <ul>
         <li><strong>Customer contracts.</strong> MSA, MSA Pilot, Order Form, NDA.</li>
         <li><strong>People.</strong> Employment DK, Employment UK.</li>
@@ -634,7 +731,7 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "Counsel keeps Word for authoring",
     description: `
-      <p>This panel explains how Word documents connect. Master templates stay as <code>.docx</code> in Drive, edited where Counsel already edits. The Drive Watch API fires a webhook on every save; our platform parses the docx, extracts <code>{{variables}}</code> and <code>\\sig:anchor\\</code> tags, and caches.</p>
+      <p>This panel explains how Word documents connect. Master templates stay as <code>.docx</code> in <strong>Google Drive or SharePoint</strong>, edited where Counsel already edits. A folder-watch webhook fires on every save; our platform parses the docx, extracts <code>{{variables}}</code> and <code>\\sig:anchor\\</code> tags, and caches.</p>
       <p class="muted">The Legal team (illustrated in this demo by Sara Friis) may still log in to approve a clause deviation when one is routed to them. What stays out is authoring, not review.</p>
     `,
     next: "advance",
@@ -705,7 +802,7 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Step 1 · Pick a template",
     description: `
-      <p>8 master templates synced from Drive. Each card shows version, jurisdictions, clause rules, and anchor-tag count.</p>
+      <p>8 master templates synced from Drive or SharePoint. Each card shows version, jurisdictions, clause rules, and anchor-tag count.</p>
       <p class="muted"><strong>Click any template card below</strong> to advance. The form auto-progresses to step 2.</p>
     `,
     next: "advance",
@@ -994,8 +1091,8 @@ export const CHAPTERS: ChapterMeta[] = [
   {
     id: "signed",
     title: "Signed record",
-    blurb: "Signed banner, PDF retention, audit trail, structured writeback.",
-    estSeconds: 40,
+    blurb: "Signed banner, PDF retention, audit trail walked event by event, structured writeback.",
+    estSeconds: 120,
   },
   {
     id: "archive",
@@ -1006,7 +1103,7 @@ export const CHAPTERS: ChapterMeta[] = [
   {
     id: "templates",
     title: "Templates",
-    blurb: "8 master Word docs in Drive, rogue-template governance, Counsel's editing workflow.",
+    blurb: "8 master Word docs (Drive or SharePoint), rogue-template governance, Counsel's editing workflow.",
     estSeconds: 55,
   },
   {

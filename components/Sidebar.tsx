@@ -154,7 +154,8 @@ export function Sidebar() {
           </button>
         </div>
 
-        <nav className={clsx("tour-anchor-sidebar-nav flex-1", collapsed ? "md:px-1.5" : "px-3")}>
+        <nav className={clsx("flex-1", collapsed ? "md:px-1.5" : "px-3")}>
+          <div className="tour-anchor-sidebar-nav">
           {NAV.map(({ href, label, icon: Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
@@ -187,6 +188,7 @@ export function Sidebar() {
             <FileText className="h-4 w-4 shrink-0" />
             <span className={clsx("truncate", collapsed && "md:hidden")}>New contract</span>
           </Link>
+          </div>
         </nav>
 
         <div className={clsx("border-t border-ink-100", collapsed ? "md:px-1.5 md:py-3" : "px-3 py-3")}>

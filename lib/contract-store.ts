@@ -791,6 +791,44 @@ export function simulateSigned(id: string): Contract {
   return saveContract(working);
 }
 
+/**
+ * Fast-forward a contract through the entire workflow to its `filed` state.
+ *
+ * Used by the tour menu to set up preconditions for chapters that start on
+ * a signed/filed page (e.g. "Signed record", "Signed archive"). Without
+ * this, picking those chapters would land the user on a page that shows
+ * an in-flight contract whose signed banner, full audit trail, and ledger
+ * writeback all don't exist yet.
+ *
+ * Idempotent: a contract already in `filed` stage is returned unchanged.
+ * Approvals get auto-approved (operator = "system" for the audit actor)
+ * so the chain doesn't block on missing decision rows; the per-approver
+ * rows still appear in the audit trail.
+ */
+export function fastForwardToFiled(id: string): Contract {
+  const contract = getContract(id);
+  if (!contract) throw new Error(`Contract not found: ${id}`);
+  if (contract.stage === "filed") return contract;
+
+  // 1. Approve any pending approvers. Each call appends an audit row and
+  //    transitions to `ready_to_send` once the chain is satisfied.
+  const pending = (contract.approvals ?? []).filter((a) => a.status === "pending");
+  for (const a of pending) {
+    // approve() reads the freshest contract internally so this loop stays
+    // correct even after the previous iteration's save.
+    approve(id, a.role, a.assignedName ?? a.role, a.assignedUserId);
+  }
+
+  // 2. Send (only valid from ready_to_send).
+  const afterApprove = getContract(id);
+  if (afterApprove && isValidTransition(afterApprove.stage, "sent")) {
+    send(id);
+  }
+
+  // 3. simulateSigned walks sent → signed → filed with ledger writeback.
+  return simulateSigned(id);
+}
+
 export function buildLedgerImpact(contract: Contract): LedgerImpact | null {
   const t = contract.type;
   const f = contract.fields;

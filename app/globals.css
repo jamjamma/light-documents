@@ -214,20 +214,16 @@ html, body {
   color: #161611;
 }
 
+/* Arrow.
+   We DON'T set border-color here — driver.js's own CSS already sets 3 of
+   the 4 border-colors to transparent for each side, leaving the visible
+   one as the popover's white background colour. Overriding `border-color`
+   globally breaks that pattern because our specificity wipes the
+   intended `transparent` values. Instead we just bump size and add a
+   drop-shadow so the arrow stands out against the dark stage overlay. */
 .driver-popover.light-tour-popover .driver-popover-arrow {
-  border-color: transparent;
-}
-.driver-popover.light-tour-popover .driver-popover-arrow-side-bottom {
-  border-bottom-color: #ffffff;
-}
-.driver-popover.light-tour-popover .driver-popover-arrow-side-top {
-  border-top-color: #ffffff;
-}
-.driver-popover.light-tour-popover .driver-popover-arrow-side-left {
-  border-left-color: #ffffff;
-}
-.driver-popover.light-tour-popover .driver-popover-arrow-side-right {
-  border-right-color: #ffffff;
+  border-width: 7px;
+  filter: drop-shadow(0 2px 4px rgba(15, 23, 42, 0.15));
 }
 
 /* The cutout stage that highlights the focused element. */

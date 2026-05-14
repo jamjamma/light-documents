@@ -19,6 +19,25 @@ function iconForEvent(event: string): ReactNode {
   return <Cog className="h-3.5 w-3.5" />;
 }
 
+/**
+ * Stable taxonomy for the tour. Each row gets a `data-event-kind`
+ * attribute the tour can anchor on. Match order matters: more specific
+ * patterns come first (e.g. "envelope completed" before "completed").
+ */
+function kindForEvent(event: string): string {
+  const e = event.toLowerCase();
+  if (e.includes("filed")) return "filed";
+  if (e.includes("envelope completed") || e.includes("connect webhook") || e.includes("signed by")) return "completed";
+  if (e.includes("envelope sent") || e.includes("sent via docusign")) return "sent";
+  if (e.includes("withdrew") || e.includes("undo")) return "withdrew";
+  if (e.includes("approved")) return "approved";
+  if (e.includes("slack")) return "notification";
+  if (e.includes("routed") || e.includes("awaiting")) return "routed";
+  if (e.includes("clause check")) return "clause-check";
+  if (e.includes("created")) return "created";
+  return "system";
+}
+
 export function AuditTrail({ events }: Props) {
   if (events.length === 0) {
     return <div className="text-sm text-ink-500">No audit events yet.</div>;
@@ -28,7 +47,11 @@ export function AuditTrail({ events }: Props) {
       <div className="absolute left-[15px] top-2 bottom-2 w-px bg-ink-200" />
       <ol className="space-y-3">
         {events.map((e, i) => (
-          <li key={i} className="relative flex gap-3">
+          <li
+            key={i}
+            className="relative flex gap-3"
+            data-event-kind={kindForEvent(e.event)}
+          >
             <div className="z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-500">
               {iconForEvent(e.event)}
             </div>

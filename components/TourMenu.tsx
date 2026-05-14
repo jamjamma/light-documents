@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { Modal } from "./ui/Modal";
 import { Play, CheckCircle2, Clock, Sparkles } from "lucide-react";
-import { resetDemo } from "@/lib/contract-store";
+import { resetDemo, fastForwardToFiled } from "@/lib/contract-store";
 import {
   CHAPTERS,
+  HERO_CONTRACT_ID,
   TOUR_STEPS,
   type ChapterId,
   firstStepIndexOf,
@@ -18,6 +19,18 @@ import {
   setTourDismissed,
   resetTourState,
 } from "@/lib/tour-steps";
+
+/**
+ * Chapters that pick up the story AFTER the contract is filed need the
+ * demo state pre-rolled so the signed banner, full audit trail, and
+ * ledger writeback are present on Bolt MSA. Without this, the user lands
+ * on a page showing "Ledger writeback will appear here after the
+ * contract is filed" because the in-flight Bolt is still in `in_review`.
+ */
+const CHAPTERS_REQUIRING_BOLT_FILED: ReadonlyArray<ChapterId> = [
+  "signed",
+  "archive",
+];
 
 /**
  * Chapter chooser modal.
@@ -81,6 +94,16 @@ export function TourMenu() {
     // Resets demo so chapter-specific preconditions (e.g. Bolt in_review for
     // workflow) hold. Tour-progress for OTHER chapters is preserved.
     resetDemo();
+    // For chapters that take place after Bolt is signed, fast-forward the
+    // contract through the full workflow so the page renders the signed
+    // banner, complete audit trail, and ledger writeback.
+    if (CHAPTERS_REQUIRING_BOLT_FILED.includes(chapter)) {
+      try {
+        fastForwardToFiled(HERO_CONTRACT_ID);
+      } catch {
+        // ignore; chapter will still render the in-flight state if this fails
+      }
+    }
     markTourSeen();
     const stepIndex = firstStepIndexOf(chapter);
     writeTourState({ active: true, stepIndex, mode: "chapter", chapter });
@@ -91,6 +114,15 @@ export function TourMenu() {
 
   const resumeChapter = (chapter: ChapterId) => {
     // Resume: do NOT reset demo data. Continue from saved step index.
+    // Still pre-roll Bolt if the chapter requires it AND Bolt isn't already
+    // filed (e.g. user dismissed the tour before Bolt got there).
+    if (CHAPTERS_REQUIRING_BOLT_FILED.includes(chapter)) {
+      try {
+        fastForwardToFiled(HERO_CONTRACT_ID);
+      } catch {
+        // ignore; already filed or transition refused
+      }
+    }
     const saved = progress[chapter];
     const stepIndex =
       typeof saved === "number" ? saved : firstStepIndexOf(chapter);
