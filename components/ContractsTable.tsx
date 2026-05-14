@@ -61,6 +61,19 @@ export function ContractsTable({ contracts, filter, onFilterChange, awaitingRole
     return m;
   }, [stageFiltered]);
 
+  // Denominator for the count line. The dashboard never surfaces filed contracts
+  // (those live on /archive), so the natural parent set is "in flight" rather
+  // than "all 14 seeded". This kills the confusing "10 of 14" when the user is
+  // on All in-flight and 10 IS the full in-flight set.
+  const inFlightCount = useMemo(
+    () => contracts.filter((c) => c.stage !== "filed").length,
+    [contracts],
+  );
+  const showingAll = filter === "all" && typeFilter === null;
+  const countLabel = showingAll
+    ? `${sorted.length} in flight`
+    : `${sorted.length} of ${inFlightCount} in flight`;
+
   const toggleSort = (field: SortField) => {
     setSort((prev) => {
       if (prev.field === field) return { field, dir: prev.dir === "asc" ? "desc" : "asc" };
@@ -88,7 +101,7 @@ export function ContractsTable({ contracts, filter, onFilterChange, awaitingRole
               </button>
             ))}
           </div>
-          <div className="text-[12px] text-ink-500">{sorted.length} of {contracts.length} contracts</div>
+          <div className="text-[12px] text-ink-500">{countLabel}</div>
         </div>
 
         {/* Type filter chips (replaces the old "Mix:" legend row) */}
