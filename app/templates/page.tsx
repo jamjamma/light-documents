@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/Button";
@@ -10,6 +10,7 @@ import { RogueTemplatesPanel } from "@/components/RogueTemplatesPanel";
 import { TEMPLATES, ROGUE_TEMPLATES, getTemplate } from "@/lib/mock-data";
 import { Card } from "@/components/ui/Card";
 import type { Template, TemplateId } from "@/lib/types";
+import type { TourEffect } from "@/lib/tour-steps";
 import { FileType2, FolderSync, Workflow, Plus, Sparkles } from "lucide-react";
 import clsx from "clsx";
 
@@ -39,6 +40,26 @@ type Category = "all" | TemplateCategory;
 export default function TemplatesPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [category, setCategory] = useState<Category>("all");
+
+  // Tour-driven side-effects: the controller dispatches `tour:effect` events
+  // when a step renders. On `template:open-detail` we open the MSA v4.2 detail
+  // modal so the tour can walk through its sections (Source file, Ownership,
+  // Clause rules, etc). On `template:close-detail` we close it again so a
+  // user stepping Back across the modal boundary is not trapped behind it.
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ effect?: TourEffect }>).detail;
+      if (detail?.effect === "template:open-detail") {
+        const msa = TEMPLATES.find((t) => t.id === "msa_v4_2") ?? null;
+        if (msa) setSelectedTemplate(msa);
+      }
+      if (detail?.effect === "template:close-detail") {
+        setSelectedTemplate(null);
+      }
+    };
+    window.addEventListener("tour:effect", handler);
+    return () => window.removeEventListener("tour:effect", handler);
+  }, []);
 
   const counts = useMemo(() => {
     const m: Record<Category, number> = { all: TEMPLATES.length, "Customer contracts": 0, People: 0, Equity: 0 };

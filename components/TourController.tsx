@@ -138,7 +138,9 @@ export function TourController() {
         // approval:open-actions also mounts new DOM (the menu pop-out) so it
         // benefits from the same initial wait.
         const initialDelay =
-          step.effect?.startsWith("modal:") || step.effect === "approval:open-actions"
+          step.effect?.startsWith("modal:") ||
+          step.effect?.startsWith("template:") ||
+          step.effect === "approval:open-actions"
             ? 300
             : 0;
         window.setTimeout(() => tryRender(25), initialDelay);

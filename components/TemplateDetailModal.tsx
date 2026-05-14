@@ -98,7 +98,7 @@ export function TemplateDetailModal({
 
         {/* Source + sync metadata */}
         {sourceFileName && (
-          <section>
+          <section className="tour-anchor-template-source">
             <div className="demo-note mb-2">Source file</div>
             <div className="flex items-start gap-3 rounded-lg border border-ink-100 bg-ink-50/40 p-3">
               <FileType2 className="mt-0.5 h-5 w-5 shrink-0 text-ink-500" />
@@ -122,7 +122,7 @@ export function TemplateDetailModal({
         )}
 
         {/* Ownership + access */}
-        <section>
+        <section className="tour-anchor-template-ownership">
           <div className="demo-note mb-2">Ownership + access</div>
           <div className="grid gap-3 text-[12px] sm:grid-cols-2">
             <div className="rounded-lg border border-ink-100 bg-white p-3">
@@ -151,7 +151,7 @@ export function TemplateDetailModal({
         </section>
 
         {/* Clause rules */}
-        <section>
+        <section className="tour-anchor-template-clauserules">
           <div className="demo-note mb-2 flex items-center gap-2">
             <Workflow className="h-3 w-3" />
             Clause rules ({template.clauseRules.length})
@@ -223,7 +223,7 @@ export function TemplateDetailModal({
         )}
 
         {/* DocuSign features */}
-        <section>
+        <section className="tour-anchor-template-features">
           <div className="demo-note mb-2">DocuSign features per envelope</div>
           <div className="grid gap-2 text-[12px] sm:grid-cols-2">
             <FeatureRow on={!!template.docusignFeatures.qesRequired} icon={<ShieldCheck className="h-3.5 w-3.5" />} label="eIDAS QES identity verification" />
@@ -238,7 +238,7 @@ export function TemplateDetailModal({
         </section>
 
         {/* Anchor tags */}
-        <section>
+        <section className="tour-anchor-template-anchors">
           <div className="demo-note mb-2">Anchor tags the Legal team embedded in the master template</div>
           <div className="flex flex-wrap gap-1.5 rounded-lg border border-accent-200 bg-accent-50 p-3">
             {template.anchorTags.map((tag) => (
@@ -251,7 +251,7 @@ export function TemplateDetailModal({
 
         {/* Version history */}
         {history.length > 0 && (
-          <section>
+          <section className="tour-anchor-template-versions">
             <div className="demo-note mb-2 flex items-center gap-2">
               <History className="h-3 w-3" />
               Version history ({history.length})

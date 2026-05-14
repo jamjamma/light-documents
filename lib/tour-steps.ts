@@ -95,7 +95,14 @@ export type TourEffect =
   // Programmatically open the per-row actions menu (the "..." button) on
   // the operator's approval row. Used so the tour shows the actual menu
   // content (Reassign / Re-ping / Reject) instead of just describing it.
-  | "approval:open-actions";
+  | "approval:open-actions"
+  // Open the TemplateDetailModal on a canonical template (MSA v4.2) so the
+  // tour can walk through Source file, Ownership, Clause rules, DocuSign
+  // features, and Anchor tags inside it.
+  | "template:open-detail"
+  // Close the TemplateDetailModal so a user stepping Back across the modal
+  // boundary returns cleanly to the catalog.
+  | "template:close-detail";
 
 export interface TourStep {
   /** Stable id, used for de-dupe in the controller render guard. */
@@ -835,6 +842,128 @@ export const TOUR_STEPS: TourStep[] = [
     `,
     next: "advance",
   },
+
+  // ── Template detail modal walk (MSA v4.2 as the canonical example) ────
+  {
+    id: "templates-detail-intro",
+    chapter: "templates",
+    path: "/templates",
+    // Centered popover (no selector). Opens the detail modal so the next
+    // step can anchor inside it.
+    title: "What's inside a template",
+    description: `
+      <p>Let's look inside one. Opening <strong>MSA v4.2</strong> now.</p>
+      <p class="muted">Every template card opens the same view: source file, ownership, clause rules, DocuSign config, and the anchor tags Legal embedded in Word.</p>
+    `,
+    next: "advance",
+    effect: "template:open-detail",
+  },
+  {
+    id: "templates-detail-source",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-template-source",
+    side: "bottom",
+    title: "Source file in Drive",
+    description: `
+      <p>The Word doc that authoritatively defines this template, synced from Google Drive via the Drive Watch API.</p>
+      <ul>
+        <li><strong>fileId</strong> ties this template to a specific doc.</li>
+        <li><strong>Variables parsed</strong> = <code>{{counterparty}}</code>-style placeholders we found.</li>
+        <li><strong>Anchor tags</strong> = invisible markers DocuSign uses for signature placement.</li>
+      </ul>
+    `,
+    next: "advance",
+    // Keep modal open across steps.
+    effect: "template:open-detail",
+  },
+  {
+    id: "templates-detail-ownership",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-template-ownership",
+    side: "top",
+    title: "Ownership and access",
+    description: `
+      <ul>
+        <li><strong>Owner team.</strong> Who is responsible for keeping this template current.</li>
+        <li><strong>Maintained by.</strong> The last person who edited the master doc.</li>
+        <li><strong>Document type + Jurisdictions.</strong> Drive routing for clause rules and signer logic.</li>
+        <li><strong>Edit access.</strong> Legal + admins write; everyone else reads via Light.</li>
+      </ul>
+    `,
+    next: "advance",
+    effect: "template:open-detail",
+  },
+  {
+    id: "templates-detail-clauserules",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-template-clauserules",
+    side: "top",
+    title: "Clause rules",
+    description: `
+      <p>Deterministic checks the engine runs on every contract:</p>
+      <ul>
+        <li><strong>Clause</strong> = which clause we look at.</li>
+        <li><strong>Expected</strong> = what the master template says.</li>
+        <li><strong>Severity</strong> = info / warn / block. Block routes to Legal automatically.</li>
+        <li><strong>Reason</strong> = why this rule exists (audit-friendly).</li>
+      </ul>
+      <p class="muted">Claude also runs against the populated document for natural-language comparison; results merge into the same shape.</p>
+    `,
+    next: "advance",
+    effect: "template:open-detail",
+  },
+  {
+    id: "templates-detail-features",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-template-features",
+    side: "top",
+    title: "DocuSign features",
+    description: `
+      <p>Defaults applied to every envelope made from this template:</p>
+      <ul>
+        <li><strong>Identity.</strong> eIDAS QES (warrants), SMS OTP (employment), or none (most MSAs).</li>
+        <li><strong>Signing.</strong> Sequential vs parallel, signing order, witness if required.</li>
+        <li><strong>Lifecycle.</strong> Expiry days and reminder cadence.</li>
+        <li><strong>Distribution.</strong> PowerForm (self-serve link) and Bulk Send capability.</li>
+      </ul>
+    `,
+    next: "advance",
+    effect: "template:open-detail",
+  },
+  {
+    id: "templates-detail-anchors",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-template-anchors",
+    side: "top",
+    title: "Anchor tags",
+    description: `
+      <p>White-on-white text Counsel types directly into the Word template. DocuSign matches each tag via <code>searchString</code> at envelope-create time and drops the signature, date, or initial field right where it sees the marker.</p>
+      <p class="muted">Type the anchors once when authoring the master. Forever after, every contract gets fields placed automatically. Zero per-contract dragging.</p>
+    `,
+    next: "advance",
+    effect: "template:open-detail",
+  },
+  {
+    id: "templates-detail-versions",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-template-versions",
+    side: "top",
+    title: "Version history",
+    description: `
+      <p>Every Drive save snapshots a new version. The active <strong>current</strong> version is what new contracts pin to; older versions stay for any in-flight contracts pinned at create time.</p>
+      <p class="muted">Click any row to expand the changelog and the diff against the previous version.</p>
+    `,
+    next: "advance",
+    // Closing the modal here so the next step (templates-counsel) renders
+    // against the catalog page, not behind a still-open modal.
+    effect: "template:close-detail",
+  },
   {
     id: "templates-counsel",
     chapter: "templates",
@@ -1067,11 +1196,38 @@ export const TOUR_STEPS: TourStep[] = [
     id: "intake-after-submit",
     chapter: "intake",
     path: "*",
-    title: "Contract created",
+    selector: ".tour-anchor-clause-diff",
+    side: "top",
+    title: "Contract created · clause check ran",
     description: `
-      <p>The new contract's detail page. Clause results are already on screen (the rules engine ran on submit).</p>
-      <p>From here, the rest of the flow is identical to what you saw in the <strong>Workflow walk</strong> chapter: routing rules fire, approvers are notified, you preview the envelope, click Send via DocuSign, the contract advances to signed, and structured writeback flows back to Light's systems of record.</p>
-      <p class="muted">If you want to walk the post-creation flow now, finish this chapter and pick <em>Workflow walk</em> from the tour menu.</p>
+      <p>You landed on the new contract's detail page. The deterministic rules engine ran on submit, so clause results are already on screen.</p>
+      <p class="muted">In production Claude also runs against the populated document; both write into the same <code>ClauseCheckResult</code> shape.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "intake-after-routing",
+    chapter: "intake",
+    path: "*",
+    selector: ".tour-anchor-approval-chain",
+    side: "top",
+    title: "Routing already fired",
+    description: `
+      <p>The same engine you saw on Bolt MSA fires here too: routing rules pick approvers based on the contract fields, each approver gets a Slack DM with a one-click Approve button, and the approval chain is auditable end-to-end.</p>
+      <p class="muted">If no approval chain is visible, this contract's combination of fields didn't trigger any rules; Send unlocks immediately.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "intake-after-send",
+    chapter: "intake",
+    path: "*",
+    selector: ".tour-anchor-preview-envelope",
+    side: "left",
+    title: "End of the workflow",
+    description: `
+      <p>From here the flow is identical to what you walked on Bolt MSA: click <strong>Preview envelope</strong>, inspect the populated MSA + anchor-tag placement, click <strong>Send via DocuSign</strong>. The contract advances to <em>Filed</em> and structured writeback fires.</p>
+      <p class="muted">Tour ends here. You can re-take the tour anytime from the sidebar.</p>
     `,
     next: "advance",
     nextLabel: "Finish",
