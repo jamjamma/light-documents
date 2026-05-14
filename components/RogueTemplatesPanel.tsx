@@ -206,6 +206,21 @@ function RogueRow({
     );
   }, [showSlackPreview, isFirst]);
 
+  // Auto-advance when the user clicks Archive on the first row during the
+  // archive walk step. The next tour step anchors on the archived-stamp.
+  useEffect(() => {
+    if (!isFirst || !action.archived) return;
+    const state = readTourState();
+    if (!state.active) return;
+    const step = TOUR_STEPS[state.stepIndex];
+    if (step?.id !== "templates-rogue-archive") return;
+    window.dispatchEvent(
+      new CustomEvent("tour:auto-next", {
+        detail: { fromStepId: "templates-rogue-archive" },
+      }),
+    );
+  }, [action.archived, isFirst]);
+
   const onArchive = () => {
     setAction(archiveRogue(rogue.driveFileId, OPERATOR_NAME));
   };
@@ -285,7 +300,12 @@ function RogueRow({
           {(action.archived || action.notified) && (
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
               {action.archived && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-ink-100 px-2 py-0.5 text-ink-700">
+                <span
+                  className={clsx(
+                    "inline-flex items-center gap-1 rounded-full bg-ink-100 px-2 py-0.5 text-ink-700",
+                    isFirst && "tour-anchor-rogue-archived-stamp",
+                  )}
+                >
                   <Check className="h-3 w-3" />
                   Archived by {action.archived.by} · {formatDateTime(action.archived.at)}
                   <button

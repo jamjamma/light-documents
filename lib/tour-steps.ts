@@ -147,7 +147,7 @@ export const TOUR_STEPS: TourStep[] = [
     title: "Welcome",
     description: `
       <p class="lead">A guided walk through Light Documents, end-to-end.</p>
-      <p class="muted"><kbd>Esc</kbd> to exit. Restart anytime via <em>Take the tour</em> in the sidebar.</p>
+      <p class="muted">Navigate with <kbd>&rarr;</kbd> / <kbd>&larr;</kbd> or the on-popover buttons. <kbd>Esc</kbd> to exit. Restart anytime via <em>Take the tour</em> in the sidebar.</p>
     `,
     next: "advance",
     nextLabel: "Start",
@@ -307,15 +307,69 @@ export const TOUR_STEPS: TourStep[] = [
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-approval-chain",
     side: "top",
-    title: "Approve every approver",
+    title: "The approval chain",
     description: `
+      <p>Three approvers, each routed by a typed rule. We'll walk the actions one at a time.</p>
+      <p class="muted">Operator (you) = Martina Holst. The other two represent Slack-DM responders.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "approval-approve",
+    chapter: "workflow",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-approval-operator-row",
+    side: "left",
+    title: "Approve your own row",
+    description: `
+      <p><strong>Click Approve</strong> on the Martina Holst row (your row). The pill flips green and an <strong>Undo</strong> chip appears next to it.</p>
+      <p class="muted">This is the only "real" approval; the other rows are simulations of Slack-DM responses.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "approval-undo",
+    chapter: "workflow",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-approval-undo",
+    side: "left",
+    title: "Undo: only before send",
+    description: `
+      <p>The <strong>Undo</strong> chip lets the operator withdraw their own approval. A new audit row gets appended (the original Approved row stays).</p>
+      <p>Click <strong>Undo</strong> now if you want to see the withdrawal flow, then click Approve again to restore the green state before continuing.</p>
+      <p class="muted">Undo is refused once the envelope is in DocuSign. That's the line.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "approval-actions-menu",
+    chapter: "workflow",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-approval-actions-menu",
+    side: "left",
+    title: "Reassign, Re-ping, Reject",
+    description: `
+      <p>Each pending row has a <strong>...</strong> menu (top right). Three actions:</p>
       <ul>
-        <li>Find the <strong>Martina Holst</strong> row. Click <strong>Approve</strong>.</li>
-        <li>Pill flips green; <strong>Undo</strong> appears next to it.</li>
-        <li>For the other rows, click <strong>Simulate X approves</strong>. They represent Slack DM responses.</li>
-        <li>Once every row is green, the Send button unlocks.</li>
+        <li><strong>Reassign / Pass on...</strong> Switch the approver to someone else (out of office, conflict of interest).</li>
+        <li><strong>Re-ping</strong> Resend the Slack DM if it's been sitting too long.</li>
+        <li><strong>Reject...</strong> Block the contract and return it to the owner with a reason.</li>
       </ul>
-      <p class="muted"><strong>Don't skip rows.</strong> If you click Next with pending approvals, the Send button will be greyed out at the next step and you'll have to come back here.</p>
+      <p class="muted">Click the <strong>...</strong> on Martina's row to try it. Every action writes a row to the audit trail.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "approval-simulate-others",
+    chapter: "workflow",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-approval-chain",
+    side: "top",
+    title: "Approve the rest",
+    description: `
+      <p>Make sure Martina is green again, then click <strong>Simulate X approves</strong> on the other two rows.</p>
+      <p>Each Simulate represents the approver clicking Approve in Slack. Once every row is green, the Send button at the bottom unlocks.</p>
+      <p class="muted"><strong>Don't skip rows.</strong> If you click Next with pending approvals, Send stays greyed at the next step and you'll have to come back here.</p>
     `,
     next: "advance",
   },
@@ -428,7 +482,7 @@ export const TOUR_STEPS: TourStep[] = [
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-modal-send",
-    side: "top",
+    side: "left",
     title: "Send via DocuSign",
     description: `
       <p>Click <strong>Send via DocuSign</strong> below. The envelope fires, the contract advances to signed, and the page redirects to the signed record. The tour will follow you there.</p>
@@ -686,6 +740,19 @@ export const TOUR_STEPS: TourStep[] = [
 
   // ── Act 6: Templates walked section by section ────────────────────────
   {
+    id: "templates-landing",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-sidebar-templates",
+    side: "right",
+    title: "We're in Templates now",
+    description: `
+      <p>This is the <strong>Templates</strong> section of the sidebar, now highlighted because we navigated here.</p>
+      <p class="muted">Master Word docs live here, alongside the rogue-template governance panel.</p>
+    `,
+    next: "advance",
+  },
+  {
     id: "templates-overview",
     chapter: "templates",
     path: "/templates",
@@ -783,7 +850,7 @@ export const TOUR_STEPS: TourStep[] = [
     chapter: "templates",
     path: "/templates",
     selector: ".tour-anchor-rogue-header",
-    side: "bottom",
+    side: "right",
     title: "Open the panel",
     description: `
       <p><strong>Click the panel header below</strong> to expand the list of flagged files.</p>
@@ -808,6 +875,34 @@ export const TOUR_STEPS: TourStep[] = [
         <li><strong>Last user</strong> and when, so notifications route to the right person.</li>
         <li><strong>Recommended action</strong>: archive, block, or notify, based on context.</li>
       </ul>
+    `,
+    next: "advance",
+  },
+  {
+    id: "templates-rogue-archive",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-rogue-actions",
+    side: "left",
+    title: "Archive (try it)",
+    description: `
+      <p><strong>Click Archive</strong> on the first flagged file. The row dims, gets an <em>archived</em> badge, and an <strong>Archived by Martina · {timestamp} · Undo</strong> stamp appears.</p>
+      <p class="muted">The file stays in Drive. We just record the decision so any future use surfaces it. The tour follows you forward as soon as you click Archive.</p>
+    `,
+    // In-app Archive click is the only forward path. Page dispatches
+    // `tour:auto-next` when `action.archived` is set on the first row.
+    hideNext: true,
+  },
+  {
+    id: "templates-rogue-undo-archive",
+    chapter: "templates",
+    path: "/templates",
+    selector: ".tour-anchor-rogue-archived-stamp",
+    side: "bottom",
+    title: "Undo the archive",
+    description: `
+      <p>The archived stamp carries an <strong>Undo</strong> link. Click it now if you want to restore the row to rogue status; the audit log keeps both decisions.</p>
+      <p class="muted">Every state change is append-only. Even Undo writes a new row; the original Archived row stays.</p>
     `,
     next: "advance",
   },
@@ -886,8 +981,11 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted"><strong>Click any template card below.</strong> The form auto-progresses to step 2 and the tour follows you.</p>
     `,
     // In-app template click is the only forward path; page dispatches
-    // `tour:auto-next` when `template` is set.
+    // `tour:auto-next` when `template` is set. Back is hidden because the
+    // previous step (templates-to-intake) lives on /templates, and going
+    // back across the navigation boundary leaves no usable anchor here.
     hideNext: true,
+    hideBack: true,
   },
   {
     id: "intake-record",
@@ -901,8 +999,11 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted"><strong>Click any record below.</strong> Variables (counterparty, value, terms, signer) auto-prefill from it. The form auto-progresses to step 3 and the tour follows.</p>
     `,
     // In-app record click is the only forward path; page dispatches
-    // `tour:auto-next` when `source` is set.
+    // `tour:auto-next` when `source` is set. Back is hidden: the previous
+    // step's anchor (.tour-anchor-intake-template-picker) is unmounted
+    // once the form auto-progresses to step 2.
     hideNext: true,
+    hideBack: true,
   },
   {
     id: "intake-form",
@@ -1169,8 +1270,8 @@ export const CHAPTERS: ChapterMeta[] = [
   {
     id: "workflow",
     title: "Workflow walk",
-    blurb: "Bolt MSA from in-review to sent. Clause check, routing, approvals, envelope preview.",
-    estSeconds: 90,
+    blurb: "Bolt MSA from in-review to sent. Clause check, routing, approvals with Undo and ... menu, envelope preview, send.",
+    estSeconds: 150,
   },
   {
     id: "signed",
@@ -1187,8 +1288,8 @@ export const CHAPTERS: ChapterMeta[] = [
   {
     id: "templates",
     title: "Templates",
-    blurb: "8 master Word docs (Drive or SharePoint), rogue-template governance, Counsel's editing workflow.",
-    estSeconds: 55,
+    blurb: "8 master Word docs (Drive or SharePoint), rogue-template governance walked action by action, Counsel's editing workflow.",
+    estSeconds: 90,
   },
   {
     id: "intake",

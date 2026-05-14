@@ -58,11 +58,15 @@ export function ApprovalChain({
         const personName = a.assignedName ?? a.role;
         const avatarColor = a.assignedAvatarColor ?? "bg-ink-100 text-ink-700";
         const title = a.assignedTitle ?? a.role;
+        // Tour anchors live on the operator's row only (the only row where
+        // Undo is real and where the actions menu is most relevant to demo).
+        const isOperatorRow = operatorName !== undefined && personName === operatorName;
         return (
           <div
             key={`${a.role}-${a.assignedUserId ?? "unassigned"}`}
             className={clsx(
               "rounded-xl border p-4",
+              isOperatorRow && "tour-anchor-approval-operator-row",
               decided ? "border-sage-500/30 bg-sage-50/50" : a.status === "rejected" ? "border-rose-500/30 bg-rose-50/50" : "border-ink-200 bg-white",
             )}
           >
@@ -122,7 +126,9 @@ export function ApprovalChain({
                       <button
                         type="button"
                         onClick={() => onUndoApprove(a)}
-                        className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-ink-700 ring-1 ring-inset ring-ink-200 hover:bg-ink-100 hover:text-ink-900"
+                        className={clsx(
+                          "tour-anchor-approval-undo inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-ink-700 ring-1 ring-inset ring-ink-200 hover:bg-ink-100 hover:text-ink-900",
+                        )}
                         title="Withdraw your approval. Returns the row to pending and walks the contract back to awaiting_approval if this was the last approver."
                       >
                         <Undo2 className="h-3 w-3" /> Undo
@@ -134,12 +140,14 @@ export function ApprovalChain({
                   )}
                 </div>
                 {a.status === "pending" && (onReassign || onReping || onReject) && (
-                  <ApprovalActionsMenu
-                    approval={a}
-                    onReassign={() => onReassign?.(a)}
-                    onReping={() => onReping?.(a)}
-                    onReject={() => onReject?.(a)}
-                  />
+                  <div className={clsx(isOperatorRow && "tour-anchor-approval-actions-menu")}>
+                    <ApprovalActionsMenu
+                      approval={a}
+                      onReassign={() => onReassign?.(a)}
+                      onReping={() => onReping?.(a)}
+                      onReject={() => onReject?.(a)}
+                    />
+                  </div>
                 )}
               </div>
             </div>
