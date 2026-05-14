@@ -102,6 +102,7 @@ export default function DashboardPage() {
                 emphasis: kpis.awaitingMe > 0,
                 onClick: () => setFilter("awaiting_me"),
                 active: filter === "awaiting_me",
+                className: "tour-anchor-kpi-awaiting",
               },
               {
                 label: "Blocked",
@@ -110,6 +111,7 @@ export default function DashboardPage() {
                 emphasis: kpis.blocked > 0,
                 onClick: () => setFilter("blocked"),
                 active: filter === "blocked",
+                className: "tour-anchor-kpi-blocked",
               },
               {
                 label: "In review",
@@ -117,6 +119,7 @@ export default function DashboardPage() {
                 hint: "clause check or legal review",
                 onClick: () => setFilter("in_review"),
                 active: filter === "in_review",
+                className: "tour-anchor-kpi-in-review",
               },
             ]}
           />

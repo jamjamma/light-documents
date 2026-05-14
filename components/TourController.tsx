@@ -162,7 +162,8 @@ export function TourController() {
       destroyDriver();
       return;
     }
-    const step = TOUR_STEPS[state.stepIndex];
+    let stepIndex = state.stepIndex;
+    let step = TOUR_STEPS[stepIndex];
     if (!step) {
       // Walked past the last step (e.g. localStorage out of sync after a
       // STATE_VERSION bump). End cleanly.
@@ -171,12 +172,24 @@ export function TourController() {
       destroyDriver();
       return;
     }
-    // Step bound to a different path: sit dormant.
+    // If the current step's path doesn't match the pathname, look for a
+    // later step whose path DOES match. This lets in-app side-effects (e.g.
+    // the user clicking "Send via DocuSign" which auto-redirects to the
+    // signed page) advance the tour past the action step automatically.
     if (step.path !== "*" && step.path !== pathname) {
-      destroyDriver();
-      return;
+      const futureMatch = TOUR_STEPS.findIndex(
+        (s, i) => i > stepIndex && s.path === pathname,
+      );
+      if (futureMatch !== -1) {
+        stepIndex = futureMatch;
+        step = TOUR_STEPS[stepIndex];
+        writeTourState({ active: true, stepIndex });
+      } else {
+        destroyDriver();
+        return;
+      }
     }
-    renderStep(state.stepIndex, step);
+    renderStep(stepIndex, step);
   }, [pathname, destroyDriver, renderStep]);
 
   // Rewrite handlersRef every render so the latest pathname / router are
@@ -213,10 +226,11 @@ export function TourController() {
         return;
       }
 
-      // Same-page advance.
+      // Same-page advance. Defer one tick so driver.js can finish its
+      // current click-handler event loop before we tear down + remount.
       const nextStep = TOUR_STEPS[nextIdx];
       if (nextStep.path === "*" || nextStep.path === pathname) {
-        renderStep(nextIdx, nextStep);
+        window.setTimeout(() => renderStep(nextIdx, nextStep), 0);
       } else {
         // Next step is on a different path and no auto-navigate directive.
         // Sit dormant; user will navigate manually.
@@ -228,7 +242,12 @@ export function TourController() {
       writeTourState({ active: true, stepIndex: prevIdx });
       const prevStep = TOUR_STEPS[prevIdx];
       if (prevStep.path === "*" || prevStep.path === pathname) {
-        renderStep(prevIdx, prevStep);
+        // Defer to next tick so driver.js can finish its click-handler event
+        // loop before we tear down its instance and remount a new one. Without
+        // this defer, destroying the driver from inside its own button handler
+        // can leave the popover in a half-dismissed state and Back appears
+        // broken.
+        window.setTimeout(() => renderStep(prevIdx, prevStep), 0);
       } else {
         // Back across page boundaries: push to the prev step's path.
         destroyDriver();

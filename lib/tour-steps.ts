@@ -35,7 +35,12 @@
 import type { Side } from "driver.js";
 
 export const HERO_CONTRACT_ID = "c_bolt_msa";
-export const SIGNED_DEMO_ID = "c_acme_msa";
+/**
+ * Bolt becomes signed during the tour (the user clicks through Approve →
+ * Preview → Send), so the signed walkthrough uses Bolt itself. Acme is no
+ * longer needed as a stand-in; the archive walkthrough lands the user on
+ * Bolt's own signed page after Send fires.
+ */
 
 /**
  * Side-effects the controller can fire when a step renders. The dashboard
@@ -50,7 +55,11 @@ export type TourEffect =
   | "filter:all"
   | "filter:awaiting_me"
   | "filter:blocked"
-  | "filter:in_review";
+  | "filter:in_review"
+  | "archive:filter:all"
+  | "archive:filter:customer"
+  | "archive:filter:people"
+  | "archive:filter:equity";
 
 export interface TourStep {
   /** Stable id, used for de-dupe in the controller render guard. */
@@ -95,8 +104,8 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/",
     title: "Welcome",
     description: `
-      <p class="lead">A 90-second walk, menu by menu.</p>
-      <p class="muted"><kbd>Esc</kbd> to exit. Restart anytime via <em>Take the tour</em>.</p>
+      <p class="lead">A 2-minute walk through Light Documents, end-to-end.</p>
+      <p class="muted"><kbd>Esc</kbd> to exit. Restart anytime via <em>Take the tour</em> in the sidebar.</p>
     `,
     next: "advance",
     nextLabel: "Start",
@@ -156,7 +165,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "filter-awaiting-me",
     path: "/",
-    selector: ".tour-anchor-kpis",
+    selector: ".tour-anchor-kpi-awaiting",
     side: "bottom",
     title: "Awaiting me",
     description: `
@@ -169,7 +178,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "filter-blocked",
     path: "/",
-    selector: ".tour-anchor-kpis",
+    selector: ".tour-anchor-kpi-blocked",
     side: "bottom",
     title: "Blocked",
     description: `
@@ -182,12 +191,12 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "filter-in-review",
     path: "/",
-    selector: ".tour-anchor-kpis",
+    selector: ".tour-anchor-kpi-in-review",
     side: "bottom",
     title: "In review",
     description: `
       <p>Clause checker or counsel actively reviewing.</p>
-      <p><strong>Bolt MSA</strong>: EUR 180k, 3 clause deviations. Hero example for the workflow walk.</p>
+      <p><strong>Bolt MSA</strong>: EUR 180k, 3 clause deviations. Hero example. We'll walk it all the way to signed.</p>
     `,
     next: "navigate",
     goto: `/contracts/${HERO_CONTRACT_ID}`,
@@ -195,7 +204,7 @@ export const TOUR_STEPS: TourStep[] = [
     effect: "filter:in_review",
   },
 
-  // ── Act 3: Workflow walk (Bolt MSA) ───────────────────────────────────
+  // ── Act 3: Walk Bolt MSA to signed ────────────────────────────────────
   {
     id: "clause-diff",
     path: `/contracts/${HERO_CONTRACT_ID}`,
@@ -203,11 +212,11 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Clause checker",
     description: `
-      <p>3 deviations vs the master template:</p>
+      <p>3 deviations vs the master template. <strong>Click each row</strong> to expand the reason:</p>
       <ul>
-        <li>Net 60 (vs Net 30)</li>
-        <li>Unlimited liability (vs EUR 500k cap)</li>
-        <li>Customer-only indemnity (vs mutual)</li>
+        <li><strong>Net 60</strong> (vs Net 30)</li>
+        <li><strong>Unlimited liability</strong> (vs EUR 500k cap)</li>
+        <li><strong>Customer-only indemnity</strong> (vs mutual)</li>
       </ul>
       <p class="muted"><em>Claude proposes; the rules engine decides who approves.</em></p>
     `,
@@ -235,14 +244,15 @@ export const TOUR_STEPS: TourStep[] = [
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-approval-chain",
     side: "top",
-    title: "Approve, then Undo",
+    title: "Approve all the approvers",
     description: `
       <ul>
-        <li>Find the <strong>Martina Holst</strong> row (Head of F&amp;O).</li>
-        <li>Click <strong>Approve</strong>. Pill flips green; <strong>Undo</strong> appears.</li>
-        <li>Other rows show <em>Simulate</em> (DM responses from others).</li>
+        <li>Find the <strong>Martina Holst</strong> row. Click <strong>Approve</strong>.</li>
+        <li>Pill flips green; <strong>Undo</strong> appears next to it.</li>
+        <li>For the other rows, click <strong>Simulate X approves</strong>. They represent Slack DM responses.</li>
+        <li>Once everyone is green, the Send button unlocks.</li>
       </ul>
-      <p class="muted"><em>Once DocuSign has the envelope, Undo is refused.</em></p>
+      <p class="muted"><em>Click Next when all rows are approved.</em></p>
     `,
     next: "advance",
   },
@@ -251,39 +261,37 @@ export const TOUR_STEPS: TourStep[] = [
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-preview-envelope",
     side: "top",
-    title: "Anchor-tag envelope",
+    title: "Preview the envelope",
     description: `
       <p>Click <strong>Preview envelope</strong> below: populated MSA with signature fields auto-placed by anchor tags from the Word template.</p>
-      <p class="muted">Config (expiry, reminders, QES) sits behind a collapsed audit disclosure. Close the modal, then click Next.</p>
+      <p class="muted">Config (expiry, reminders, QES) sits behind a collapsed audit disclosure inside the modal.</p>
     `,
-    next: "navigate",
-    goto: "/archive",
-    nextLabel: "Next: outputs",
+    next: "advance",
+    nextLabel: "Next: send",
+  },
+  {
+    id: "send-envelope",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-preview-envelope",
+    side: "top",
+    title: "Send via DocuSign",
+    description: `
+      <p>In the modal, click <strong>Send via DocuSign</strong>. The contract advances to signed and you'll auto-redirect to the signed page.</p>
+      <p class="muted"><em>If you closed the modal, click Preview envelope again, then Send.</em></p>
+    `,
+    next: "advance",
+    nextLabel: "Waiting…",
   },
 
-  // ── Act 4: Outputs (signed contracts + structured writeback) ──────────
+  // ── Act 4: Bolt's own signed page ─────────────────────────────────────
   {
-    id: "signed-archive",
-    path: "/archive",
-    title: "Signed contracts",
-    description: `
-      <p>Retrieval surface for past records.</p>
-      <ul>
-        <li>KPIs are <strong>counts</strong>, not financial totals.</li>
-        <li>Each row links to PDF, audit trail, writeback.</li>
-      </ul>
-    `,
-    next: "navigate",
-    goto: `/contracts/${SIGNED_DEMO_ID}/signed`,
-    nextLabel: "Open Acme MSA",
-  },
-  {
-    id: "structured-writeback",
-    path: `/contracts/${SIGNED_DEMO_ID}/signed`,
+    id: "bolt-signed",
+    path: `/contracts/${HERO_CONTRACT_ID}/signed`,
     selector: ".tour-anchor-ledger",
     side: "left",
     title: "Structured writeback",
     description: `
+      <p>Bolt is signed. Each signed contract emits structured data:</p>
       <ul>
         <li><strong>MSA / Order Form.</strong> Ledger journal entry plus dimensions.</li>
         <li><strong>Employment.</strong> HRIS record.</li>
@@ -293,11 +301,114 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted"><em>Fires on DocuSign <code>envelope-completed</code>. Both sides of the integration are stubbed in this build.</em></p>
     `,
     next: "navigate",
+    goto: "/archive",
+    nextLabel: "Next: archive",
+  },
+
+  // ── Act 5: Signed contracts archive ───────────────────────────────────
+  {
+    id: "archive-overview",
+    path: "/archive",
+    title: "Signed contracts archive",
+    description: `
+      <p>Bolt is now alongside the other signed records.</p>
+      <ul>
+        <li><strong>KPI tiles.</strong> Counts by category, not financial totals.</li>
+        <li><strong>Filter chips.</strong> All, Customer, People, Equity.</li>
+        <li><strong>Section view</strong> when All is selected, grouped by category.</li>
+      </ul>
+    `,
+    next: "advance",
+    effect: "archive:filter:all",
+  },
+  {
+    id: "archive-customer",
+    path: "/archive",
+    selector: ".tour-anchor-archive-filters",
+    side: "bottom",
+    title: "Customer contracts",
+    description: `
+      <p>MSAs, Order Forms, NDAs. Each emits a ledger journal entry on file.</p>
+      <p class="muted">Bolt MSA, Quantum Analytics MSA, Linear MSA all sit here.</p>
+    `,
+    next: "advance",
+    effect: "archive:filter:customer",
+  },
+  {
+    id: "archive-people",
+    path: "/archive",
+    selector: ".tour-anchor-archive-filters",
+    side: "bottom",
+    title: "People",
+    description: `
+      <p>Employment offers. Each emits an HRIS record on file.</p>
+      <p class="muted">Erin O'Brien and Oliver Adekunle offers sit here.</p>
+    `,
+    next: "advance",
+    effect: "archive:filter:people",
+  },
+  {
+    id: "archive-equity",
+    path: "/archive",
+    selector: ".tour-anchor-archive-filters",
+    side: "bottom",
+    title: "Equity",
+    description: `
+      <p>Warrant agreements. Each emits a cap-table grant on file.</p>
+      <p class="muted">None signed yet in this demo; the section appears when one is filed.</p>
+    `,
+    next: "navigate",
+    goto: "/templates",
+    nextLabel: "Next: templates",
+    effect: "archive:filter:equity",
+  },
+
+  // ── Act 6: Templates + rogue governance ───────────────────────────────
+  {
+    id: "templates-overview",
+    path: "/templates",
+    title: "Templates catalog",
+    description: `
+      <p>8 master Word docs in Drive, organized by category:</p>
+      <ul>
+        <li><strong>Customer.</strong> MSA, MSA Pilot, Order Form, NDA.</li>
+        <li><strong>People.</strong> Employment DK, Employment UK.</li>
+        <li><strong>Equity.</strong> Warrant, Advisor Warrant.</li>
+      </ul>
+      <p class="muted">Click any card for version history, clause rules, DocuSign config.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "templates-counsel",
+    path: "/templates",
+    title: "Counsel keeps Word for authoring",
+    description: `
+      <p>Master templates stay as Word docs in Drive, edited where Counsel already edits.</p>
+      <p class="muted">Counsel may still log in to approve a clause deviation when one is routed to them. What stays out is authoring, not review.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "templates-rogue",
+    path: "/templates",
+    selector: ".tour-anchor-rogue",
+    side: "top",
+    title: "Rogue templates governance",
+    description: `
+      <p>Daily scan flags docs outside <code>/Master Templates/</code> that look like masters but aren't.</p>
+      <ul>
+        <li><strong>Archive.</strong> Mark out of policy.</li>
+        <li><strong>Notify Owner.</strong> Slack DM with the diff and a remediation link.</li>
+      </ul>
+      <p class="muted"><em>Phase-2 governance demo. Audit log preserves both decisions.</em></p>
+    `,
+    next: "navigate",
     goto: "/contracts/new",
     nextLabel: "Next: new contract",
   },
 
-  // ── Act 5: New contract intake ────────────────────────────────────────
+  // ── Act 7: New contract intake ────────────────────────────────────────
   {
     id: "intake-walk",
     path: "/contracts/new",
@@ -306,25 +417,11 @@ export const TOUR_STEPS: TourStep[] = [
     title: "Create a new contract",
     description: `
       <ul>
-        <li><strong>1. Template.</strong> 8 master Word docs.</li>
-        <li><strong>2. Source record.</strong> Salesforce, HubSpot, Personio, or manual.</li>
+        <li><strong>1. Template.</strong> Pick one of the 8 masters.</li>
+        <li><strong>2. Source record.</strong> From Salesforce, HubSpot, Personio, or manual entry.</li>
         <li><strong>3. Confirm.</strong> Prefilled fields, clause check on submit.</li>
       </ul>
-    `,
-    next: "navigate",
-    goto: "/templates",
-    nextLabel: "Next: templates",
-  },
-  {
-    id: "templates",
-    path: "/templates",
-    title: "Templates and rogue governance",
-    description: `
-      <ul>
-        <li><strong>Master templates.</strong> Word docs in Drive, owned by Legal.</li>
-        <li><strong>Counsel keeps Word for authoring.</strong> They may still log in to approve a deviation; what stays out is authoring, not review.</li>
-        <li><strong>Rogue panel</strong> (scroll down). Daily scan flags docs outside <code>/Master Templates/</code>.</li>
-      </ul>
+      <p class="muted">Same workflow as Bolt begins on submit.</p>
     `,
     next: "advance",
     nextLabel: "Wrap up",
@@ -339,10 +436,10 @@ export const TOUR_STEPS: TourStep[] = [
       <ul>
         <li><strong>Dashboard.</strong> KPIs, filters, sidebar.</li>
         <li><strong>Filter walk.</strong> Awaiting me, Blocked, In review.</li>
-        <li><strong>Workflow.</strong> Clause check, routing, approvals, envelope.</li>
-        <li><strong>Outputs.</strong> Archive and structured writeback.</li>
+        <li><strong>Workflow.</strong> Clause check, routing, approvals, envelope, send.</li>
+        <li><strong>Signed.</strong> Bolt's writeback then the full archive by category.</li>
+        <li><strong>Templates.</strong> Catalog + Counsel-keeps-Word + rogue governance.</li>
         <li><strong>Intake.</strong> 3-step new-contract form.</li>
-        <li><strong>Templates.</strong> Drive-backed plus rogue governance.</li>
       </ul>
       <p class="muted">Re-take from the sidebar anytime.</p>
     `,

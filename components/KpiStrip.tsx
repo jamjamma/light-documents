@@ -10,6 +10,8 @@ interface Kpi {
   onClick?: () => void;
   /** Visually highlight this tile (paired with onClick to indicate active filter). */
   active?: boolean;
+  /** Extra className applied to the tile root (used to host tour anchors). */
+  className?: string;
 }
 
 interface Props {
@@ -42,6 +44,7 @@ export function KpiStrip({ kpis, trailing }: Props) {
             i < 2 ? "sm:border-t-0" : "",
             interactive && "transition-colors hover:bg-ink-50",
             k.active && "bg-ink-900/[0.03] ring-1 ring-inset ring-ink-900/15",
+            k.className,
           );
           if (interactive) {
             return (

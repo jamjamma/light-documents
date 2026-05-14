@@ -130,7 +130,9 @@ export default function TemplatesPage() {
           </div>
         )}
 
-        <RogueTemplatesPanel rogues={ROGUE_TEMPLATES} templateNameById={(id) => getTemplate(id)?.name ?? id} />
+        <div className="tour-anchor-rogue">
+          <RogueTemplatesPanel rogues={ROGUE_TEMPLATES} templateNameById={(id) => getTemplate(id)?.name ?? id} />
+        </div>
 
         <div className="panel overflow-hidden">
           <header className="flex flex-wrap items-center justify-between gap-2 border-b border-ink-100 px-4 py-3 sm:px-5">
