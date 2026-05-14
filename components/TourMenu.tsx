@@ -18,6 +18,7 @@ import {
   markTourSeen,
   setTourDismissed,
   resetTourState,
+  formatTotalTourDuration,
 } from "@/lib/tour-steps";
 
 /**
@@ -181,7 +182,7 @@ export function TourMenu() {
             <div className="min-w-0 flex-1">
               <div className="text-[14px] font-semibold">Walk everything in order</div>
               <div className="mt-0.5 text-[12px] text-white/70">
-                All 6 chapters, end-to-end. About 4 minutes.
+                All 6 chapters, end-to-end. About {formatTotalTourDuration()}.
               </div>
             </div>
           </button>

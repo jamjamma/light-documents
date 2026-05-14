@@ -146,7 +146,7 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/",
     title: "Welcome",
     description: `
-      <p class="lead">A 2-minute walk through Light Documents, end-to-end.</p>
+      <p class="lead">A guided walk through Light Documents, end-to-end.</p>
       <p class="muted"><kbd>Esc</kbd> to exit. Restart anytime via <em>Take the tour</em> in the sidebar.</p>
     `,
     next: "advance",
