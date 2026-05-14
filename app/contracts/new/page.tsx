@@ -94,7 +94,9 @@ function NewContractInner() {
       />
       <div className="px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
         <Card>
-          <Stepper step={step} onJump={(s) => setStep(s)} canJumpTo={canJumpTo(step, !!template, !!source)} />
+          <div className="tour-anchor-intake-steps">
+            <Stepper step={step} onJump={(s) => setStep(s)} canJumpTo={canJumpTo(step, !!template, !!source)} />
+          </div>
         </Card>
 
         <div className="mt-4">

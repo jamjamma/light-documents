@@ -5,16 +5,19 @@
  * mounts in the root layout, watches pathname + localStorage, and drives the
  * driver.js popover for the current step on each page.
  *
- * The hero MSA contract is `c_bolt_msa` (high-risk, in-review). The signed
- * walkthrough jumps to `c_acme_msa/signed` because Bolt MSA isn't signed yet
- * and we don't want the tour to force the user through the modal/Send flow.
+ * Hero contract: `c_bolt_msa` (high-risk, in-review, €180k MSA with 3 clause
+ * deviations). Bolt's `lightEntity` is set to "Light ApS (Denmark)" in
+ * mock-data so the Head of F&O slot routes to Martina Holst (the operator).
+ * That means the user can Approve their own row and watch the Undo
+ * affordance appear inline.
  *
- * Anchors are CSS classes prefixed with `tour-anchor-` placed on the relevant
- * wrapper element so the tour doesn't break if the components are restyled.
+ * The signed walkthrough jumps to `c_acme_msa/signed` because Bolt MSA
+ * isn't fully signed yet and we don't want the tour to force the user
+ * through the modal/Send flow.
  *
- * Descriptions support HTML. Driver.js renders the description string via
- * innerHTML so we can use <strong>, <em>, <code>, <ul>, <li> for richer
- * formatting. Keep copy short: ~2-4 short paragraphs max per step.
+ * Descriptions support HTML (driver.js renders via innerHTML). Keep copy
+ * tight: 2-4 short lines max per step. Use <strong>, <em>, <ul>, <li>, but
+ * NOT em-dashes (project rule). Use colons or commas instead.
  */
 
 import type { Side } from "driver.js";
@@ -53,26 +56,26 @@ export interface TourStep {
 }
 
 export const TOUR_STEPS: TourStep[] = [
-  // ── Act 1: Operator surface (dashboard) ────────────────────────────────
+  // ── Act 1: Dashboard (operator surface) ────────────────────────────────
   {
     id: "welcome",
     path: "/",
-    title: "Welcome to Light Documents",
+    title: "Welcome",
     description: `
-      <p>A ~2-minute tour through one contract end-to-end, from intake to signed structured writeback.</p>
-      <p>Skip anytime with <kbd>Esc</kbd> or the <strong>×</strong> button. You can restart from the sidebar.</p>
+      <p>A ~2-minute walk through one contract end-to-end.</p>
+      <p><kbd>Esc</kbd> or <strong>×</strong> to skip. Restart anytime from <em>Take the tour</em> in the sidebar.</p>
     `,
     next: "advance",
     nextLabel: "Start",
     hideBack: true,
   },
   {
-    id: "reframe",
+    id: "answer",
     path: "/",
-    title: "The partner-framed answer",
+    title: "The answer, in two beats",
     description: `
-      <p>The stated pain (manual Word edits, hand-placed DocuSign fields) is real, and this build kills both directly.</p>
-      <p>The bigger prize uniquely available to Light: every signed contract becomes <strong>structured data</strong> that flows into the relevant system of record. The PDF is the audit artifact; the data is the product.</p>
+      <p><strong>Visible pain:</strong> manual Word edits, hand-placed DocuSign fields. This build kills both.</p>
+      <p><strong>Bigger prize for Light:</strong> every signed contract becomes structured data that flows into the relevant system of record. The PDF is the audit artifact; the data is the product.</p>
     `,
     next: "advance",
   },
@@ -81,15 +84,15 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/",
     selector: ".tour-anchor-kpis",
     side: "bottom",
-    title: "Operator-actionable KPIs",
+    title: "Operator KPIs",
     description: `
       <p>Three tiles cover what an ops lead actually acts on:</p>
       <ul>
-        <li><strong>Awaiting me</strong>: pending the operator's approval</li>
+        <li><strong>Awaiting me</strong>: pending your approval</li>
         <li><strong>Blocked</strong>: awaiting approval or in review</li>
         <li><strong>In review</strong>: clause check running or legal review</li>
       </ul>
-      <p>Each tile filters the table below. Cycle health is demoted to a secondary line because it's a leadership metric, not an action one.</p>
+      <p>Click any tile to filter the table. Cycle health sits below as a secondary metric.</p>
     `,
     next: "advance",
   },
@@ -100,41 +103,58 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "Stage tabs + type chips",
     description: `
-      <p>Two filters compose: <strong>stage tabs</strong> (All in-flight / Awaiting me / Blocked / In review) and <strong>type chips</strong> (MSA, NDA, Employment, Warrant, Order Form).</p>
-      <p>The same workflow engine handles all 8 templates: same intake, same clause check, same routing, same writeback shape (per document type).</p>
+      <p>Two filters compose: stage tabs and document-type chips.</p>
+      <p>The same engine handles all 8 templates (MSA, NDA, Employment, Warrant, Order Form, plus variants). Same intake, same clause check, same writeback shape per type.</p>
     `,
     next: "advance",
   },
   {
-    id: "open-bolt",
+    id: "new-contract-btn",
     path: "/",
-    selector: ".tour-anchor-callout",
-    side: "bottom",
-    title: "Open the hero contract",
+    selector: ".tour-anchor-new-contract",
+    side: "right",
+    title: "Create a new contract",
     description: `
-      <p>Bolt MSA is a <strong>high-risk, in-review</strong> €180k UK contract with 3 clause deviations from the master template.</p>
-      <p>Click <strong>Open Bolt MSA</strong> below to walk the workflow.</p>
+      <p>The intake is a 3-step flow: pick a template, pick a source record (or enter manually), confirm prefilled fields. Let's see it.</p>
+    `,
+    next: "navigate",
+    goto: "/contracts/new",
+    nextLabel: "Open intake",
+  },
+  {
+    id: "intake-walk",
+    path: "/contracts/new",
+    selector: ".tour-anchor-intake-steps",
+    side: "bottom",
+    title: "3-step intake",
+    description: `
+      <ul>
+        <li><strong>1. Template</strong>: 8 master Word docs synced from Drive</li>
+        <li><strong>2. Source record</strong>: pulled from Salesforce / HubSpot / Personio (or manual entry for off-CRM)</li>
+        <li><strong>3. Confirm</strong>: prefilled fields with live validation; clause check runs on submit</li>
+      </ul>
+      <p>Let's go look at an in-flight contract instead.</p>
     `,
     next: "navigate",
     goto: `/contracts/${HERO_CONTRACT_ID}`,
-    nextLabel: "Open Bolt MSA →",
+    nextLabel: "See in-flight contract",
   },
 
-  // ── Act 2: The workflow (contract detail) ──────────────────────────────
+  // ── Act 2: Workflow (contract detail) ──────────────────────────────────
   {
     id: "clause-diff",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-clause-diff",
     side: "top",
-    title: "Clause checker (3 deviations flagged)",
+    title: "Clause checker",
     description: `
-      <p>The clause engine compared the negotiated draft to the pinned master template and flagged:</p>
+      <p>Bolt MSA has 3 deviations from the master template:</p>
       <ul>
-        <li><strong>Net 60</strong> vs Net 30 standard</li>
-        <li><strong>Unlimited liability</strong> vs €500k cap</li>
-        <li><strong>Customer-only indemnity</strong> vs mutual</li>
+        <li><strong>Net 60</strong> (vs Net 30)</li>
+        <li><strong>Unlimited liability</strong> (vs €500k cap)</li>
+        <li><strong>Customer-only indemnity</strong> (vs mutual)</li>
       </ul>
-      <p>In production, Claude proposes the deviations with rationale. The rules engine decides who approves. <em>Separation of duties keeps the system auditable.</em></p>
+      <p><em>In production, Claude proposes deviations; the rules engine decides who approves. Separation keeps it auditable.</em></p>
     `,
     next: "advance",
   },
@@ -143,13 +163,13 @@ export const TOUR_STEPS: TourStep[] = [
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-routing",
     side: "top",
-    title: "Routing rules engine",
+    title: "Routing rules",
     description: `
-      <p>13 typed routing rules fire based on the contract fields + clause results. For Bolt MSA, three approvers were summoned:</p>
+      <p>13 typed rules fire from contract fields. For Bolt:</p>
       <ul>
-        <li><strong>Legal</strong>: because clause deviations were flagged</li>
-        <li><strong>Head of F&amp;O</strong>: because ARR &gt; €50k</li>
-        <li><strong>CFO</strong>: because ARR &gt; €100k</li>
+        <li><strong>Legal</strong>: clause deviations</li>
+        <li><strong>Head of F&amp;O</strong>: ARR &gt; €50k</li>
+        <li><strong>CFO</strong>: ARR &gt; €100k</li>
       </ul>
       <p>Each row carries its <em>"why"</em> for the audit log. Head of F&amp;O owns this engine in production.</p>
     `,
@@ -160,10 +180,10 @@ export const TOUR_STEPS: TourStep[] = [
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-approval-chain",
     side: "top",
-    title: "Approval chain &middot; with operator actions",
+    title: "Approval chain &middot; try Approve + Undo",
     description: `
-      <p>Approvers are pinged via <strong>Slack DM</strong> (or email magic link for board / external counsel). Each row has actions on the &middot;&middot;&middot; menu: <strong>Reassign</strong>, <strong>Pass on</strong>, <strong>Re-ping</strong>, <strong>Reject</strong>.</p>
-      <p>Try clicking <em>Simulate Sara approves</em> on the Legal row. The pill flips green and an <strong>Undo</strong> button appears next to it, because you (Martina) approved on Sara's behalf.</p>
+      <p>Find the <strong>Head of Finance &amp; Ops</strong> row (Martina Holst). That's your row, so the button reads <strong>Approve</strong>, not Simulate.</p>
+      <p>Click Approve. Pill flips green and an <strong>Undo</strong> button appears next to it. Other rows show <em>Simulate X approves</em>: those represent Slack DM responses from other people; only your own approval is Undo-able.</p>
       <p><em>Once DocuSign has the envelope, Undo is refused. That's the line.</em></p>
     `,
     next: "advance",
@@ -173,70 +193,62 @@ export const TOUR_STEPS: TourStep[] = [
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-preview-envelope",
     side: "top",
-    title: "Anchor-tag envelope preview",
+    title: "Preview envelope",
     description: `
-      <p>Once all chips are green, <strong>Preview envelope</strong> opens a populated MSA with anchor-tag callouts. Counsel embedded the anchor strings in the Word template once as white-on-white text; DocuSign API places every signature field automatically.</p>
-      <p>The configuration block (expiry, reminders, QES, witness, PowerForm) is collapsed by default behind an audit-view disclosure.</p>
-      <p>For this tour I'll skip ahead to a contract that's already signed, so you can see the structured writeback.</p>
+      <p><strong>Preview envelope</strong> opens a populated MSA with anchor-tag callouts. Counsel embedded the anchor strings in the Word template once as white-on-white text; DocuSign places every signature field automatically. Config (expiry, reminders, QES) is collapsed by default behind an audit-view disclosure.</p>
+      <p>Bolt isn't fully approved here, so click <strong>Next</strong> below to jump to a contract that already is.</p>
     `,
     next: "navigate",
     goto: `/contracts/${SIGNED_DEMO_ID}/signed`,
-    nextLabel: "See a signed contract →",
+    nextLabel: "Jump to signed",
   },
 
-  // ── Act 3: Outputs + extensibility ─────────────────────────────────────
+  // ── Act 3: Outputs ─────────────────────────────────────────────────────
   {
     id: "structured-writeback",
     path: `/contracts/${SIGNED_DEMO_ID}/signed`,
     selector: ".tour-anchor-ledger",
     side: "left",
-    title: "Structured writeback &middot; the strategic extension",
+    title: "Structured writeback",
     description: `
-      <p>Every signed MSA emits a <strong>journal entry shape</strong>: DR Trade Receivables / CR Deferred Revenue, with dimension chips (customer, source record, entity, renewal).</p>
-      <p>For Employment contracts the shape becomes an HRIS record. For Warrants, a cap-table grant. For NDAs (no commercial impact), the audit trail itself is the system of record.</p>
-      <p><em>The prototype renders the shape. In production it posts to whichever endpoint Light exposes. Both sides of the integration are stubbed in this build: this is the structural argument, not a capability claim.</em></p>
+      <p><strong>MSA / Order Form</strong>: journal entry shape (DR Trade Receivables / CR Deferred Revenue) with customer / source / entity / renewal chips.</p>
+      <p><strong>Employment</strong>: HRIS record. <strong>Warrant</strong>: cap-table grant. <strong>NDA</strong>: retention metadata only.</p>
+      <p><em>Prototype emits the shape. Production posts to whichever endpoint Light exposes. Both sides of the integration are stubbed here: this is the structural argument, not a capability claim.</em></p>
     `,
     next: "navigate",
     goto: "/archive",
-    nextLabel: "Past contracts →",
+    nextLabel: "Past contracts",
   },
   {
     id: "signed-archive",
     path: "/archive",
-    title: "Signed contracts archive",
+    title: "Signed contracts",
     description: `
-      <p>Past signed contracts live here. KPIs are <strong>counts</strong> (total, customer, people, equity): not ARR / headcount / equity totals. Those leadership metrics live on Light's real dashboards, not on a contract-retrieval surface.</p>
-      <p>Each row links to its full signed record (audit trail + writeback). The list also surfaces who signed, when, and against which template version.</p>
+      <p>KPIs are <strong>counts</strong> (total, customer, people, equity). ARR / headcount / equity TOTALS live on Light's real dashboards, not on a contract-retrieval surface.</p>
+      <p>Each row links to its full signed record (audit trail + writeback). Shows who signed, when, against which template version.</p>
     `,
     next: "navigate",
     goto: "/templates",
-    nextLabel: "Templates →",
+    nextLabel: "Templates",
   },
   {
     id: "templates",
     path: "/templates",
     title: "Templates &middot; Counsel keeps Word",
     description: `
-      <p>Master templates live as Word docs in Drive, owned by Legal. Counsel never logs into Light Documents: they edit master templates where they already edit, with Track Changes and comments. Our platform watches the folder via Drive Watch API and syncs.</p>
-      <p>Scroll down: the <strong>Rogue templates</strong> panel is a Phase-2 governance demo. A daily Drive scan flags docs that look like master templates but sit outside <code>/Master Templates/</code>. Each rogue file gets Archive + Notify Owner actions with a smart routing rationale (still-employed lastUser → DM; ex-employee → channel fallback).</p>
+      <p>Master templates live as Word docs in Drive, owned by Legal. <strong>Counsel never logs into Light Documents</strong>: they edit where they already edit, Track Changes and all. We watch the folder and sync.</p>
+      <p>Scroll down: the <strong>Rogue templates</strong> panel is a Phase-2 governance demo. Daily scan flags docs outside <code>/Master Templates/</code> with Archive + Notify Owner.</p>
     `,
     next: "advance",
     nextLabel: "Wrap up",
   },
-
-  // ── Wrap up ────────────────────────────────────────────────────────────
   {
     id: "done",
     path: "*",
-    title: "That's the tour",
+    title: "Tour complete",
     description: `
-      <p>You've seen:</p>
-      <ul>
-        <li>Operator KPIs &middot; stage tabs &middot; type chips</li>
-        <li>Clause checker &middot; routing rules &middot; approval chain &middot; Undo</li>
-        <li>Anchor-tag envelope &middot; structured writeback &middot; signed archive &middot; templates + rogue scan</li>
-      </ul>
-      <p>From here: <strong>About this build</strong> in the sidebar has the full submission memo. <strong>Reset demo data</strong> starts the contracts fresh. <strong>Take the tour</strong> restarts this any time.</p>
+      <p>You've seen the operator surface, intake, workflow, structured writeback, signed archive, and templates governance.</p>
+      <p>Next: <strong>About this build</strong> (sidebar) has the full submission memo. <strong>Reset demo data</strong> wipes everything and lets you take the tour again.</p>
     `,
     next: "advance",
     nextLabel: "Finish",

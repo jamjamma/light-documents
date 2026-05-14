@@ -884,11 +884,11 @@ export const SOURCE_RECORDS: SourceRecord[] = [
     system: "HubSpot",
     externalRef: "Deal 4421",
     display: "Bolt Industries Ltd",
-    subtitle: "€180k ARR · UK customer · Net 60 + no cap + custom indemnity",
+    subtitle: "€180k ARR · UK customer · Light ApS signing · Net 60 + no cap + custom indemnity",
     syncedAt: "2026-05-12T09:18:00Z",
     data: {
       counterpartyLegalName: "Bolt Industries Ltd",
-      lightEntity: "Light Ltd (United Kingdom)",
+      lightEntity: "Light ApS (Denmark)",
       contractValueEur: 180_000,
       paymentTermsDays: 60,
       liabilityCapUnlimited: true,

@@ -10,7 +10,7 @@ import { findMember } from "./approver-directory";
 const STORAGE_KEY = "light-documents-state";
 // Bump on every shape change to Contract / Approval / seed data so old localStorage
 // state is discarded and the demo re-seeds with the current data model.
-const STATE_VERSION = 9;
+const STATE_VERSION = 10;
 
 export interface RogueAction {
   archived?: { at: string; by: string };

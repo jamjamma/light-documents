@@ -129,30 +129,14 @@ export default function DashboardPage() {
           <div className="tour-anchor-callout flex items-start gap-3 rounded-xl border border-accent-200 bg-accent-50/60 px-4 py-3">
             <div className="flex-1 text-[13px] text-ink-700">
               <span className="font-medium text-ink-900">New here?</span>{" "}
-              Take the guided tour, or open <strong>Bolt MSA</strong> to walk the demo path yourself.
+              Open <strong>Bolt MSA</strong> to walk the demo path, or take the guided tour from the sidebar.
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                if (typeof window !== "undefined" && window.innerWidth < 768) {
-                  alert(
-                    "The guided tour is desktop-first. Open this page on a wider screen, or use the 'Open Bolt MSA' button to walk the demo manually on mobile.",
-                  );
-                  return;
-                }
-                writeTourState({ active: true, stepIndex: 0 });
-                window.dispatchEvent(new CustomEvent("tour:start"));
-              }}
-              className="hidden shrink-0 items-center gap-1.5 rounded-md bg-ink-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-ink-800 md:inline-flex"
-            >
-              Take the tour
-              <ArrowRight className="h-3.5 w-3.5" />
-            </button>
             <Link
               href={HERO_MSA_HREF}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-ink-200 bg-white px-3 py-1.5 text-[12px] font-medium text-ink-900 hover:bg-ink-50"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-ink-900 px-3 py-1.5 text-[12px] font-medium text-white hover:bg-ink-800"
             >
               Open Bolt MSA
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
             <button
               type="button"

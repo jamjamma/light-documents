@@ -180,7 +180,7 @@ export function Sidebar() {
             href="/contracts/new"
             title={collapsed ? "New contract" : undefined}
             className={clsx(
-              "mb-0.5 flex items-center gap-2.5 rounded-lg border border-ink-200 text-sm font-medium text-ink-900 hover:bg-ink-50",
+              "tour-anchor-new-contract mb-0.5 flex items-center gap-2.5 rounded-lg border border-ink-200 text-sm font-medium text-ink-900 hover:bg-ink-50",
               collapsed ? "md:justify-center md:px-2 md:py-2.5" : "px-3 py-2",
             )}
           >
