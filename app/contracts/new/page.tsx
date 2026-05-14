@@ -102,7 +102,9 @@ function NewContractInner() {
         <div className="mt-4">
           {step === 1 && (
             <Card title="Choose a template" subtitle="Master Word documents synced from Drive. Each has typed clause rules.">
-              <TemplatePicker selected={template} onSelect={(t) => { setTemplate(t); setStep(2); }} />
+              <div className="tour-anchor-intake-template-picker">
+                <TemplatePicker selected={template} onSelect={(t) => { setTemplate(t); setStep(2); }} />
+              </div>
             </Card>
           )}
 
@@ -112,7 +114,9 @@ function NewContractInner() {
               subtitle="Records pulled from connected CRM, HRIS, or added manually. Variables prefill automatically."
               actions={<Button variant="ghost" size="sm" onClick={() => setStep(1)} leadingIcon={<ArrowLeft className="h-3.5 w-3.5" />}>Back</Button>}
             >
-              <RecordPicker template={template} selected={source} onSelect={(r) => { setSource(r); setStep(3); }} />
+              <div className="tour-anchor-intake-record-picker">
+                <RecordPicker template={template} selected={source} onSelect={(r) => { setSource(r); setStep(3); }} />
+              </div>
             </Card>
           )}
 
@@ -125,11 +129,13 @@ function NewContractInner() {
                 actions={
                   <div className="flex gap-2">
                     <Button variant="ghost" size="sm" onClick={() => setStep(2)} leadingIcon={<ArrowLeft className="h-3.5 w-3.5" />}>Back</Button>
-                    <Button onClick={handleRunChecks} trailingIcon={<ArrowRight className="h-3.5 w-3.5" />}>Run checks</Button>
+                    <Button onClick={handleRunChecks} trailingIcon={<ArrowRight className="h-3.5 w-3.5" />} className="tour-anchor-intake-runchecks">Run checks</Button>
                   </div>
                 }
               >
+                <div className="tour-anchor-intake-form">
                 <IntakeForm template={template} source={source} onChange={setFields} />
+                </div>
                 {submitError && (
                   <div className="mt-4 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-[12px] text-rose-800">
                     <strong>Could not run checks:</strong> {submitError}

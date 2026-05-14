@@ -648,25 +648,93 @@ export const TOUR_STEPS: TourStep[] = [
     nextLabel: "Next",
   },
 
-  // ── Act 7: New contract intake ────────────────────────────────────────
+  // ── Act 7: New contract intake (end-to-end) ───────────────────────────
   {
-    id: "intake-walk",
+    id: "intake-stepper",
     chapter: "intake",
     path: "/contracts/new",
     selector: ".tour-anchor-intake-steps",
     side: "bottom",
     title: "Create a new contract",
     description: `
-      <p>3 steps. The progress bar above tracks where you are.</p>
+      <p>3 steps, tracked by the progress bar above. We'll walk all three.</p>
       <ul>
-        <li><strong>1. Template.</strong> Pick from the 8 masters you just saw.</li>
-        <li><strong>2. Source record.</strong> Pull from Salesforce, HubSpot, Personio, or enter manually.</li>
-        <li><strong>3. Confirm.</strong> Pre-filled fields by type (Counterparty, Commercial terms, Legal, Counterparty signer for MSAs; Candidate, Compensation, Terms for Employment; Grant for Warrants).</li>
+        <li><strong>1. Template.</strong> Master Word doc.</li>
+        <li><strong>2. Source record.</strong> CRM / HRIS / manual entry.</li>
+        <li><strong>3. Confirm.</strong> Pre-filled fields + clause check on submit.</li>
       </ul>
-      <p class="muted">Clause check runs on submit, routing rules fire, and the workflow you just walked through begins.</p>
     `,
     next: "advance",
-    nextLabel: "Wrap up",
+  },
+  {
+    id: "intake-template",
+    chapter: "intake",
+    path: "/contracts/new",
+    selector: ".tour-anchor-intake-template-picker",
+    side: "top",
+    title: "Step 1 · Pick a template",
+    description: `
+      <p>8 master templates synced from Drive. Each card shows version, jurisdictions, clause rules, and anchor-tag count.</p>
+      <p class="muted"><strong>Click any template card below</strong> to advance. The form auto-progresses to step 2.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "intake-record",
+    chapter: "intake",
+    path: "/contracts/new",
+    selector: ".tour-anchor-intake-record-picker",
+    side: "top",
+    title: "Step 2 · Pick a source record",
+    description: `
+      <p>Records pulled from <strong>Salesforce</strong>, <strong>HubSpot</strong>, or <strong>Personio</strong> per template type. Manual entry available for off-CRM records.</p>
+      <p class="muted"><strong>Click any record below.</strong> Variables (counterparty, value, terms, signer) auto-prefill from it. The form auto-progresses to step 3.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "intake-form",
+    chapter: "intake",
+    path: "/contracts/new",
+    selector: ".tour-anchor-intake-form",
+    side: "top",
+    title: "Step 3 · Confirm details",
+    description: `
+      <p>Fields grouped by section (Counterparty / Commercial / Legal / Signer for MSAs; Candidate / Compensation / Terms for Employment; Grant for Warrants).</p>
+      <ul>
+        <li><strong>Pre-filled</strong> from the source record. Non-standard fields are flagged inline.</li>
+        <li><strong>Adjust anything.</strong> Variable changes go through this form, not Word.</li>
+        <li><strong>Bespoke redline lane.</strong> For full-blown legal markup, download the doc, edit in Word with Track Changes, upload back; AI diffs vs master and routes to Legal.</li>
+      </ul>
+    `,
+    next: "advance",
+  },
+  {
+    id: "intake-runchecks",
+    chapter: "intake",
+    path: "/contracts/new",
+    selector: ".tour-anchor-intake-runchecks",
+    side: "top",
+    title: "Run checks · create the contract",
+    description: `
+      <p><strong>Click Run checks.</strong> The contract record is created, the deterministic rules engine runs against the master template, and you land on the new contract's detail page.</p>
+      <p class="muted">In production, Claude also runs against the populated document for natural-language clause comparison. Both write into the same <code>ClauseCheckResult</code> shape.</p>
+    `,
+    next: "advance",
+    hideNext: true,
+  },
+  {
+    id: "intake-after-submit",
+    chapter: "intake",
+    path: "*",
+    title: "Contract created",
+    description: `
+      <p>The new contract's detail page. Clause results are already on screen (the rules engine ran on submit).</p>
+      <p>From here, the rest of the flow is identical to what you saw in the <strong>Workflow walk</strong> chapter: routing rules fire, approvers are notified, you preview the envelope, click Send via DocuSign, the contract advances to signed, and structured writeback flows back to Light's systems of record.</p>
+      <p class="muted">If you want to walk the post-creation flow now, finish this chapter and pick <em>Workflow walk</em> from the tour menu.</p>
+    `,
+    next: "advance",
+    nextLabel: "Finish",
   },
 
   // ── Wrap up ───────────────────────────────────────────────────────────
