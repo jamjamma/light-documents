@@ -15,6 +15,7 @@ import {
   Clock,
   Mail,
   ShieldCheck,
+  Save,
 } from "lucide-react";
 
 interface Props {
@@ -23,6 +24,12 @@ interface Props {
   contract: Contract;
   template: Template;
   onSend: () => Promise<void>;
+  /**
+   * Park the contract at its current stage and exit. Mirrors the
+   * Save-draft-and-exit action on the contract detail page so the operator
+   * can step away from inside the modal without first closing it.
+   */
+  onSaveDraft?: () => void;
   /**
    * True only when the approval chain is fully satisfied and the contract is
    * ready to send. When false the modal still opens (so the operator can
@@ -37,7 +44,7 @@ const SIDE_COLOR: Record<SignerDef["side"], { bg: string; ring: string; text: st
   witness: { bg: "bg-purple-50", ring: "ring-purple-300", text: "text-purple-800", tab: "bg-purple-300", tabText: "text-purple-950" },
 };
 
-export function DocuSignPreviewModal({ open, onClose, contract, template, onSend, canSend }: Props) {
+export function DocuSignPreviewModal({ open, onClose, contract, template, onSend, onSaveDraft, canSend }: Props) {
   const [sending, setSending] = useState(false);
   const [showApi, setShowApi] = useState(false);
   const [page, setPage] = useState(1);
@@ -75,6 +82,17 @@ export function DocuSignPreviewModal({ open, onClose, contract, template, onSend
           <Button variant="ghost" onClick={() => setShowApi((s) => !s)}>
             {showApi ? "Hide" : "Show"} API call
           </Button>
+          {onSaveDraft && (
+            <Button
+              variant="ghost"
+              leadingIcon={<Save className="h-3.5 w-3.5" />}
+              onClick={onSaveDraft}
+              disabled={sending}
+              title="Park this contract at its current stage and return to the dashboard. Auto-save is already on; this also writes a 'stepped away' audit event."
+            >
+              Save draft &amp; exit
+            </Button>
+          )}
           <Button variant="ghost" onClick={onClose} disabled={sending}>Close</Button>
           <Button
             onClick={handleSend}

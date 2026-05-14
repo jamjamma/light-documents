@@ -286,6 +286,11 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
         contract={contract}
         template={template}
         onSend={handleSend}
+        onSaveDraft={() => {
+          saveDraftAndExit(contract.id, OPERATOR_NAME);
+          setShowPreview(false);
+          router.push("/");
+        }}
         canSend={canSend}
       />
 
