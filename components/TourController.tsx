@@ -129,7 +129,14 @@ export function TourController() {
       // we also want to fire the effect, give React a render cycle to mount
       // the modal, and only then start polling.
       const startWithEffect = () => {
-        fireEffectOnce();
+        // Defer the effect dispatch a tick so page-level tour:effect
+        // listeners attached in useEffect (which run AFTER the layout's
+        // useEffect that owns the controller) can register before we
+        // dispatch. Without this, hard navigations (location.href = X)
+        // and Resume from the chapter chooser race: the controller fires
+        // the effect on initial mount before the page useEffect attaches,
+        // and the modal/menu the effect would have opened stays closed.
+        const dispatchDelay = step.effect ? 60 : 0;
         // For steps that mount substantial new DOM (modal:open), give React
         // multiple paint cycles before the first poll: the modal animates in,
         // its contents lay out, the inner overflow-y-auto positions itself.
@@ -144,7 +151,10 @@ export function TourController() {
           step.effect === "approval:open-reassign"
             ? 300
             : 0;
-        window.setTimeout(() => tryRender(25), initialDelay);
+        window.setTimeout(() => {
+          fireEffectOnce();
+          window.setTimeout(() => tryRender(25), initialDelay);
+        }, dispatchDelay);
       };
 
       const tryRender = (attempts: number) => {
@@ -154,6 +164,21 @@ export function TourController() {
         if (step.selector && !el && attempts > 0) {
           window.setTimeout(() => tryRender(attempts - 1), 100);
           return;
+        }
+
+        // If we found an anchor, make sure it's actually visible in any
+        // overflow:auto ancestor (e.g. TemplateDetailModal's max-h-[70vh]
+        // body, DocuSignPreviewModal's inner scroll). driver.js's
+        // smoothScroll only walks the window; nested scrolling containers
+        // are left alone, so an anchor deep inside the modal body renders
+        // the popover at an offscreen position. scrollIntoView walks every
+        // scroll ancestor and adjusts only those that need it.
+        if (el) {
+          try {
+            el.scrollIntoView({ block: "center", inline: "nearest" });
+          } catch {
+            // ignore (older browsers without IntersectionScrollOptions)
+          }
         }
 
         destroyDriver();
@@ -376,7 +401,22 @@ export function TourController() {
           (["dashboard", "workflow", "signed", "archive", "templates", "intake"] as const).forEach(markChapterDone);
         }
         destroyDriver();
+        // Land the operator back on the dashboard so they see the AboutWidget
+        // and the rest of the chrome they explored. Skip if already there.
+        if (pathname !== "/") {
+          router.push("/");
+        }
         return;
+      }
+
+      // Chapter boundary in walk-everything mode: mark the just-finished
+      // chapter as done so the chapter chooser checkmarks it even though
+      // the user is mid-tour. Idempotent: markChapterDone uses a Set.
+      if (
+        state.mode === "all" &&
+        nextStep.chapter !== step.chapter
+      ) {
+        markChapterDone(step.chapter);
       }
 
       // Chapter boundary: in chapter mode, ending the chapter opens the menu.

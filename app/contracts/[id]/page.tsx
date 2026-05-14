@@ -175,6 +175,34 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
     );
   }, [showPreview]);
 
+  // When the user is on the `approval-actions-menu` step and clicks the ...
+  // menu open, advance the tour. We observe the aria-expanded attribute on
+  // the operator row's menu button. ApprovalActionsMenu owns its own state;
+  // we don't need to know about it directly. Re-attaches whenever the
+  // contract refreshes (the operator row may unmount briefly between
+  // optimistic state changes).
+  useEffect(() => {
+    const btn = document.querySelector<HTMLButtonElement>(
+      ".tour-anchor-approval-actions-menu button[aria-haspopup='menu']",
+    );
+    if (!btn) return;
+    const checkAndAdvance = () => {
+      if (btn.getAttribute("aria-expanded") !== "true") return;
+      const state = readTourState();
+      if (!state.active) return;
+      const step = TOUR_STEPS[state.stepIndex];
+      if (step?.id !== "approval-actions-menu") return;
+      window.dispatchEvent(
+        new CustomEvent("tour:auto-next", {
+          detail: { fromStepId: "approval-actions-menu" },
+        }),
+      );
+    };
+    const mo = new MutationObserver(checkAndAdvance);
+    mo.observe(btn, { attributes: true, attributeFilter: ["aria-expanded"] });
+    return () => mo.disconnect();
+  }, [contract]);
+
   if (contract === null) {
     return (
       <>

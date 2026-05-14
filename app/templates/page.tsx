@@ -10,7 +10,7 @@ import { RogueTemplatesPanel } from "@/components/RogueTemplatesPanel";
 import { TEMPLATES, ROGUE_TEMPLATES, getTemplate } from "@/lib/mock-data";
 import { Card } from "@/components/ui/Card";
 import type { Template, TemplateId } from "@/lib/types";
-import type { TourEffect } from "@/lib/tour-steps";
+import { readTourState, TOUR_STEPS, type TourEffect } from "@/lib/tour-steps";
 import { FileType2, FolderSync, Workflow, Plus, Sparkles } from "lucide-react";
 import clsx from "clsx";
 
@@ -60,6 +60,23 @@ export default function TemplatesPage() {
     window.addEventListener("tour:effect", handler);
     return () => window.removeEventListener("tour:effect", handler);
   }, []);
+
+  // When the user clicks View details on the MSA card during the
+  // templates-detail-intro step, the modal opens and the tour follows.
+  // Guarded by fromStepId so opening MSA at any other time is a no-op.
+  useEffect(() => {
+    if (!selectedTemplate) return;
+    if (selectedTemplate.id !== "msa_v4_2") return;
+    const state = readTourState();
+    if (!state.active) return;
+    const step = TOUR_STEPS[state.stepIndex];
+    if (step?.id !== "templates-detail-intro") return;
+    window.dispatchEvent(
+      new CustomEvent("tour:auto-next", {
+        detail: { fromStepId: "templates-detail-intro" },
+      }),
+    );
+  }, [selectedTemplate]);
 
   const counts = useMemo(() => {
     const m: Record<Category, number> = { all: TEMPLATES.length, "Customer contracts": 0, People: 0, Equity: 0 };
@@ -214,17 +231,19 @@ export default function TemplatesPage() {
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                       {groupTemplates.map((template) => {
                         const meta = SYNC_META[template.id];
+                        const isMsa = template.id === "msa_v4_2";
                         return (
-                          <TemplateCard
-                            key={template.id}
-                            template={template}
-                            sourceFileName={meta.fileName}
-                            syncedAgo={meta.syncedAgo}
-                            variableCount={meta.variableCount}
-                            anchorTagCount={meta.anchorTagCount}
-                            onClick={() => setSelectedTemplate(template)}
-                            hideCategoryPill
-                          />
+                          <div key={template.id} className={isMsa ? "tour-anchor-template-msa-card" : undefined}>
+                            <TemplateCard
+                              template={template}
+                              sourceFileName={meta.fileName}
+                              syncedAgo={meta.syncedAgo}
+                              variableCount={meta.variableCount}
+                              anchorTagCount={meta.anchorTagCount}
+                              onClick={() => setSelectedTemplate(template)}
+                              hideCategoryPill
+                            />
+                          </div>
                         );
                       })}
                     </div>
@@ -237,16 +256,18 @@ export default function TemplatesPage() {
             <div className="grid grid-cols-1 gap-3 p-3 sm:grid-cols-2 sm:p-4 xl:grid-cols-3 2xl:grid-cols-4">
               {filtered.map((template) => {
                 const meta = SYNC_META[template.id];
+                const isMsa = template.id === "msa_v4_2";
                 return (
-                  <TemplateCard
-                    key={template.id}
-                    template={template}
-                    sourceFileName={meta.fileName}
-                    syncedAgo={meta.syncedAgo}
-                    variableCount={meta.variableCount}
-                    anchorTagCount={meta.anchorTagCount}
-                    onClick={() => setSelectedTemplate(template)}
-                  />
+                  <div key={template.id} className={isMsa ? "tour-anchor-template-msa-card" : undefined}>
+                    <TemplateCard
+                      template={template}
+                      sourceFileName={meta.fileName}
+                      syncedAgo={meta.syncedAgo}
+                      variableCount={meta.variableCount}
+                      anchorTagCount={meta.anchorTagCount}
+                      onClick={() => setSelectedTemplate(template)}
+                    />
+                  </div>
                 );
               })}
             </div>

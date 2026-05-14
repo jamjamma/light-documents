@@ -342,18 +342,19 @@ export const TOUR_STEPS: TourStep[] = [
     side: "left",
     title: "The row actions menu",
     description: `
-      <p>We just opened the <strong>...</strong> menu on Martina's row for you. Three actions live here:</p>
+      <p><strong>Click the ... menu</strong> on Martina's row (top-right of the row). Three actions live there:</p>
       <ul>
         <li><strong>Reassign / Pass on...</strong> Switch the approver (out of office, conflict of interest, workload balancing).</li>
         <li><strong>Re-ping.</strong> Resend the Slack DM if it's been sitting too long.</li>
         <li><strong>Reject...</strong> Block the contract and return it to the owner with a reason.</li>
       </ul>
-      <p class="muted">Every action writes a row to the audit trail. We'll open Reassign next to walk through that flow.</p>
+      <p class="muted">The tour follows you forward the moment the menu opens.</p>
     `,
-    next: "advance",
-    // Programmatically open the menu so the popover describes what's
-    // actually on screen, not what would be on screen if the user clicked.
-    effect: "approval:open-actions",
+    // The in-app click opens the menu and dispatches tour:auto-next. The
+    // close-reassign effect is fired in case the user navigated BACK into
+    // this step from a reassign step (modal still open underneath).
+    hideNext: true,
+    effect: "approval:close-reassign",
   },
   {
     id: "approval-reassign-intent",
@@ -934,15 +935,18 @@ export const TOUR_STEPS: TourStep[] = [
     id: "templates-detail-intro",
     chapter: "templates",
     path: "/templates",
-    // Centered popover (no selector). Opens the detail modal so the next
-    // step can anchor inside it.
-    title: "What's inside a template",
+    selector: ".tour-anchor-template-msa-card",
+    side: "right",
+    title: "Open a template",
     description: `
-      <p>Let's look inside one. Opening <strong>MSA v4.2</strong> now.</p>
-      <p class="muted">Every template card opens the same view: source file, ownership, clause rules, DocuSign config, and the anchor tags Legal embedded in Word.</p>
+      <p>Let's look inside one. <strong>Click View details</strong> on the MSA v4.2 card (highlighted).</p>
+      <p class="muted">Every template card opens the same view: source file, ownership, clause rules, DocuSign config, and the anchor tags Legal embedded in Word. The tour follows you in.</p>
     `,
-    next: "advance",
-    effect: "template:open-detail",
+    // The in-app click opens the modal and dispatches tour:auto-next. The
+    // close-detail effect handles Back navigation from inside the modal so
+    // the user returns cleanly to the catalog.
+    hideNext: true,
+    effect: "template:close-detail",
   },
   {
     id: "templates-detail-source",
@@ -1139,15 +1143,16 @@ export const TOUR_STEPS: TourStep[] = [
     id: "templates-rogue-undo-archive",
     chapter: "templates",
     path: "/templates",
-    // Anchor on the row wrapper, not the Undo button. The Undo button lives
-    // inside the archived stamp; clicking Undo removes the stamp (row
-    // returns to rogue state) and orphans the popover. The row wrapper
-    // persists through both archived + un-archived states.
-    selector: ".tour-anchor-rogue-row",
-    side: "bottom",
+    // Anchor on the Undo button itself. If the user clicks Undo here the
+    // stamp disappears and the popover orphans, but the description does
+    // not ask the user to click Undo at this step (it's read-only), so
+    // pointing at the actual target reads better than highlighting the
+    // whole row.
+    selector: ".tour-anchor-rogue-undo",
+    side: "top",
     title: "Undo: append-only audit",
     description: `
-      <p>The archived stamp carries an <strong>Undo</strong> link (next to "Archived by Martina"). Clicking it restores the row to rogue status.</p>
+      <p>This <strong>Undo</strong> link restores the row to rogue status. Try it after Next if you want, or leave it archived.</p>
       <p class="muted">Every state change is append-only. Even Undo writes a new audit row; the original Archived row stays.</p>
     `,
     next: "advance",
@@ -1171,12 +1176,15 @@ export const TOUR_STEPS: TourStep[] = [
     id: "templates-rogue-slack-preview",
     chapter: "templates",
     path: "/templates",
-    selector: ".tour-anchor-rogue-slack-preview",
-    side: "top",
+    // Centered popover (no selector): the SlackDmPreview component unmounts
+    // when the user clicks Send DM / Send post (replaced with a sent pill).
+    // Anchoring on the preview would orphan the popover after Send. A
+    // centered popover lets the user click either Cancel or Send and still
+    // click Next without breaking the tour.
     title: "What gets sent",
     description: `
-      <p>The Slack message previewed before send: file name, % match, the diff, the recommended action, and the recipient's rationale.</p>
-      <p>Click <strong>Cancel</strong> to back out without sending, or <strong>Send DM / Send post</strong> to dispatch. Either way the tour continues on Next.</p>
+      <p>The Slack message preview below shows: file name, % match, the diff, the recommended action, and the recipient's rationale.</p>
+      <p>Click <strong>Cancel</strong> to back out, or <strong>Send DM / Send post</strong> to dispatch. Either way, come back here and click <strong>Next</strong> to continue.</p>
       <p class="muted">In production we post via the Slack Web API with interactive Acknowledge / Reroute / Snooze buttons; replies thread back into the audit log.</p>
     `,
     next: "advance",
@@ -1309,7 +1317,11 @@ export const TOUR_STEPS: TourStep[] = [
     chapter: "intake",
     path: "*",
     selector: ".tour-anchor-preview-envelope",
-    side: "left",
+    // side="bottom": popover renders directly below the Preview envelope
+    // button. side="left" earlier let driver.js fall back to top-left when
+    // the requested side didn't fit, which left the arrow pointing into
+    // empty space below the popover instead of at the button.
+    side: "bottom",
     title: "End of the workflow",
     description: `
       <p>From here the flow is identical to what you walked on Bolt MSA: click <strong>Preview envelope</strong>, inspect the populated MSA + anchor-tag placement, click <strong>Send via DocuSign</strong>. The contract advances to <em>Filed</em> and structured writeback fires.</p>
@@ -1334,7 +1346,8 @@ export const TOUR_STEPS: TourStep[] = [
         <li><strong>Templates.</strong> Catalog + Counsel-keeps-Word + rogue governance.</li>
         <li><strong>Intake.</strong> 3-step new-contract form.</li>
       </ul>
-      <p class="muted">Re-take from the sidebar anytime.</p>
+      <p class="lead">Click <strong>Finish</strong> and you'll land back on the dashboard. From there, open <strong>About this build</strong> in the sidebar (or scroll to the panel at the bottom of the dashboard) for the submission memo: the reframe, what's real vs stubbed, and what I'd build next.</p>
+      <p class="muted">Re-take the tour or pick a chapter anytime from the sidebar.</p>
     `,
     next: "advance",
     nextLabel: "Finish",
