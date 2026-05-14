@@ -10,7 +10,7 @@ import { findMember } from "./approver-directory";
 const STORAGE_KEY = "light-documents-state";
 // Bump on every shape change to Contract / Approval / seed data so old localStorage
 // state is discarded and the demo re-seeds with the current data model.
-const STATE_VERSION = 7;
+const STATE_VERSION = 8;
 
 export interface RogueAction {
   archived?: { at: string; by: string };
@@ -760,12 +760,12 @@ export function simulateSigned(id: string): Contract {
   if (isValidTransition(working.stage, "filed")) {
     const ledger = buildLedgerImpact(working);
     working = appendAudit(
-      { ...working, stage: "filed", ledger },
+      { ...working, stage: "filed", ...(ledger ? { ledger } : {}) },
       {
         at: now(),
         actor: "system",
-        event: "Filed to Drive, ledger updated",
-        meta: ledger.headline,
+        event: ledger ? "Filed to Drive, ledger updated" : "Filed to Drive (retention only, no ledger writeback)",
+        meta: ledger?.headline,
       },
     );
   }
@@ -773,9 +773,14 @@ export function simulateSigned(id: string): Contract {
   return saveContract(working);
 }
 
-function buildLedgerImpact(contract: Contract): LedgerImpact {
+function buildLedgerImpact(contract: Contract): LedgerImpact | null {
   const t = contract.type;
   const f = contract.fields;
+  // NDAs are retention-only: no MRR, headcount, equity, or cap-table impact.
+  // The audit trail above is the system of record. Surfacing a "ledger
+  // writeback" panel for an NDA would be misleading in the demo and wrong
+  // in production.
+  if (t === "NDA") return null;
   if (t === "MSA") {
     const arr = f.contractValueEur ?? 0;
     const mrr = Math.round(arr / 12);
