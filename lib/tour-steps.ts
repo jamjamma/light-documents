@@ -195,13 +195,24 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "In review",
     description: `
-      <p>Clause checker or counsel actively reviewing.</p>
-      <p><strong>Bolt MSA</strong>: EUR 180k, 3 clause deviations. Hero example. We'll walk it all the way to signed.</p>
+      <p>Clause checker or counsel actively reviewing. The table below now shows the single In-review contract.</p>
+    `,
+    next: "advance",
+    effect: "filter:in_review",
+  },
+  {
+    id: "hero-row",
+    path: "/",
+    selector: ".tour-anchor-hero-row",
+    side: "top",
+    title: "Bolt MSA",
+    description: `
+      <p>EUR 180k customer MSA with 3 clause deviations.</p>
+      <p class="muted">This is our hero example. We'll walk it from in-review all the way to signed.</p>
     `,
     next: "navigate",
     goto: `/contracts/${HERO_CONTRACT_ID}`,
     nextLabel: "Open Bolt MSA",
-    effect: "filter:in_review",
   },
 
   // ── Act 3: Walk Bolt MSA to signed ────────────────────────────────────

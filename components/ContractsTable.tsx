@@ -167,7 +167,10 @@ export function ContractsTable({ contracts, filter, onFilterChange, awaitingRole
             </thead>
             <tbody className="divide-y divide-ink-100">
               {sorted.map((c) => (
-                <tr key={c.id} className="row-hover">
+                <tr
+                  key={c.id}
+                  className={clsx("row-hover", c.id === "c_bolt_msa" && "tour-anchor-hero-row")}
+                >
                   <td className="px-5 py-3.5 align-top font-medium text-ink-900">
                     <Link href={contractHref(c)} className="flex items-start gap-2.5 hover:underline">
                       <DocumentTypeIcon type={c.type} size="sm" />
