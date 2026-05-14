@@ -203,6 +203,49 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
     return () => mo.disconnect();
   }, [contract]);
 
+  // Auto-advance the tour when the operator approves their own row during the
+  // approval-approve step. The next step (approval-undo) anchors on the just-
+  // appeared Undo chip on the operator row.
+  useEffect(() => {
+    if (!contract) return;
+    const operatorApproval = contract.approvals?.find(
+      (a) => a.assignedName === OPERATOR_NAME,
+    );
+    if (!operatorApproval || operatorApproval.status !== "approved") return;
+    const state = readTourState();
+    if (!state.active) return;
+    const step = TOUR_STEPS[state.stepIndex];
+    if (step?.id !== "approval-approve") return;
+    window.dispatchEvent(
+      new CustomEvent("tour:auto-next", { detail: { fromStepId: "approval-approve" } }),
+    );
+  }, [contract]);
+
+  // Auto-advance the tour when ALL non-operator approvals are approved during
+  // the approval-simulate-others step. Both Magnus and Sara must be green for
+  // Send to unlock; once both are, the next step (preview-envelope) becomes
+  // the natural target.
+  useEffect(() => {
+    if (!contract) return;
+    const others = contract.approvals?.filter(
+      (a) => a.assignedName !== OPERATOR_NAME,
+    ) ?? [];
+    if (others.length === 0) return;
+    const allOthersApproved = others.every(
+      (a) => a.status === "approved" || a.status === "auto_approved",
+    );
+    if (!allOthersApproved) return;
+    const state = readTourState();
+    if (!state.active) return;
+    const step = TOUR_STEPS[state.stepIndex];
+    if (step?.id !== "approval-simulate-others") return;
+    window.dispatchEvent(
+      new CustomEvent("tour:auto-next", {
+        detail: { fromStepId: "approval-simulate-others" },
+      }),
+    );
+  }, [contract]);
+
   if (contract === null) {
     return (
       <>

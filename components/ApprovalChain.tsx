@@ -168,7 +168,11 @@ export function ApprovalChain({
                   </div>
                   <button
                     onClick={() => onSimulateApprove(a)}
-                    className="rounded-md bg-ink-900 px-3 py-1.5 text-[11px] font-medium text-white hover:bg-ink-800"
+                    className={clsx(
+                      "rounded-md bg-ink-900 px-3 py-1.5 text-[11px] font-medium text-white hover:bg-ink-800",
+                      isOperator && "tour-anchor-approval-operator-approve",
+                      !isOperator && "tour-anchor-approval-simulate-button",
+                    )}
                   >
                     {isOperator ? "Approve" : `Simulate ${personName.split(" ")[0]} approves`}
                   </button>

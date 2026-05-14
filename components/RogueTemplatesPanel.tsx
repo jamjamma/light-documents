@@ -228,6 +228,21 @@ function RogueRow({
     setAction(archiveRogue(rogue.driveFileId, OPERATOR_NAME));
   };
   const onUndoArchive = () => {
+    // Dispatch BEFORE the state change so the tour controller advances and
+    // re-anchors on the next step (the Notify owner button) before the
+    // archived stamp (which contains the Undo button anchor) unmounts. Without
+    // this, the popover orphans visually for one frame.
+    if (isFirst) {
+      const state = readTourState();
+      const step = state.active ? TOUR_STEPS[state.stepIndex] : null;
+      if (step?.id === "templates-rogue-undo-archive") {
+        window.dispatchEvent(
+          new CustomEvent("tour:auto-next", {
+            detail: { fromStepId: "templates-rogue-undo-archive" },
+          }),
+        );
+      }
+    }
     setAction(undoArchiveRogue(rogue.driveFileId));
   };
   const onOpenNotify = () => setShowSlackPreview(true);
@@ -362,7 +377,13 @@ function RogueRow({
           )}
         >
           {!isArchived && (
-            <Button variant="secondary" size="sm" leadingIcon={<ArchiveIcon className="h-3.5 w-3.5" />} onClick={onArchive}>
+            <Button
+              variant="secondary"
+              size="sm"
+              leadingIcon={<ArchiveIcon className="h-3.5 w-3.5" />}
+              onClick={onArchive}
+              className={clsx(isFirst && "tour-anchor-rogue-archive-button")}
+            >
               Archive
             </Button>
           )}
@@ -373,6 +394,7 @@ function RogueRow({
               leadingIcon={<BellRing className="h-3.5 w-3.5" />}
               onClick={onOpenNotify}
               title={`Open Slack DM preview for ${target.recipient}`}
+              className={clsx(isFirst && "tour-anchor-rogue-notify-button")}
             >
               Notify owner
             </Button>

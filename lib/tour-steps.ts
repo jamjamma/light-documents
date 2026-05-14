@@ -156,6 +156,19 @@ export interface TourStep {
    * (e.g. the dashboard) act on it.
    */
   effect?: TourEffect;
+  /**
+   * When true, clicks on the highlighted element (the stage) are blocked.
+   * Use for read-only walkthrough steps whose anchor wraps a region that
+   * contains buttons or links the operator might click out of curiosity
+   * (e.g. the approval chain card has Simulate Approve buttons that
+   * advance the workflow ahead of where the tour expects). Default false
+   * so interactive steps (where the user must click in-app) still work.
+   *
+   * Implementation note: passes through to driver.js's
+   * `disableActiveInteraction`. Clicks outside the stage are already
+   * blocked by driver.js's overlay regardless of this flag.
+   */
+  lockInteraction?: boolean;
 }
 
 export const TOUR_STEPS: TourStep[] = [
@@ -206,6 +219,7 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted">Same engine handles all 8 templates.</p>
     `,
     next: "advance",
+    lockInteraction: true,
   },
   {
     id: "sidebar-overview",
@@ -224,6 +238,9 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted">Bottom: New contract, Take the tour, Reset demo.</p>
     `,
     next: "advance",
+    // Sidebar links would navigate away from the dashboard and break the
+    // tour mid-flow. Lock the stage; user clicks Next to continue.
+    lockInteraction: true,
   },
 
   // ── Act 2: Filter walk ────────────────────────────────────────────────
@@ -282,6 +299,10 @@ export const TOUR_STEPS: TourStep[] = [
     next: "navigate",
     goto: `/contracts/${HERO_CONTRACT_ID}`,
     nextLabel: "Open Bolt MSA",
+    // Whole row is a Link to the contract; clicking it instead of the
+    // popover button would still navigate but skip the tour's intended
+    // transition. Lock it so the only forward path is the popover button.
+    lockInteraction: true,
   },
 
   // ── Act 3: Walk Bolt MSA to signed ────────────────────────────────────
@@ -333,6 +354,10 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted">Operator (you) = Martina Holst. The other two represent Slack-DM responders.</p>
     `,
     next: "advance",
+    // The chain card contains Simulate Approve buttons; clicking them now
+    // would jump the workflow ahead of the tour's planned sequence. Lock
+    // until the next step, which guides the user to the actions menu.
+    lockInteraction: true,
   },
   {
     id: "approval-actions-menu",
@@ -373,6 +398,7 @@ export const TOUR_STEPS: TourStep[] = [
     `,
     next: "advance",
     effect: "approval:open-reassign",
+    lockInteraction: true,
   },
   {
     id: "approval-reassign-picker",
@@ -392,6 +418,7 @@ export const TOUR_STEPS: TourStep[] = [
     `,
     next: "advance",
     effect: "approval:open-reassign",
+    lockInteraction: true,
   },
   {
     id: "approval-reassign-reason",
@@ -410,6 +437,7 @@ export const TOUR_STEPS: TourStep[] = [
     `,
     next: "advance",
     effect: "approval:open-reassign",
+    lockInteraction: true,
   },
   {
     id: "approval-reassign-notification",
@@ -428,20 +456,26 @@ export const TOUR_STEPS: TourStep[] = [
     `,
     next: "advance",
     effect: "approval:open-reassign",
+    lockInteraction: true,
   },
   {
     id: "approval-approve",
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
-    selector: ".tour-anchor-approval-operator-row",
+    // Anchor on the operator's Approve button itself so the highlight stage
+    // wraps just the click target. driver.js's overlay blocks every other
+    // button on the page automatically.
+    selector: ".tour-anchor-approval-operator-approve",
     side: "left",
-    title: "Approve your own row",
+    title: "Approve your row",
     description: `
-      <p>We've closed the Reassign modal so you can see your row again.</p>
-      <p><strong>Click Approve</strong> on the Martina Holst row (your row). The pill flips green and an <strong>Undo</strong> chip appears next to it.</p>
-      <p class="muted">This is the only "real" approval; the other rows are simulations of Slack-DM responses.</p>
+      <p><strong>Click Approve</strong>. The pill flips green; the tour follows.</p>
+      <p class="muted">This is the only real approval on this contract; the other rows simulate Slack-DM responses.</p>
     `,
-    next: "advance",
+    // In-app Approve click is the only forward path. The contract page
+    // dispatches `tour:auto-next` when the operator approval becomes
+    // approved.
+    hideNext: true,
     // Close the Reassign modal so the popover anchored on the operator row
     // isn't covered by it. Idempotent if the modal is already closed.
     effect: "approval:close-reassign",
@@ -450,17 +484,16 @@ export const TOUR_STEPS: TourStep[] = [
     id: "approval-undo",
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
-    // Anchor on the operator's row, not the Undo chip itself. Clicking Undo
-    // removes the chip (row returns to pending), which would orphan the
-    // popover if it anchored on the disappearing chip. The row stays in DOM
-    // through both approved + pending states.
-    selector: ".tour-anchor-approval-operator-row",
+    // Anchor on the Undo button itself. driver.js's overlay blocks every
+    // other button automatically. If the user clicks Undo the chip vanishes
+    // and the popover orphans for a moment, but the description tells them
+    // to re-Approve (which restores the chip and re-renders the anchor).
+    selector: ".tour-anchor-approval-undo",
     side: "left",
     title: "Undo: only before send",
     description: `
-      <p>The <strong>Undo</strong> chip next to <em>Approved</em> withdraws your own approval. A new audit row gets appended; the original Approved row stays.</p>
-      <p>Try it: click <strong>Undo</strong>, then click <strong>Approve</strong> again to restore the green state before continuing.</p>
-      <p class="muted">Undo is refused once the envelope is in DocuSign. That's the line.</p>
+      <p>This <strong>Undo</strong> chip withdraws your approval. Try it: click <strong>Undo</strong>, then click <strong>Approve</strong> again to restore the green state.</p>
+      <p class="muted">Every Undo writes a new audit row; the original Approved row stays. Undo is refused once the envelope is in DocuSign.</p>
     `,
     next: "advance",
   },
@@ -470,13 +503,15 @@ export const TOUR_STEPS: TourStep[] = [
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-approval-chain",
     side: "top",
-    title: "Approve the rest",
+    title: "Approve the other rows",
     description: `
-      <p>Make sure Martina is green again, then click <strong>Simulate X approves</strong> on the other two rows.</p>
-      <p>Each Simulate represents the approver clicking Approve in Slack. Once every row is green, the Send button at the bottom unlocks.</p>
-      <p class="muted"><strong>Don't skip rows.</strong> If you click Next with pending approvals, Send stays greyed at the next step and you'll have to come back here.</p>
+      <p>Click <strong>Simulate X approves</strong> on the two non-operator rows (Magnus + Sara). The tour follows once both are green.</p>
+      <p class="muted">Each Simulate stands in for that approver clicking Approve in Slack. Send unlocks when every row is green.</p>
     `,
-    next: "advance",
+    // In-app Simulate clicks are the forward path. The contract page
+    // dispatches `tour:auto-next` when both non-operator approvals are
+    // approved.
+    hideNext: true,
   },
   {
     id: "preview-envelope",
@@ -560,13 +595,14 @@ export const TOUR_STEPS: TourStep[] = [
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-modal-pagenav",
     side: "top",
-    title: "Flip to the signature page",
+    title: "Flip through the pages",
     description: `
-      <p><strong>Click the last page number</strong> in the page nav below (or click Next on the nav repeatedly) to jump to the signature page.</p>
-      <p class="muted">The tour follows you forward as soon as you reach the last page.</p>
+      <p><strong>Click any page number</strong> in the nav below to preview that page. Click the <strong>last page</strong> to jump to the signature block; the tour follows automatically.</p>
     `,
     // Only paging to the last page (in-app) or Back advances the tour. The
-    // modal dispatches `tour:auto-next` when page === totalPages.
+    // modal dispatches `tour:auto-next` when page === totalPages. Other
+    // buttons in the modal are blocked by driver.js's overlay; the page-nav
+    // buttons inside the highlight stage stay clickable.
     hideNext: true,
     effect: "modal:open",
   },
@@ -803,6 +839,9 @@ export const TOUR_STEPS: TourStep[] = [
     `,
     next: "advance",
     effect: "archive:filter:all",
+    // Row is a Link to the signed contract; locking prevents accidental
+    // navigation away from /archive before the section walk continues.
+    lockInteraction: true,
   },
   {
     id: "archive-customer",
@@ -1128,12 +1167,15 @@ export const TOUR_STEPS: TourStep[] = [
     id: "templates-rogue-archive",
     chapter: "templates",
     path: "/templates",
-    selector: ".tour-anchor-rogue-actions",
+    // Anchor on the Archive button itself so the highlight stage wraps the
+    // click target only. driver.js's overlay blocks Notify owner and every
+    // other button on the page automatically.
+    selector: ".tour-anchor-rogue-archive-button",
     side: "left",
     title: "Archive (try it)",
     description: `
-      <p><strong>Click Archive</strong> on the first flagged file. The row dims, gets an <em>archived</em> badge, and an <strong>Archived by Martina · {timestamp} · Undo</strong> stamp appears.</p>
-      <p class="muted">The file stays in Drive. We just record the decision so any future use surfaces it. The tour follows you forward as soon as you click Archive.</p>
+      <p><strong>Click Archive</strong> on the first flagged file. An <em>Archived by Martina · timestamp · Undo</em> stamp appears; the tour follows.</p>
+      <p class="muted">The file stays in Drive. We just record the decision so any future use surfaces it.</p>
     `,
     // In-app Archive click is the only forward path. Page dispatches
     // `tour:auto-next` when `action.archived` is set on the first row.
@@ -1143,16 +1185,14 @@ export const TOUR_STEPS: TourStep[] = [
     id: "templates-rogue-undo-archive",
     chapter: "templates",
     path: "/templates",
-    // Anchor on the Undo button itself. If the user clicks Undo here the
-    // stamp disappears and the popover orphans, but the description does
-    // not ask the user to click Undo at this step (it's read-only), so
-    // pointing at the actual target reads better than highlighting the
-    // whole row.
+    // Anchor on the Undo button itself. The page's onUndoArchive handler
+    // dispatches tour:auto-next BEFORE clearing state, so the popover hops
+    // to the next step before the Undo button unmounts and never orphans.
     selector: ".tour-anchor-rogue-undo",
     side: "top",
     title: "Undo: append-only audit",
     description: `
-      <p>This <strong>Undo</strong> link restores the row to rogue status. Try it after Next if you want, or leave it archived.</p>
+      <p>The <strong>Undo</strong> link next to the Archived stamp restores the row to rogue status. Click it to try (the tour follows), or click <strong>Next</strong> to leave it archived.</p>
       <p class="muted">Every state change is append-only. Even Undo writes a new audit row; the original Archived row stays.</p>
     `,
     next: "advance",
@@ -1161,11 +1201,14 @@ export const TOUR_STEPS: TourStep[] = [
     id: "templates-rogue-notify",
     chapter: "templates",
     path: "/templates",
-    selector: ".tour-anchor-rogue-actions",
+    // Anchor on the Notify owner button itself so the highlight wraps the
+    // click target only. driver.js's overlay blocks every other button
+    // (including Archive) automatically.
+    selector: ".tour-anchor-rogue-notify-button",
     side: "left",
     title: "Notify the owner",
     description: `
-      <p><strong>Click Notify owner</strong> on the first flagged file (right side of the row) to open the Slack DM preview.</p>
+      <p><strong>Click Notify owner</strong> to open the Slack DM preview.</p>
       <p class="muted">The recipient is auto-routed: last editor when known, team channel when they left the company.</p>
     `,
     // The in-app Notify click is the only forward path. Page dispatches
@@ -1317,18 +1360,17 @@ export const TOUR_STEPS: TourStep[] = [
     chapter: "intake",
     path: "*",
     selector: ".tour-anchor-preview-envelope",
-    // side="bottom": popover renders directly below the Preview envelope
-    // button. side="left" earlier let driver.js fall back to top-left when
-    // the requested side didn't fit, which left the arrow pointing into
-    // empty space below the popover instead of at the button.
-    side: "bottom",
+    // side="top": Preview envelope sits in the Send-via-DocuSign card's
+    // action bar near the bottom of the page. side="bottom" pushed the
+    // popover off the viewport on shorter windows. Top puts the arrow
+    // directly on the button with the popover floating above it.
+    side: "top",
     title: "End of the workflow",
     description: `
-      <p>From here the flow is identical to what you walked on Bolt MSA: click <strong>Preview envelope</strong>, inspect the populated MSA + anchor-tag placement, click <strong>Send via DocuSign</strong>. The contract advances to <em>Filed</em> and structured writeback fires.</p>
-      <p class="muted">Tour ends here. You can re-take the tour anytime from the sidebar.</p>
+      <p>From here the flow is identical to Bolt MSA: <strong>Preview envelope</strong>, inspect placement, then <strong>Send via DocuSign</strong>. The contract advances to <em>Filed</em>; structured writeback fires.</p>
+      <p class="muted">Click <strong>Next</strong> to wrap up.</p>
     `,
     next: "advance",
-    nextLabel: "Finish",
   },
 
   // ── Wrap up ───────────────────────────────────────────────────────────
@@ -1340,13 +1382,26 @@ export const TOUR_STEPS: TourStep[] = [
     description: `
       <ul>
         <li><strong>Dashboard.</strong> KPIs, filters, sidebar.</li>
-        <li><strong>Filter walk.</strong> Awaiting me, Blocked, In review.</li>
         <li><strong>Workflow.</strong> Clause check, routing, approvals, envelope, send.</li>
-        <li><strong>Signed.</strong> Bolt's writeback then the full archive by category.</li>
-        <li><strong>Templates.</strong> Catalog + Counsel-keeps-Word + rogue governance.</li>
+        <li><strong>Signed.</strong> Audit trail + structured writeback.</li>
+        <li><strong>Templates.</strong> Catalog + rogue governance.</li>
         <li><strong>Intake.</strong> 3-step new-contract form.</li>
       </ul>
-      <p class="lead">Click <strong>Finish</strong> and you'll land back on the dashboard. From there, open <strong>About this build</strong> in the sidebar (or scroll to the panel at the bottom of the dashboard) for the submission memo: the reframe, what's real vs stubbed, and what I'd build next.</p>
+      <p class="lead">Click <strong>Next</strong> to land on the dashboard, where I'll point at the submission memo.</p>
+    `,
+    next: "navigate",
+    goto: "/",
+    nextLabel: "Next",
+  },
+  {
+    id: "about-this-build",
+    chapter: "intake",
+    path: "/",
+    selector: ".tour-anchor-about-widget",
+    side: "bottom",
+    title: "About this build",
+    description: `
+      <p>Read this for the submission memo: the reframe, what's real vs stubbed, and what I'd build next.</p>
       <p class="muted">Re-take the tour or pick a chapter anytime from the sidebar.</p>
     `,
     next: "advance",

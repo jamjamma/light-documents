@@ -201,6 +201,12 @@ export function TourController() {
 
         const driveStep: DriveStep = {
           element: el ?? undefined,
+          // Block clicks on the highlighted element for read-only walkthrough
+          // steps (e.g. the approval chain intro, where the stage wraps the
+          // whole chain card including Simulate buttons that would advance
+          // the workflow). driver.js's overlay already blocks clicks
+          // outside the stage; this fills the remaining gap inside it.
+          disableActiveInteraction: !!step.lockInteraction,
           popover: {
             title: step.title,
             description: step.description,

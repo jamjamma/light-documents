@@ -10,7 +10,7 @@ import { ArrowRight, Workflow } from "lucide-react";
  */
 export function AboutWidget() {
   return (
-    <section className="panel overflow-hidden">
+    <section className="panel tour-anchor-about-widget overflow-hidden">
       <div className="flex items-stretch">
         <div className="hidden w-1 shrink-0 bg-accent-400 sm:block" />
         <div className="flex-1 px-5 py-4">
