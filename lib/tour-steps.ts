@@ -15,9 +15,12 @@
  * isn't fully signed yet and we don't want the tour to force the user
  * through the modal/Send flow.
  *
- * Descriptions support HTML (driver.js renders via innerHTML). Keep copy
- * tight: 2-4 short lines max per step. Use <strong>, <em>, <ul>, <li>, but
- * NOT em-dashes (project rule). Use colons or commas instead.
+ * Descriptions support HTML (driver.js renders via innerHTML). Style guide:
+ *  - Lead with one short sentence stating WHAT, no jargon
+ *  - Use bullet lists for any structured content (>= 2 items)
+ *  - Close with 1 italic sentence for production / caveat where useful
+ *  - Max ~4 short paragraphs total
+ *  - No em-dashes (project rule). Use colons / commas / periods.
  */
 
 import type { Side } from "driver.js";
@@ -60,10 +63,10 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "welcome",
     path: "/",
-    title: "Welcome",
+    title: "Welcome to Light Documents",
     description: `
-      <p>A ~2-minute walk through one contract end-to-end.</p>
-      <p><kbd>Esc</kbd> or <strong>×</strong> to skip. Restart anytime from <em>Take the tour</em> in the sidebar.</p>
+      <p>A short walk through one contract, end-to-end. About 2 minutes.</p>
+      <p>Press <kbd>Esc</kbd> or <strong>×</strong> to exit. Restart anytime via <em>Take the tour</em> in the sidebar.</p>
     `,
     next: "advance",
     nextLabel: "Start",
@@ -74,8 +77,8 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/",
     title: "The answer, in two beats",
     description: `
-      <p><strong>Visible pain:</strong> manual Word edits, hand-placed DocuSign fields. This build kills both.</p>
-      <p><strong>Bigger prize for Light:</strong> every signed contract becomes structured data that flows into the relevant system of record. The PDF is the audit artifact; the data is the product.</p>
+      <p><strong>Stated problem.</strong> Manual Word edits, hand-placed DocuSign fields. This build eliminates both.</p>
+      <p><strong>Strategic opportunity for Light.</strong> Every signed contract becomes structured data that flows back into the system of record. The PDF is the audit artifact; the data is the product.</p>
     `,
     next: "advance",
   },
@@ -86,13 +89,13 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "Operator KPIs",
     description: `
-      <p>Three tiles cover what an ops lead actually acts on:</p>
+      <p>Three tiles for what an ops lead actually acts on:</p>
       <ul>
-        <li><strong>Awaiting me</strong>: pending your approval</li>
-        <li><strong>Blocked</strong>: awaiting approval or in review</li>
-        <li><strong>In review</strong>: clause check running or legal review</li>
+        <li><strong>Awaiting me.</strong> Your queue.</li>
+        <li><strong>Blocked.</strong> Approvers haven't responded.</li>
+        <li><strong>In review.</strong> Clause check or legal review running.</li>
       </ul>
-      <p>Click any tile to filter the table. Cycle health sits below as a secondary metric.</p>
+      <p>Click any tile to filter the table. Cycle health sits below as a leadership metric.</p>
     `,
     next: "advance",
   },
@@ -103,8 +106,8 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "Stage tabs + type chips",
     description: `
-      <p>Two filters compose: stage tabs and document-type chips.</p>
-      <p>The same engine handles all 8 templates (MSA, NDA, Employment, Warrant, Order Form, plus variants). Same intake, same clause check, same writeback shape per type.</p>
+      <p>Two filters compose: stage on top, document type below.</p>
+      <p>The same workflow engine handles all 8 templates (MSA, NDA, Employment, Warrant, Order Form, plus variants). Same intake, same clause check, same writeback shape per type.</p>
     `,
     next: "advance",
   },
@@ -115,7 +118,13 @@ export const TOUR_STEPS: TourStep[] = [
     side: "right",
     title: "Create a new contract",
     description: `
-      <p>The intake is a 3-step flow: pick a template, pick a source record (or enter manually), confirm prefilled fields. Let's see it.</p>
+      <p>Intake is a 3-step flow:</p>
+      <ul>
+        <li>Pick a master template</li>
+        <li>Pick a source record (or enter manually)</li>
+        <li>Confirm prefilled fields</li>
+      </ul>
+      <p>Click <strong>Open intake</strong> to see the form.</p>
     `,
     next: "navigate",
     goto: "/contracts/new",
@@ -129,15 +138,15 @@ export const TOUR_STEPS: TourStep[] = [
     title: "3-step intake",
     description: `
       <ul>
-        <li><strong>1. Template</strong>: 8 master Word docs synced from Drive</li>
-        <li><strong>2. Source record</strong>: pulled from Salesforce / HubSpot / Personio (or manual entry for off-CRM)</li>
-        <li><strong>3. Confirm</strong>: prefilled fields with live validation; clause check runs on submit</li>
+        <li><strong>1. Template.</strong> 8 master Word docs synced from Drive.</li>
+        <li><strong>2. Source record.</strong> Pulled from Salesforce / HubSpot / Personio. Or manual entry for off-CRM records.</li>
+        <li><strong>3. Confirm.</strong> Prefilled fields with live validation. Clause check runs on submit.</li>
       </ul>
-      <p>Let's go look at an in-flight contract instead.</p>
+      <p>Once submitted, the workflow begins. Next, open a contract already in motion.</p>
     `,
     next: "navigate",
     goto: `/contracts/${HERO_CONTRACT_ID}`,
-    nextLabel: "See in-flight contract",
+    nextLabel: "Open Bolt MSA",
   },
 
   // ── Act 2: Workflow (contract detail) ──────────────────────────────────
@@ -165,11 +174,11 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Routing rules",
     description: `
-      <p>13 typed rules fire from contract fields. For Bolt:</p>
+      <p>13 typed rules fire based on contract fields. Bolt triggers three:</p>
       <ul>
-        <li><strong>Legal</strong>: clause deviations</li>
-        <li><strong>Head of F&amp;O</strong>: ARR &gt; €50k</li>
-        <li><strong>CFO</strong>: ARR &gt; €100k</li>
+        <li><strong>Legal.</strong> Clause deviations flagged.</li>
+        <li><strong>Head of F&amp;O.</strong> ARR &gt; €50k.</li>
+        <li><strong>CFO.</strong> ARR &gt; €100k.</li>
       </ul>
       <p>Each row carries its <em>"why"</em> for the audit log. Head of F&amp;O owns this engine in production.</p>
     `,
@@ -183,7 +192,7 @@ export const TOUR_STEPS: TourStep[] = [
     title: "Approval chain &middot; try Approve + Undo",
     description: `
       <p>Find the <strong>Head of Finance &amp; Ops</strong> row (Martina Holst). That's your row, so the button reads <strong>Approve</strong>, not Simulate.</p>
-      <p>Click Approve. Pill flips green and an <strong>Undo</strong> button appears next to it. Other rows show <em>Simulate X approves</em>: those represent Slack DM responses from other people; only your own approval is Undo-able.</p>
+      <p>Click Approve. The pill flips green and an <strong>Undo</strong> appears next to it. Other rows show <em>Simulate X approves</em> because they represent Slack DM responses from other people; only your own approval is Undo-able.</p>
       <p><em>Once DocuSign has the envelope, Undo is refused. That's the line.</em></p>
     `,
     next: "advance",
@@ -193,14 +202,14 @@ export const TOUR_STEPS: TourStep[] = [
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-preview-envelope",
     side: "top",
-    title: "Preview envelope",
+    title: "Anchor-tag envelope",
     description: `
-      <p><strong>Preview envelope</strong> opens a populated MSA with anchor-tag callouts. Counsel embedded the anchor strings in the Word template once as white-on-white text; DocuSign places every signature field automatically. Config (expiry, reminders, QES) is collapsed by default behind an audit-view disclosure.</p>
-      <p>Bolt isn't fully approved here, so click <strong>Next</strong> below to jump to a contract that already is.</p>
+      <p><strong>Preview envelope</strong> shows the populated MSA with signature fields auto-placed by anchor tags Counsel typed once into the Word template. Config (expiry, reminders, QES) sits behind a collapsed audit disclosure.</p>
+      <p>Bolt isn't fully approved yet. Skipping ahead to a signed contract.</p>
     `,
     next: "navigate",
     goto: `/contracts/${SIGNED_DEMO_ID}/signed`,
-    nextLabel: "Jump to signed",
+    nextLabel: "See signed contract",
   },
 
   // ── Act 3: Outputs ─────────────────────────────────────────────────────
@@ -211,9 +220,14 @@ export const TOUR_STEPS: TourStep[] = [
     side: "left",
     title: "Structured writeback",
     description: `
-      <p><strong>MSA / Order Form</strong>: journal entry shape (DR Trade Receivables / CR Deferred Revenue) with customer / source / entity / renewal chips.</p>
-      <p><strong>Employment</strong>: HRIS record. <strong>Warrant</strong>: cap-table grant. <strong>NDA</strong>: retention metadata only.</p>
-      <p><em>Prototype emits the shape. Production posts to whichever endpoint Light exposes. Both sides of the integration are stubbed here: this is the structural argument, not a capability claim.</em></p>
+      <p>Every signed contract emits structured data into the relevant system of record:</p>
+      <ul>
+        <li><strong>MSA / Order Form.</strong> Ledger journal entry plus customer, source, entity, renewal as dimensions.</li>
+        <li><strong>Employment.</strong> HRIS record (start date, role, comp, manager).</li>
+        <li><strong>Warrant.</strong> Cap-table grant (stakeholder, percentage, vesting, board resolution).</li>
+        <li><strong>NDA.</strong> Retention metadata only. No commercial impact.</li>
+      </ul>
+      <p><em>The prototype emits this on the DocuSign <code>envelope-completed</code> webhook. Production posts to whichever endpoint Light exposes. The integration target is also stubbed in this build.</em></p>
     `,
     next: "navigate",
     goto: "/archive",
@@ -222,10 +236,11 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "signed-archive",
     path: "/archive",
-    title: "Signed contracts",
+    title: "Past signed contracts",
     description: `
-      <p>KPIs are <strong>counts</strong> (total, customer, people, equity). ARR / headcount / equity TOTALS live on Light's real dashboards, not on a contract-retrieval surface.</p>
-      <p>Each row links to its full signed record (audit trail + writeback). Shows who signed, when, against which template version.</p>
+      <p>Filed contracts live here for retrieval. KPIs are <strong>counts</strong>, not financial totals.</p>
+      <p>ARR, headcount, and equity totals live on Light's real dashboards. This surface is for finding past records: who signed, when, against which template version.</p>
+      <p>Each row links to its full signed record: PDF, audit trail, structured writeback.</p>
     `,
     next: "navigate",
     goto: "/templates",
@@ -236,19 +251,27 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/templates",
     title: "Templates &middot; Counsel keeps Word",
     description: `
-      <p>Master templates live as Word docs in Drive, owned by Legal. <strong>Counsel never logs into Light Documents</strong>: they edit where they already edit, Track Changes and all. We watch the folder and sync.</p>
-      <p>Scroll down: the <strong>Rogue templates</strong> panel is a Phase-2 governance demo. Daily scan flags docs outside <code>/Master Templates/</code> with Archive + Notify Owner.</p>
+      <p>Master templates live as Word docs in Drive, owned by Legal. <strong>Counsel never logs into Light Documents</strong>: they edit where they already edit, with Track Changes and all. Our platform watches the folder and syncs.</p>
+      <p>Scroll down for the <strong>Rogue templates</strong> panel: a Phase-2 governance demo. A daily scan flags docs outside <code>/Master Templates/</code> with Archive + Notify Owner actions.</p>
     `,
     next: "advance",
     nextLabel: "Wrap up",
   },
+
+  // ── Wrap up ────────────────────────────────────────────────────────────
   {
     id: "done",
     path: "*",
     title: "Tour complete",
     description: `
-      <p>You've seen the operator surface, intake, workflow, structured writeback, signed archive, and templates governance.</p>
-      <p>Next: <strong>About this build</strong> (sidebar) has the full submission memo. <strong>Reset demo data</strong> wipes everything and lets you take the tour again.</p>
+      <p>You've seen:</p>
+      <ul>
+        <li><strong>Operator dashboard.</strong> KPIs, stage tabs, type chips.</li>
+        <li><strong>Intake.</strong> Templates, source records, prefilled fields.</li>
+        <li><strong>Workflow.</strong> Clause check, routing, approvals, Undo, anchor-tag envelope.</li>
+        <li><strong>Outputs.</strong> Structured writeback, signed archive, template governance.</li>
+      </ul>
+      <p><strong>Where to next.</strong> The sidebar holds <em>About this build</em> (the full submission memo) and <em>Reset demo data</em> (wipes everything, lets you take the tour again).</p>
     `,
     next: "advance",
     nextLabel: "Finish",

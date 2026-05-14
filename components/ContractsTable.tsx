@@ -253,11 +253,10 @@ function applyFilter(contracts: Contract[], filter: Filter, awaitingRole: string
     );
   }
   if (filter === "blocked") {
-    return contracts.filter((c) => {
-      if (c.stage === "in_review") return true;
-      if (c.stage === "awaiting_approval" && (c.approvals ?? []).some((a) => a.status === "pending")) return true;
-      return false;
-    });
+    // Disjoint with the In review filter: in_review stage shows up there, not here.
+    return contracts.filter((c) =>
+      c.stage === "awaiting_approval" && (c.approvals ?? []).some((a) => a.status === "pending"),
+    );
   }
   if (filter === "in_review") {
     return contracts.filter((c) => c.stage === "in_review" || c.stage === "checks_running");

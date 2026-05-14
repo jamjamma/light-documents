@@ -936,8 +936,11 @@ function computeRenewalDate(startISO: string | undefined, termMonths: number): s
 // ── Helpers for filters ──────────────────────────────────────────────────────
 
 export function isBlocked(c: Contract): boolean {
+  // Disjoint from "In review" KPI: contracts in the in_review or checks_running
+  // stage are surfaced by that KPI, not this one. This KPI is for human-
+  // blockage specifically: an approver hasn't responded, or DocuSign envelope
+  // is stuck unsigned past a week.
   if (c.stage === "awaiting_approval" && (c.approvals ?? []).some((a) => a.status === "pending")) return true;
-  if (c.stage === "in_review") return true;
   if (c.stage === "sent" && c.signedAt === undefined) {
     const sentDays = (Date.now() - new Date(c.updatedAt).getTime()) / (1000 * 60 * 60 * 24);
     if (sentDays > 7) return true;

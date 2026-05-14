@@ -4,7 +4,7 @@ Target: 4 to 5 minutes. Narrate the click path, lead with the reframe, end on th
 
 ## 0:00 to 0:30 — The reframe
 
-> "The stated pain is manually editing Word docs and highlighting DocuSign fields by hand. The workflow you're about to see kills that directly. While we're in there, there's a bigger prize uniquely available to Light: every signed contract is structured data that belongs in the systems of record. Other CLMs ship integrations into N ERPs. Light *is* the ERP. So my answer is: wrap DocuSign as infrastructure, keep Word for authoring, and build a workflow layer between them whose output flows into the ledger."
+> "The stated problem is manual Word edits and hand-placed DocuSign fields. The workflow you're about to see eliminates both. While we're in there, there's a strategic opportunity uniquely available to Light: every signed contract is structured data that belongs in the systems of record. Other CLMs ship integrations into N ERPs. Light *is* the ERP. So my answer is: wrap DocuSign as infrastructure, keep Word for authoring, and build a workflow layer between them whose output flows into the systems of record."
 
 Open `http://localhost:3000`. Point at the AboutWidget on the Dashboard. Read the one sentence.
 

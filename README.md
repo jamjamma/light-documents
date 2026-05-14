@@ -15,7 +15,7 @@
 
 The stated pain (Word edits and hand-placed DocuSign fields) is real, and the workflow below kills both directly.
 
-While we're rebuilding the flow there's a bigger prize uniquely available to Light: every signed contract is structured data (revenue, headcount, equity, vendor obligations) that belongs in the systems of record. The PDF is the audit artifact; the data is the product. Other CLMs ship integrations into N ERPs. Light *is* the ERP.
+While we're rebuilding the flow, there is a strategic opportunity uniquely available to Light: every signed contract is structured data (revenue, headcount, equity, vendor obligations) that belongs in the systems of record. The PDF is the audit artifact; the data is the product. Other CLMs ship integrations into N ERPs. Light *is* the ERP.
 
 ```
 Source records (Salesforce / HubSpot / Attio / Personio / Ashby / Manual entry)

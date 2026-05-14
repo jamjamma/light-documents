@@ -94,7 +94,7 @@ export default function DashboardPage() {
               {
                 label: "Blocked",
                 value: String(kpis.blocked),
-                hint: "awaiting approval or in review",
+                hint: "approvers haven't responded",
                 emphasis: kpis.blocked > 0,
                 onClick: () => setFilter("blocked"),
                 active: filter === "blocked",
@@ -129,7 +129,7 @@ export default function DashboardPage() {
           <div className="tour-anchor-callout flex items-start gap-3 rounded-xl border border-accent-200 bg-accent-50/60 px-4 py-3">
             <div className="flex-1 text-[13px] text-ink-700">
               <span className="font-medium text-ink-900">New here?</span>{" "}
-              Open <strong>Bolt MSA</strong> to walk the demo path, or take the guided tour from the sidebar.
+              Open <strong>Bolt MSA</strong> below: a €180k MSA in review with 3 clause deviations and pending approvals. Or take the guided tour from the sidebar.
             </div>
             <Link
               href={HERO_MSA_HREF}

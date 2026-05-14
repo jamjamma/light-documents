@@ -7,7 +7,7 @@
 
 ## 1. The reframe (one sentence)
 
-**The stated pain (Word edits and hand-placed DocuSign fields) is real, and the workflow below kills both directly. The bigger prize uniquely available to Light: every signed contract is structured data that belongs in the systems of record.** Other CLMs ship integrations into N ERPs. Light *is* the ERP.
+**The stated problem (Word edits and hand-placed DocuSign fields) is real, and the workflow below eliminates both. The strategic opportunity uniquely available to Light: every signed contract is structured data that belongs in the systems of record.** Other CLMs ship integrations into N ERPs. Light *is* the ERP.
 
 The PDF is the audit artifact; the data is the product. Routing per document type: MSAs / Order Forms → revenue and billing, Employment → headcount and compensation, Warrants → cap table, Vendor → AP, NDAs → retention metadata only (see ADR 14).
 
