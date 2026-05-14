@@ -57,7 +57,7 @@ export default function SignedRecordPage({ params }: { params: Promise<{ id: str
 
       <div className="space-y-4 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
         {isSigned && (
-          <div className="flex items-center gap-3 rounded-xl border border-sage-500/30 bg-sage-50 px-5 py-3 text-[13px]">
+          <div className="tour-anchor-signed-banner flex items-center gap-3 rounded-xl border border-sage-500/30 bg-sage-50 px-5 py-3 text-[13px]">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sage-500 text-white">
               <FileCheck className="h-4 w-4" />
             </div>
@@ -74,6 +74,7 @@ export default function SignedRecordPage({ params }: { params: Promise<{ id: str
 
         <div className="grid gap-4 xl:grid-cols-[1fr_360px]">
           <div className="space-y-4">
+            <div className="tour-anchor-signed-document">
             <Card title="Signed document" subtitle="PDF retained, audit trail attached.">
               <div className="flex items-center gap-4 rounded-lg border border-ink-200 bg-ink-50/40 p-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white shadow-card">
@@ -101,10 +102,13 @@ export default function SignedRecordPage({ params }: { params: Promise<{ id: str
                 Production stores the signed PDF and the DocuSign Certificate of Completion in the customer's Drive (or SharePoint) archive folder.
               </div>
             </Card>
+            </div>
 
+            <div className="tour-anchor-audit-trail">
             <Card title="Audit trail" subtitle="Every step with timestamp, actor, and notification channel.">
               <AuditTrail events={contract.audit} />
             </Card>
+            </div>
           </div>
 
           <div className="tour-anchor-ledger space-y-4">

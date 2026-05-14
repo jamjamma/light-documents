@@ -99,6 +99,7 @@ export function DocuSignPreviewModal({ open, onClose, contract, template, onSend
             leadingIcon={sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
             disabled={sending || !canSend}
             title={!canSend ? `Send blocked until all approvals complete (${pendingApprovals} pending).` : undefined}
+            className="tour-anchor-modal-send"
           >
             {sending ? "Creating envelope..." : "Send via DocuSign"}
           </Button>
@@ -113,15 +114,19 @@ export function DocuSignPreviewModal({ open, onClose, contract, template, onSend
               <strong>Send blocked.</strong> {pendingApprovals} approval(s) still pending. You can inspect the populated envelope here, but the Send button stays disabled until the approval chain is complete.
             </div>
           )}
-          <DocumentPage
-            page={page}
-            totalPages={totalPages}
-            contract={contract}
-            template={template}
-            signers={signers}
-          />
+          <div className="tour-anchor-modal-document">
+            <DocumentPage
+              page={page}
+              totalPages={totalPages}
+              contract={contract}
+              template={template}
+              signers={signers}
+            />
+          </div>
           <PageNav page={page} totalPages={totalPages} onChange={setPage} />
-          <AnchorTagBar template={template} />
+          <div className="tour-anchor-modal-anchortags">
+            <AnchorTagBar template={template} />
+          </div>
           {showApi && <ApiCallPreview contract={contract} template={template} signers={signers} />}
         </div>
       </div>
@@ -134,7 +139,7 @@ export function DocuSignPreviewModal({ open, onClose, contract, template, onSend
 function RecipientSidebar({ signers, template }: { signers: SignerDef[]; template: Template }) {
   return (
     <aside className="space-y-3">
-      <div>
+      <div className="tour-anchor-modal-recipients">
         <div className="demo-note mb-2">Recipients ({signers.length})</div>
         <ol className="space-y-2">
           {signers.map((s) => {
@@ -165,7 +170,7 @@ function RecipientSidebar({ signers, template }: { signers: SignerDef[]; templat
         </ol>
       </div>
 
-      <details className="group rounded-lg border border-ink-100 bg-white p-3 text-[11px]">
+      <details className="tour-anchor-modal-config group rounded-lg border border-ink-100 bg-white p-3 text-[11px]">
         <summary className="flex cursor-pointer list-none items-center justify-between text-[11px] font-medium text-ink-700">
           <span className="inline-flex items-center gap-1.5">
             <span className="demo-note">Envelope configuration</span>

@@ -104,6 +104,14 @@ export function TourController() {
         // For centered popovers (no element) driver.js floats them in the
         // viewport; passing side="bottom" mistakenly pins them to the
         // bottom of the page instead of centering.
+        //
+        // disableButtons: [] is REQUIRED. driver.js's drive() function auto-
+        // sets `disableButtons: ["previous"]` whenever the driver's internal
+        // steps array has no previous step. Our model creates a fresh single-
+        // step driver per tour step, so driver.js always thinks there's no
+        // previous to go back to and greys out the Prev button regardless of
+        // our onPrevClick handler. Spreading an empty array here overrides
+        // that auto-disable so Back fires normally.
         const driveStep: DriveStep = {
           element: el ?? undefined,
           popover: {
@@ -113,6 +121,7 @@ export function TourController() {
             showButtons: step.hideBack
               ? ["close", "next"]
               : ["close", "previous", "next"],
+            disableButtons: [],
             nextBtnText: step.nextLabel ?? (idx === TOUR_STEPS.length - 1 ? "Finish" : "Next"),
             prevBtnText: "Back",
           },

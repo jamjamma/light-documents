@@ -165,8 +165,16 @@ export default function TemplatesPage() {
               {CATEGORY_ORDER.map((cat) => {
                 const groupTemplates = TEMPLATES.filter((t) => TEMPLATE_CATEGORY[t.id] === cat);
                 if (groupTemplates.length === 0) return null;
+                const anchorClass =
+                  cat === "Customer contracts"
+                    ? "tour-anchor-templates-customer"
+                    : cat === "People"
+                    ? "tour-anchor-templates-people"
+                    : cat === "Equity"
+                    ? "tour-anchor-templates-equity"
+                    : "";
                 return (
-                  <section key={cat} className="rounded-xl">
+                  <section key={cat} className={clsx("rounded-xl", anchorClass)}>
                     <header className="mb-2 flex flex-wrap items-center justify-between gap-2 px-1 pt-2">
                       <div className="flex items-center gap-2">
                         <span className={clsx("inline-flex h-7 w-7 items-center justify-center rounded-md ring-1 ring-inset", CATEGORY_ACCENT[cat])}>

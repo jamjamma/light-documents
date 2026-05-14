@@ -65,30 +65,31 @@ html, body {
     inset 0 3px 0 #fbbf24,
     0 18px 48px rgba(15, 23, 42, 0.22),
     0 2px 6px rgba(15, 23, 42, 0.08);
-  padding: 24px 24px 18px;
-  max-width: 400px;
+  padding: 20px 22px 16px;
+  min-width: 320px;
+  max-width: 460px;
   font-family: inherit;
 }
 
 .driver-popover.light-tour-popover .driver-popover-title {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
   color: #161611;
-  margin: 0 0 10px;
-  padding-bottom: 10px;
+  margin: 0 0 12px;
+  padding: 0 24px 12px 0;
   letter-spacing: -0.015em;
-  line-height: 1.3;
+  line-height: 1.35;
   border-bottom: 1px solid #f1f1ea;
 }
 
 .driver-popover.light-tour-popover .driver-popover-description {
   font-size: 13.5px;
-  line-height: 1.6;
+  line-height: 1.55;
   color: #3f3f37;
   margin: 0 0 14px;
 }
 
-/* Tighten consecutive paragraph spacing and give bullet lists breathing room. */
+/* Paragraph and list rhythm. */
 .driver-popover.light-tour-popover .driver-popover-description p {
   margin: 0 0 8px;
 }
@@ -96,22 +97,31 @@ html, body {
   margin-bottom: 0;
 }
 .driver-popover.light-tour-popover .driver-popover-description p.lead {
-  font-size: 14.5px;
+  font-size: 14px;
   color: #161611;
   font-weight: 500;
 }
 .driver-popover.light-tour-popover .driver-popover-description p.muted {
   font-size: 12.5px;
   color: #6f6f63;
+  line-height: 1.5;
 }
 .driver-popover.light-tour-popover .driver-popover-description ul {
-  margin: 8px 0 10px;
+  margin: 0 0 8px;
   padding-left: 18px;
   list-style: disc;
 }
+.driver-popover.light-tour-popover .driver-popover-description ul:last-child {
+  margin-bottom: 0;
+}
 .driver-popover.light-tour-popover .driver-popover-description li {
-  margin: 4px 0;
+  margin: 3px 0;
   padding-left: 2px;
+  line-height: 1.5;
+}
+/* List items don't need their own bottom margin when adjacent to a closing p. */
+.driver-popover.light-tour-popover .driver-popover-description ul + p {
+  margin-top: 2px;
 }
 .driver-popover.light-tour-popover .driver-popover-description code {
   background: #f5f5ee;
@@ -188,13 +198,16 @@ html, body {
   color: #8b8b7a;
   font-size: 18px;
   font-family: inherit;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 6px;
   background: transparent;
+  position: absolute;
+  top: 14px;
+  right: 14px;
 }
 .driver-popover.light-tour-popover .driver-popover-close-btn:hover {
   background: #f5f5ee;

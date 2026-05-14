@@ -263,35 +263,127 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Preview the envelope",
     description: `
-      <p>Click <strong>Preview envelope</strong> below: populated MSA with signature fields auto-placed by anchor tags from the Word template.</p>
-      <p class="muted">Config (expiry, reminders, QES) sits behind a collapsed audit disclosure inside the modal.</p>
+      <p>Click <strong>Preview envelope</strong> below to open the DocuSign envelope modal.</p>
+      <p class="muted">We'll walk through its features inside.</p>
     `,
     next: "advance",
-    nextLabel: "Next: send",
+  },
+
+  // ── Act 4: DocuSign preview modal walk ────────────────────────────────
+  {
+    id: "modal-recipients",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-modal-recipients",
+    side: "right",
+    title: "Recipients and routing",
+    description: `
+      <ul>
+        <li>Counterparty signer (amber) routes first.</li>
+        <li>Light authorised signatory (sky) routes second.</li>
+        <li>Each row shows the <em>why</em>: source record, jurisdiction, or template policy.</li>
+      </ul>
+      <p class="muted">Sequential routing; reminders kick in by day 3.</p>
+    `,
+    next: "advance",
   },
   {
-    id: "send-envelope",
+    id: "modal-config",
     path: `/contracts/${HERO_CONTRACT_ID}`,
-    selector: ".tour-anchor-preview-envelope",
+    selector: ".tour-anchor-modal-config",
+    side: "right",
+    title: "Envelope configuration",
+    description: `
+      <p>Audit-view disclosure. Click <strong>Expand</strong> to see expiry, reminder schedule, signing order, and any extras (eIDAS QES, SMS OTP, witness).</p>
+      <p class="muted">Defaults come from the template's DocuSign feature config.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "modal-document",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-modal-document",
+    side: "left",
+    title: "Populated document",
+    description: `
+      <p>The signed PDF preview. All variables substituted; signature fields auto-placed by anchor tags.</p>
+      <p class="muted">Use the page nav below to flip through. Page numbers vary by template type.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "modal-anchortags",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-modal-anchortags",
+    side: "top",
+    title: "Anchor tags",
+    description: `
+      <p>White-on-white text in the Word template that DocuSign matches via <code>searchString</code> to place signature, date, and initial fields.</p>
+      <p class="muted">Counsel types these once into the master. Zero per-contract dragging.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "modal-send",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-modal-send",
     side: "top",
     title: "Send via DocuSign",
     description: `
-      <p>In the modal, click <strong>Send via DocuSign</strong>. The contract advances to signed and you'll auto-redirect to the signed page.</p>
-      <p class="muted"><em>If you closed the modal, click Preview envelope again, then Send.</em></p>
+      <p>Click <strong>Send via DocuSign</strong>. The envelope fires, the contract advances to signed, and the page auto-redirects to the signed record.</p>
+      <p class="muted"><em>If the modal closed, click Preview envelope again and find this button in the footer.</em></p>
     `,
     next: "advance",
-    nextLabel: "Waiting…",
   },
 
-  // ── Act 4: Bolt's own signed page ─────────────────────────────────────
+  // ── Act 5: Bolt's signed page ─────────────────────────────────────────
   {
-    id: "bolt-signed",
+    id: "signed-banner",
+    path: `/contracts/${HERO_CONTRACT_ID}/signed`,
+    selector: ".tour-anchor-signed-banner",
+    side: "bottom",
+    title: "Signed and filed",
+    description: `
+      <p>Banner confirms the envelope ID, signed timestamp, Drive storage, and eIDAS QES verification.</p>
+      <p class="muted">Stage badge moves to <em>Filed</em>.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "signed-document",
+    path: `/contracts/${HERO_CONTRACT_ID}/signed`,
+    selector: ".tour-anchor-signed-document",
+    side: "right",
+    title: "Signed PDF",
+    description: `
+      <p>The retained PDF with metadata: template version, signer count, eIDAS QES badge.</p>
+      <p class="muted">Download fetches both the PDF and DocuSign Certificate of Completion.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "audit-trail",
+    path: `/contracts/${HERO_CONTRACT_ID}/signed`,
+    selector: ".tour-anchor-audit-trail",
+    side: "right",
+    title: "Audit trail",
+    description: `
+      <ul>
+        <li>Every state transition timestamped.</li>
+        <li>Actor recorded: user, system, or counterparty.</li>
+        <li>Notification channel (Slack DM, email, DocuSign) attached.</li>
+      </ul>
+      <p class="muted">7-year retention. Append-only. WORM compliant.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "structured-writeback",
     path: `/contracts/${HERO_CONTRACT_ID}/signed`,
     selector: ".tour-anchor-ledger",
     side: "left",
     title: "Structured writeback",
     description: `
-      <p>Bolt is signed. Each signed contract emits structured data:</p>
+      <p>Each signed contract emits structured data into the relevant system of record:</p>
       <ul>
         <li><strong>MSA / Order Form.</strong> Ledger journal entry plus dimensions.</li>
         <li><strong>Employment.</strong> HRIS record.</li>
@@ -302,7 +394,7 @@ export const TOUR_STEPS: TourStep[] = [
     `,
     next: "navigate",
     goto: "/archive",
-    nextLabel: "Next: archive",
+    nextLabel: "Next",
   },
 
   // ── Act 5: Signed contracts archive ───────────────────────────────────
@@ -359,23 +451,70 @@ export const TOUR_STEPS: TourStep[] = [
     `,
     next: "navigate",
     goto: "/templates",
-    nextLabel: "Next: templates",
+    nextLabel: "Next",
     effect: "archive:filter:equity",
   },
 
-  // ── Act 6: Templates + rogue governance ───────────────────────────────
+  // ── Act 6: Templates walked section by section ────────────────────────
   {
     id: "templates-overview",
     path: "/templates",
     title: "Templates catalog",
     description: `
-      <p>8 master Word docs in Drive, organized by category:</p>
+      <p>8 master Word docs in Drive, grouped into three categories:</p>
       <ul>
-        <li><strong>Customer.</strong> MSA, MSA Pilot, Order Form, NDA.</li>
+        <li><strong>Customer contracts.</strong> MSA, MSA Pilot, Order Form, NDA.</li>
         <li><strong>People.</strong> Employment DK, Employment UK.</li>
         <li><strong>Equity.</strong> Warrant, Advisor Warrant.</li>
       </ul>
       <p class="muted">Click any card for version history, clause rules, DocuSign config.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "templates-customer",
+    path: "/templates",
+    selector: ".tour-anchor-templates-customer",
+    side: "top",
+    title: "Customer contracts",
+    description: `
+      <ul>
+        <li><strong>MSA v4.2.</strong> Standard commercial deal. 5 clause rules, 8 anchor tags.</li>
+        <li><strong>MSA: Pilot v1.0.</strong> 3-month POC trials.</li>
+        <li><strong>Order Form v2.0.</strong> Pricing companion to the MSA. References parent MSA.</li>
+        <li><strong>Mutual NDA v3.1.</strong> 24-month confidentiality. No ledger writeback.</li>
+      </ul>
+      <p class="muted">Owned by Sales + Legal. 3 jurisdictions supported.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "templates-people",
+    path: "/templates",
+    selector: ".tour-anchor-templates-people",
+    side: "top",
+    title: "People",
+    description: `
+      <ul>
+        <li><strong>Employment DK v2.0.</strong> Denmark hires under Funktionærloven.</li>
+        <li><strong>Employment UK v1.0.</strong> United Kingdom hires.</li>
+      </ul>
+      <p class="muted">Owned by People Ops + Legal. Jurisdiction-specific clauses. SMS OTP identity verification.</p>
+    `,
+    next: "advance",
+  },
+  {
+    id: "templates-equity",
+    path: "/templates",
+    selector: ".tour-anchor-templates-equity",
+    side: "top",
+    title: "Equity",
+    description: `
+      <ul>
+        <li><strong>Warrant v1.5.</strong> Employee warrants. 48-month vest, 12-month cliff.</li>
+        <li><strong>Advisor Warrant v1.0.</strong> Advisor grants. Different vest schedule.</li>
+      </ul>
+      <p class="muted">Owned by Finance + Legal. eIDAS QES required (Light policy for equity). Witness signer.</p>
     `,
     next: "advance",
   },
@@ -405,7 +544,7 @@ export const TOUR_STEPS: TourStep[] = [
     `,
     next: "navigate",
     goto: "/contracts/new",
-    nextLabel: "Next: new contract",
+    nextLabel: "Next",
   },
 
   // ── Act 7: New contract intake ────────────────────────────────────────
@@ -416,12 +555,13 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "Create a new contract",
     description: `
+      <p>3 steps. The progress bar above tracks where you are.</p>
       <ul>
-        <li><strong>1. Template.</strong> Pick one of the 8 masters.</li>
-        <li><strong>2. Source record.</strong> From Salesforce, HubSpot, Personio, or manual entry.</li>
-        <li><strong>3. Confirm.</strong> Prefilled fields, clause check on submit.</li>
+        <li><strong>1. Template.</strong> Pick from the 8 masters you just saw.</li>
+        <li><strong>2. Source record.</strong> Pull from Salesforce, HubSpot, Personio, or enter manually.</li>
+        <li><strong>3. Confirm.</strong> Pre-filled fields by type (Counterparty, Commercial terms, Legal, Counterparty signer for MSAs; Candidate, Compensation, Terms for Employment; Grant for Warrants).</li>
       </ul>
-      <p class="muted">Same workflow as Bolt begins on submit.</p>
+      <p class="muted">Clause check runs on submit, routing rules fire, and the workflow you just walked through begins.</p>
     `,
     next: "advance",
     nextLabel: "Wrap up",
