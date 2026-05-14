@@ -13,6 +13,7 @@ import {
   X,
   ChevronsLeft,
   ChevronsRight,
+  Play,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { resetDemo } from "@/lib/contract-store";
@@ -21,7 +22,7 @@ import { useMobileNav } from "./MobileNavContext";
 const NAV = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/templates", label: "Templates", icon: BookOpen },
-  { href: "/archive", label: "Archive", icon: Archive },
+  { href: "/archive", label: "Signed contracts", icon: Archive },
   { href: "/about", label: "About this build", icon: Info },
 ];
 
@@ -149,12 +150,6 @@ export function Sidebar() {
           </button>
         </div>
 
-        {!collapsed && (
-          <div className="mb-3 px-3 pl-12 text-[11px] text-ink-500 md:px-5 md:pb-3">
-            workflow layer
-          </div>
-        )}
-
         <nav className={clsx("flex-1", collapsed ? "md:px-1.5" : "px-3")}>
           {NAV.map(({ href, label, icon: Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -212,6 +207,30 @@ export function Sidebar() {
               Demo: simulating a Martina session. Production uses Google Workspace SSO so each user sees their own queue.
             </div>
           )}
+
+          <button
+            onClick={() => {
+              if (typeof window !== "undefined" && window.innerWidth < 768) {
+                alert(
+                  "The guided tour is desktop-first. Open on a wider screen, or click into Bolt MSA from the dashboard to walk the demo manually.",
+                );
+                return;
+              }
+              import("@/lib/tour-steps").then(({ writeTourState, setTourDismissed }) => {
+                setTourDismissed(false);
+                writeTourState({ active: true, stepIndex: 0 });
+                window.dispatchEvent(new CustomEvent("tour:start"));
+              });
+            }}
+            title={collapsed ? "Take the tour" : "Take a guided tour of the build (~90s)"}
+            className={clsx(
+              "flex w-full items-center gap-2.5 rounded-lg text-xs text-ink-700 hover:bg-ink-50",
+              collapsed ? "md:justify-center md:px-2 md:py-2" : "px-3 py-2",
+            )}
+          >
+            <Play className="h-3.5 w-3.5 shrink-0" />
+            <span className={clsx(collapsed && "md:hidden")}>Take the tour</span>
+          </button>
 
           <button
             onClick={onReset}

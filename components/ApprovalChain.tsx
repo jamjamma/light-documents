@@ -116,7 +116,19 @@ export function ApprovalChain({
 
               <div className="flex shrink-0 items-start gap-2">
                 <div className="flex flex-col items-end gap-1">
-                  <ApprovalStatusPill status={a.status} />
+                  <div className="flex items-center gap-2">
+                    <ApprovalStatusPill status={a.status} />
+                    {a.status === "approved" && onUndoApprove && canUndoApprove?.(a) && (
+                      <button
+                        type="button"
+                        onClick={() => onUndoApprove(a)}
+                        className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-ink-700 ring-1 ring-inset ring-ink-200 hover:bg-ink-100 hover:text-ink-900"
+                        title="Withdraw your approval. Returns the row to pending and walks the contract back to awaiting_approval if this was the last approver."
+                      >
+                        <Undo2 className="h-3 w-3" /> Undo
+                      </button>
+                    )}
+                  </div>
                   {a.decidedAt && (
                     <div className="text-[11px] text-ink-500">{formatDateTime(a.decidedAt)}</div>
                   )}
@@ -166,17 +178,10 @@ export function ApprovalChain({
               </div>
             )}
             {a.status === "approved" && a.decidedBy && (
-              <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-ink-500">
-                <span>Approved by {a.decidedBy}</span>
+              <div className="mt-2 text-[11px] text-ink-500">
+                Approved by {a.decidedBy}
                 {onUndoApprove && canUndoApprove?.(a) && (
-                  <button
-                    type="button"
-                    onClick={() => onUndoApprove(a)}
-                    className="inline-flex items-center gap-1 rounded-full bg-ink-50 px-2 py-0.5 text-[11px] text-ink-700 ring-1 ring-inset ring-ink-200 hover:bg-ink-100"
-                    title="Withdraw your approval. Returns the row to pending and walks the contract back to awaiting_approval if this was the last approver."
-                  >
-                    <Undo2 className="h-3 w-3" /> Undo my approval
-                  </button>
+                  <span className="ml-1 text-ink-400">(your approval; use Undo above to withdraw)</span>
                 )}
               </div>
             )}

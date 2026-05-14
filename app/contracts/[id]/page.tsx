@@ -202,32 +202,38 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
           </div>
         )}
 
-        <Card title="Clause review" subtitle="Auto-run on intake. Re-runs whenever fields change.">
-          <ClauseDiff results={contract.clauseResults ?? []} />
-        </Card>
+        <div className="tour-anchor-clause-diff">
+          <Card title="Clause review" subtitle="Auto-run on intake. Re-runs whenever fields change.">
+            <ClauseDiff results={contract.clauseResults ?? []} />
+          </Card>
+        </div>
 
-        <Card title="Approval routing" subtitle="Rule-based. Each rule attaches its 'why' so the chain is auditable.">
-          <RoutingPanel approvals={contract.approvals ?? []} />
-        </Card>
+        <div className="tour-anchor-routing">
+          <Card title="Approval routing" subtitle="Rule-based. Each rule attaches its 'why' so the chain is auditable.">
+            <RoutingPanel approvals={contract.approvals ?? []} />
+          </Card>
+        </div>
 
         {contract.approvals && contract.approvals.length > 0 && (
-          <Card title="Approval chain" subtitle="Approvers are notified by their channel. Each row has Reassign / Pass on / Re-ping / Reject actions.">
-            <ApprovalChain
-              approvals={contract.approvals}
-              onSimulateApprove={handleApprove}
-              onReassign={(a) => setReassignFor(a)}
-              onReping={handleReping}
-              onReject={(a) => setRejectFor(a)}
-              onUndoApprove={handleUndoApprove}
-              canUndoApprove={canUndoApprove}
-              operatorName={OPERATOR_NAME}
-            />
-          </Card>
+          <div className="tour-anchor-approval-chain">
+            <Card title="Approval chain" subtitle="Approvers are notified by their channel. Each row has Reassign / Pass on / Re-ping / Reject actions.">
+              <ApprovalChain
+                approvals={contract.approvals}
+                onSimulateApprove={handleApprove}
+                onReassign={(a) => setReassignFor(a)}
+                onReping={handleReping}
+                onReject={(a) => setRejectFor(a)}
+                onUndoApprove={handleUndoApprove}
+                canUndoApprove={canUndoApprove}
+                operatorName={OPERATOR_NAME}
+              />
+            </Card>
+          </div>
         )}
 
         <Card
           title="Send via DocuSign"
-          subtitle="Variables substituted from intake. Anchor tags placed automatically. eIDAS QES in EU."
+          subtitle="Variables substituted from intake. Anchor tags placed automatically."
           actions={
             <div className="flex flex-wrap gap-2">
               <Button
@@ -247,6 +253,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
                 size="sm"
                 leadingIcon={<Eye className="h-3.5 w-3.5" />}
                 onClick={() => setShowPreview(true)}
+                className="tour-anchor-preview-envelope"
               >
                 Preview envelope
               </Button>

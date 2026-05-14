@@ -46,9 +46,11 @@ The case study calls out two specific frictions: "manually edited in Word" and "
 **Conditional sections attached automatically:**
 - Service Level Exhibit (Exhibit A) — always
 - Data Processing Agreement (Exhibit B) — when DPA required
-- eIDAS QES identity verification — when ARR ≥ €100k and EU governing law
+- eIDAS QES identity verification, applied as **Light signing policy** when ARR ≥ €100k and EU governing law (not a legal requirement on every EU MSA; see policy note below)
 
-**DocuSign features used:** AutoPlace (8 anchor tags), sequential signing (counterparty first), 30-day expiry, day-3-7-14 reminders, Identify QES for high-value EU contracts.
+**DocuSign features used:** AutoPlace (8 anchor tags), sequential signing (counterparty first), 30-day expiry, day-3-7-14 reminders, Identify (AES) for standard EU contracts, QES on high-value EU contracts per Light policy.
+
+> **Policy note on QES.** Standard B2B SaaS MSAs do not require QES under eIDAS. Light's policy applies QES to high-value EU contracts because it materially strengthens evidential weight in an EU court if a dispute arises later. This is a company decision, not a legal mandate, and is owned by Head of F&O alongside the routing rules.
 
 ### Employment Contract (Denmark)
 
@@ -99,7 +101,7 @@ Candidate name, role, base salary, variable %, start date, manager, probation, n
 - Latest 409A Valuation (Exhibit B) — always
 - Acceleration Addendum — when applicable
 
-**DocuSign features used:** AutoPlace (8 anchor tags including witness), sequential signing, **eIDAS QES required**, **witness signer as third recipient**, 30-day expiry, day-7-14 reminders.
+**DocuSign features used:** AutoPlace (8 anchor tags including witness), sequential signing, **eIDAS QES applied per Light policy for all warrants** (warrants are high-value equity instruments; policy escalates to QES regardless of jurisdiction), **witness signer as third recipient**, 30-day expiry, day-7-14 reminders.
 
 ### Order Form (commercial companion to MSA)
 

@@ -11,17 +11,16 @@ export default function AboutPage() {
         subtitle="Submission memo for the AI Strategy & Operations Associate case study at Light"
       />
       <div className="mx-auto max-w-4xl space-y-5 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
-        <Section title="The problem (reframed)" icon={<Target className="h-4 w-4" />}>
+        <Section title="The problem" icon={<Target className="h-4 w-4" />}>
           <p>
-            The visible pain is manual Word editing and manual DocuSign field placement. The real problem is{" "}
-            <strong>controlled document execution</strong>: there is no single path from approved business terms to a
-            signed, audit-ready agreement whose data flows back into the Light ledger. At 50-100 docs / month, Light is
-            operating without a system of record for the most legally and financially material artifacts the company
-            produces.
+            The stated pain (manual Word edits and hand-placed DocuSign fields) is real, and the workflow below kills
+            both directly.
           </p>
           <p>
-            For an AI-native ERP whose wedge is a rebuilt general ledger, contracts should be born <em>from</em> ledger
-            data and return <em>as</em> ledger data. The PDF is just the audit artifact.
+            While we are rebuilding the flow there is a bigger prize uniquely available to Light: every signed contract
+            is structured data (revenue, headcount, equity, vendor obligations) that belongs in the systems of record.
+            The PDF is the audit artifact; the data is the product. Other CLMs ship integrations into N ERPs. Light{" "}
+            <em>is</em> the ERP.
           </p>
         </Section>
 
@@ -37,7 +36,7 @@ export default function AboutPage() {
             <tbody className="divide-y divide-ink-100 text-[13px]">
               <BvBRow layer="E-signature + identity + audit trail" decision="Buy / keep DocuSign" why="eIDAS QES in EU, ESIGN in US, court-tested. Not our edge." />
               <BvBRow layer="Template authoring" decision="Keep Word + Drive" why="Legal counsel will not adopt a new editor. We read templates from Drive, we do not host editing." />
-              <BvBRow layer="Full CLM (Ironclad, Juro, SpotDraft)" decision="Defer" why="Too heavy for 50-100 / mo. Revisit at 500+ / mo or when post-signature obligation tracking becomes critical." />
+              <BvBRow layer="Full CLM (Ironclad, Juro, SpotDraft)" decision="Defer, not dismiss" why="Juro and SpotDraft now target Series A SaaS in Europe with SMB pricing and ~30-day implementations. A pilot would cover ~70% of this workflow. The 30% they don't cover is the strategic wedge: writeback into Light's ledger, routing rules owned by Head of F&O, integration with the source records Light's customers already trust. Revisit at 500+ / mo." />
               <BvBRow layer="Workflow layer (intake, validation, approval, generation, send orchestration, ledger writeback)" decision="Build" why="This is the gap, and the gap Light's ERP wedge is uniquely positioned to fill." />
             </tbody>
           </table>
@@ -45,29 +44,29 @@ export default function AboutPage() {
 
         <Section title="The one key decision walked through" icon={<Shield className="h-4 w-4" />}>
           <p>
-            <strong>Wrap DocuSign as infrastructure. Contracts become structured ledger objects, not files.</strong>
+            <strong>Wrap DocuSign as infrastructure. Make contracts first-class structured data, not files.</strong>
           </p>
           <p>Three reasons:</p>
           <ol className="ml-5 list-decimal space-y-1.5 text-[13px]">
             <li>
-              <strong>Legal.</strong> Rebuilding the signing layer means inheriting eIDAS, ESIGN, UETA, and a decade of
-              case-law compliance. Wrong battle for a Series A finance company.
+              <strong>Legal.</strong> Rebuilding the signing layer means inheriting eIDAS, ESIGN, UETA, authority-to-bind
+              verification, witnessing rules, and a decade of case-law compliance. Wrong battle for a Series A finance
+              company.
             </li>
             <li>
               <strong>Adoption.</strong> Legal counsel authors contracts in Word. Forcing them into a new editor kills the
               rollout. We read what they write, we do not replace where they write.
             </li>
             <li>
-              <strong>Strategic fit for Light.</strong> Light's wedge is a rebuilt general ledger. Contracts are not
-              files, they are streams of structured data (revenue, headcount, equity, vendor obligations) that belong in
-              the ledger. The PDF is just the audit artifact. This is the only contract approach that matches Light's
-              product thesis. It also means "Light Documents" could ship as a customer-facing module after we use it
-              internally first.
+              <strong>Strategic fit for Light.</strong> Contracts are streams of structured data (revenue, headcount,
+              equity, vendor obligations) that belong in the systems of record Light already operates. The PDF is the
+              audit artifact. This is the contract approach that matches Light's product thesis, and it lets "Light
+              Documents" ship as a customer-facing module after internal use proves it.
             </li>
           </ol>
           <p className="text-[13px] text-ink-500">
             Smallest technical embodiment: DocuSign anchor tags embedded in templates as white-on-white text, paired
-            with typed variables. Collapses the "manually drag signature fields" step from 5 minutes per doc to zero,
+            with typed variables. Collapses "manually drag signature fields" from ~5 minutes per doc to zero,
             deterministically, without writing any signing code ourselves.
           </p>
         </Section>
@@ -115,14 +114,14 @@ export default function AboutPage() {
             <div>
               <div className="demo-note mb-2">In scope</div>
               <ul className="space-y-1 text-[13px]">
-                <li>• 5 document templates with clause rules + DocuSign config + conditional sections</li>
+                <li>• 8 document templates with clause rules + DocuSign config + conditional sections</li>
                 <li>• Structured intake form (adapts to template type)</li>
-                <li>• Clause check engine (deterministic stand-in for AI)</li>
+                <li>• Clause check engine (deterministic stand-in; production swaps in Claude with the same output shape)</li>
                 <li>• Rule-based approval routing with channels (Slack / email)</li>
                 <li>• DocuSign envelope preview with anchor-tag placement</li>
-                <li>• Signed record with audit trail + ledger writeback</li>
+                <li>• Signed record with audit trail + writeback to systems of record</li>
                 <li>• Dashboard with KPIs and filter chips</li>
-                <li>• 3 Light entities: Denmark, UK, US Delaware</li>
+                <li>• 3 Light entities (assumed): Denmark, UK, US Delaware</li>
               </ul>
             </div>
             <div>
@@ -151,13 +150,13 @@ export default function AboutPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-ink-100 text-[13px]">
-              <NextRow n="1" what="Slack (interactive approvals)" why="Everyone is in Slack. Approve via DM means zero new tool to learn." />
-              <NextRow n="2" what="Salesforce + HubSpot deal read" why="30 to 50 contracts / mo originate from Sales." />
-              <NextRow n="3" what="DocuSign API (real envelopes + Connect webhooks)" why="Replaces simulated send. Well-documented API. Low risk." />
-              <NextRow n="4" what="HRIS read (Personio, Ashby, Workday)" why="10 to 20 contracts / mo from People Ops." />
-              <NextRow n="5" what="Drive / SharePoint template sync" why="Replaces ad-hoc folder. Required for version control + compliance." />
-              <NextRow n="6" what="Email magic links" why="Handles board, external counsel, non-Slack users." />
-              <NextRow n="7" what="Light ledger writeback" why="The strategic moat. Light's wedge made operational." />
+              <NextRow n="1" what="Slack (interactive approvals)" why="Everyone is in Slack. Zero new tool to learn. The adoption gate." />
+              <NextRow n="2" what="Light writeback (ledger / HRIS / cap table)" why="The strategic moat. Light's wedge made operational. Built in parallel with Slack so the first signed contract lands in a system of record, not just in Drive." />
+              <NextRow n="3" what="Salesforce + HubSpot deal read" why="30 to 50 contracts / mo originate from Sales." />
+              <NextRow n="4" what="DocuSign API (real envelopes + Connect webhooks)" why="Replaces simulated send. Well-documented API. Low risk." />
+              <NextRow n="5" what="HRIS read (Personio, Ashby, Workday)" why="10 to 20 contracts / mo from People Ops." />
+              <NextRow n="6" what="Drive / SharePoint template sync" why="Replaces ad-hoc folder. Required for version control + compliance." />
+              <NextRow n="7" what="Email magic links" why="Handles board, external counsel, non-Slack users." />
               <NextRow n="8" what="Calendar alerts for renewals" why="Closes the loop on obligations." />
             </tbody>
           </table>
@@ -175,19 +174,9 @@ export default function AboutPage() {
 
         <Section title="A note on the names in this demo" icon={<Users className="h-4 w-4" />}>
           <p>
-            Every person mentioned in this prototype is an illustrative stand-in, not a real Light employee. The names
-            are seeded into the mock data so the workflow, audit trail, and Slack-style approvals feel concrete instead
-            of abstract.
-          </p>
-          <ul className="ml-5 list-disc space-y-1 text-[13px] text-ink-600">
-            <li><strong>Sara Friis</strong>: in-house counsel (e.g. role). Used throughout for "the Legal team".</li>
-            <li><strong>Martina Holst</strong>: Head of Finance &amp; Ops (the persona this case study is written for, simulated as the logged-in user).</li>
-            <li><strong>Tom Bauer</strong> and <strong>Sara Lindberg</strong>: Sales AEs who originate contracts.</li>
-            <li><strong>Anna Lind</strong>: UK counsel example. <strong>Plesner</strong>: outside-counsel firm example. <strong>Pia Andersen</strong>: People Ops example.</li>
-            <li><strong>Astrid Sjöberg, Christian Bek, Emma Holloway</strong>: example board members on the Warrant flow.</li>
-          </ul>
-          <p className="text-[13px] text-ink-500">
-            Replace the directory + seed data and the same flow runs against Light's real org chart.
+            All personas (Martina Holst as Head of F&amp;O, Sara Friis as in-house counsel, Tom Bauer as the AE, board
+            members, outside counsel) are illustrative stand-ins. Replace the directory + seed data and the same flow
+            runs against Light's real org chart.
           </p>
         </Section>
 

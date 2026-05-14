@@ -20,9 +20,11 @@ interface Props {
   variableCount: number;
   anchorTagCount: number;
   onClick: () => void;
+  /** Hide the category pill when the card is already grouped under a section header for that category. */
+  hideCategoryPill?: boolean;
 }
 
-export function TemplateCard({ template, sourceFileName, syncedAgo, anchorTagCount, onClick }: Props) {
+export function TemplateCard({ template, sourceFileName, syncedAgo, anchorTagCount, onClick, hideCategoryPill }: Props) {
   const history = template.versionHistory ?? [];
   const currentAuthor = history.find((v) => v.status === "current")?.author;
   const bullets = bulletsForTemplate(template);
@@ -46,9 +48,11 @@ export function TemplateCard({ template, sourceFileName, syncedAgo, anchorTagCou
               <div className="text-[11px] font-mono text-ink-500">{template.version}</div>
             </div>
           </div>
-          <span className={clsx("inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider ring-1 ring-inset", CATEGORY_PILL[category])}>
-            {category}
-          </span>
+          {!hideCategoryPill && (
+            <span className={clsx("inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider ring-1 ring-inset", CATEGORY_PILL[category])}>
+              {category}
+            </span>
+          )}
         </div>
 
         {recency && (

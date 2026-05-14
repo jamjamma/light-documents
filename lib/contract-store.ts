@@ -10,7 +10,7 @@ import { findMember } from "./approver-directory";
 const STORAGE_KEY = "light-documents-state";
 // Bump on every shape change to Contract / Approval / seed data so old localStorage
 // state is discarded and the demo re-seeds with the current data model.
-const STATE_VERSION = 8;
+const STATE_VERSION = 9;
 
 export interface RogueAction {
   archived?: { at: string; by: string };
@@ -96,7 +96,14 @@ function writeState(state: StoredState): void {
 function seedState(): StoredState {
   const contracts: Record<string, Contract> = {};
   for (const c of SEED_CONTRACTS) {
-    contracts[c.id] = c;
+    // Backfill the ledger for already-filed seed contracts so they render
+    // the same realistic GL journal entry (or HRIS / cap-table block) as
+    // contracts signed live during the demo. The seed contracts predate the
+    // journalEntry/hrisRecord/capTableDelta extension and would otherwise
+    // show only the flat summary rows.
+    const needsLedger = (c.stage === "filed" || c.stage === "signed") && c.type !== "NDA";
+    const ledger = needsLedger ? buildLedgerImpact(c) ?? c.ledger : c.ledger;
+    contracts[c.id] = ledger ? { ...c, ledger } : c;
   }
   return { version: STATE_VERSION, contracts, seededAt: now() };
 }
@@ -784,7 +791,7 @@ export function simulateSigned(id: string): Contract {
   return saveContract(working);
 }
 
-function buildLedgerImpact(contract: Contract): LedgerImpact | null {
+export function buildLedgerImpact(contract: Contract): LedgerImpact | null {
   const t = contract.type;
   const f = contract.fields;
   // NDAs are retention-only: no MRR, headcount, equity, or cap-table impact.
@@ -795,15 +802,54 @@ function buildLedgerImpact(contract: Contract): LedgerImpact | null {
   if (t === "MSA") {
     const arr = f.contractValueEur ?? 0;
     const mrr = Math.round(arr / 12);
+    const renewalDate = computeRenewalDate(f.effectiveDate, f.termMonths ?? 12);
     return {
       headline: `+€${mrr.toLocaleString()} MRR booked to ${contract.counterparty}`,
       rows: [
-        { label: "MRR change", value: `+€${mrr.toLocaleString()}`, note: "Light ledger entry created" },
+        { label: "MRR change", value: `+€${mrr.toLocaleString()}`, note: "Posted to Light ledger" },
         { label: "ARR", value: `€${arr.toLocaleString()}` },
         { label: "Contract start", value: f.effectiveDate ?? "TBD", note: "Invoice schedule generated" },
-        { label: "Renewal", value: "Calendar alert created", note: "60 days before term end" },
-        { label: "Linked", value: contract.sourceRecordId, note: "Two-way sync established with source system" },
+        { label: "Renewal", value: renewalDate, note: "Calendar alert set 60 days before" },
+        { label: "Linked source", value: contract.sourceRecordId, note: "Two-way sync to source system" },
       ],
+      journalEntry: {
+        entryNumber: ledgerEntryNumber(contract),
+        postedAt: contract.signedAt ?? now(),
+        debit: { account: "1200 · Trade Receivables", amount: `€${arr.toLocaleString()}` },
+        credit: { account: "2400 · Deferred Revenue", amount: `€${arr.toLocaleString()}` },
+        dimensions: [
+          { label: "Customer", value: contract.counterparty },
+          { label: "Source record", value: contract.sourceRecordId },
+          { label: "Entity", value: f.lightEntity ?? "Light ApS (Denmark)" },
+          { label: "Renewal", value: renewalDate },
+        ],
+      },
+    };
+  }
+  if (t === "Order Form") {
+    const total = f.orderTotalEur ?? 0;
+    const mrr = Math.round(total / (f.termMonths ?? 12));
+    return {
+      headline: `+€${mrr.toLocaleString()} MRR booked (expansion via Order Form)`,
+      rows: [
+        { label: "Order total", value: `€${total.toLocaleString()}`, note: "Posted to Light ledger" },
+        { label: "MRR delta", value: `+€${mrr.toLocaleString()}`, note: `Spread over ${f.termMonths ?? 12} months` },
+        { label: "Reference MSA", value: f.referenceMsaId ?? "—", note: "Linked to existing MSA record" },
+        { label: "Billing", value: f.billingFrequency ?? "annual" },
+        { label: "Seats", value: f.seatCount ? String(f.seatCount) : "—", note: f.seatCount ? "Provisioned in product" : undefined },
+      ],
+      journalEntry: {
+        entryNumber: ledgerEntryNumber(contract),
+        postedAt: contract.signedAt ?? now(),
+        debit: { account: "1200 · Trade Receivables", amount: `€${total.toLocaleString()}` },
+        credit: { account: "2400 · Deferred Revenue", amount: `€${total.toLocaleString()}` },
+        dimensions: [
+          { label: "Customer", value: contract.counterparty },
+          { label: "Parent MSA", value: f.referenceMsaId ?? "—" },
+          { label: "Source record", value: contract.sourceRecordId },
+          { label: "Entity", value: f.lightEntity ?? "Light ApS (Denmark)" },
+        ],
+      },
     };
   }
   if (t === "Employment") {
@@ -816,6 +862,17 @@ function buildLedgerImpact(contract: Contract): LedgerImpact | null {
         { label: "Start date", value: f.startDate ?? "TBD", note: "Payroll updated" },
         { label: "Equity", value: f.equityBps ? `${(f.equityBps / 100).toFixed(2)}%` : "None", note: f.equityBps ? "Cap table updated" : "No equity component" },
       ],
+      hrisRecord: {
+        employeeId: hrisEmployeeId(contract),
+        payrollUpdate: `Effective ${f.startDate ?? "TBD"}, +1 active employee, +€${(f.salaryEur ?? 0).toLocaleString()} annual payroll cost`,
+        fields: [
+          { label: "Employee ID", value: hrisEmployeeId(contract) },
+          { label: "Role", value: f.role ?? "—" },
+          { label: "Manager", value: f.manager ?? "—" },
+          { label: "Entity", value: f.lightEntity ?? "Light ApS (Denmark)" },
+          { label: "Probation", value: f.probationMonths ? `${f.probationMonths} months` : "—" },
+        ],
+      },
     };
   }
   if (t === "Warrant") {
@@ -828,26 +885,52 @@ function buildLedgerImpact(contract: Contract): LedgerImpact | null {
         { label: "Board resolution", value: f.boardResolutionRef ?? "Pending" },
         { label: "Cap table", value: "Updated", note: "Stakeholder record linked" },
       ],
-    };
-  }
-  if (t === "Order Form") {
-    const total = f.orderTotalEur ?? 0;
-    const mrr = Math.round(total / (f.termMonths ?? 12));
-    return {
-      headline: `+€${mrr.toLocaleString()} MRR booked (expansion via Order Form)`,
-      rows: [
-        { label: "Order total", value: `€${total.toLocaleString()}`, note: "Light ledger entry created" },
-        { label: "MRR delta", value: `+€${mrr.toLocaleString()}`, note: `Spread over ${f.termMonths ?? 12} months` },
-        { label: "Reference MSA", value: f.referenceMsaId ?? "—", note: "Linked to existing MSA record" },
-        { label: "Billing", value: f.billingFrequency ?? "annual" },
-        { label: "Seats", value: f.seatCount ? String(f.seatCount) : "—", note: f.seatCount ? "Provisioned in product" : undefined },
-      ],
+      capTableDelta: {
+        stakeholder: contract.counterparty,
+        grantId: capTableGrantId(contract),
+        fields: [
+          { label: "Grant ID", value: capTableGrantId(contract) },
+          { label: "Stakeholder", value: contract.counterparty },
+          { label: "Percentage", value: `${f.warrantPct ?? 0}% (fully diluted)` },
+          { label: "Vesting", value: `${f.vestingMonths ?? 48}m / ${f.cliffMonths ?? 12}m cliff` },
+          { label: "Board resolution", value: f.boardResolutionRef ?? "Pending" },
+          { label: "Entity", value: f.lightEntity ?? "Light ApS (Denmark)" },
+        ],
+      },
     };
   }
   return {
     headline: `${contract.name} filed`,
     rows: [{ label: "Type", value: t }, { label: "Counterparty", value: contract.counterparty }],
   };
+}
+
+// Stable but realistic-looking identifiers derived from the contract id so the
+// same contract always renders the same entry number across reloads of the
+// signed page.
+function ledgerEntryNumber(c: Contract): string {
+  const n = hashTo4Digits(c.id);
+  return `JE-${n}`;
+}
+function hrisEmployeeId(c: Contract): string {
+  const n = hashTo4Digits(c.id);
+  return `EMP-${n}`;
+}
+function capTableGrantId(c: Contract): string {
+  const n = hashTo4Digits(c.id);
+  return `GR-${n}`;
+}
+function hashTo4Digits(s: string): string {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return String(4000 + (h % 5000)).padStart(4, "0");
+}
+function computeRenewalDate(startISO: string | undefined, termMonths: number): string {
+  if (!startISO) return "TBD";
+  const d = new Date(startISO);
+  if (Number.isNaN(d.getTime())) return "TBD";
+  d.setMonth(d.getMonth() + termMonths);
+  return d.toISOString().slice(0, 10);
 }
 
 // ── Helpers for filters ──────────────────────────────────────────────────────
@@ -872,14 +955,21 @@ export function isSignedThisWeek(c: Contract): boolean {
   return days <= 7;
 }
 
-export function computeKpis(contracts: Contract[]): {
-  inFlight: number;
+export function computeKpis(
+  contracts: Contract[],
+  forRole: string = "Head of Finance & Ops",
+): {
+  awaitingMe: number;
   blocked: number;
+  inReview: number;
+  inFlight: number;
   signedThisWeek: number;
   avgCycleDays: number;
 } {
-  const inFlight = contracts.filter((c) => c.stage !== "filed" && c.stage !== "signed").length;
+  const awaitingMe = contracts.filter((c) => isAwaitingMe(c, forRole)).length;
   const blocked = contracts.filter(isBlocked).length;
+  const inReview = contracts.filter((c) => c.stage === "in_review" || c.stage === "checks_running").length;
+  const inFlight = contracts.filter((c) => c.stage !== "filed" && c.stage !== "signed").length;
   const signedThisWeek = contracts.filter(isSignedThisWeek).length;
   const filed = contracts.filter((c) => c.signedAt && c.stage === "filed");
   const avgCycleDays =
@@ -892,5 +982,15 @@ export function computeKpis(contracts: Contract[]): {
             return sum + (end - start) / (1000 * 60 * 60 * 24);
           }, 0) / filed.length,
         );
-  return { inFlight, blocked, signedThisWeek, avgCycleDays };
+  return { awaitingMe, blocked, inReview, inFlight, signedThisWeek, avgCycleDays };
+}
+
+/**
+ * Days since the contract last advanced. Used to surface a "stalling" badge
+ * on individual rows. Not a KPI threshold any more (see ADR rationale: the
+ * KPI label must match the filter tab semantics, so they both mean
+ * "currently blocked," with row-level stale signal for urgency).
+ */
+export function stageAgeDays(c: Contract): number {
+  return (Date.now() - new Date(c.updatedAt).getTime()) / (1000 * 60 * 60 * 24);
 }

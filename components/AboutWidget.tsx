@@ -1,6 +1,13 @@
 import Link from "next/link";
-import { ArrowRight, BellRing, Undo2, Workflow } from "lucide-react";
+import { ArrowRight, Workflow } from "lucide-react";
 
+/**
+ * Dashboard preamble that orients first-time reviewers to what this build is.
+ *
+ * Intentionally simple: one paragraph stating the strategic answer, one link
+ * to the full memo. No CTAs (those live in the dashboard callout and the
+ * sidebar). No "TRY:" hints (the guided tour handles teaching the surface).
+ */
 export function AboutWidget() {
   return (
     <section className="panel overflow-hidden">
@@ -12,21 +19,10 @@ export function AboutWidget() {
             About this build
           </div>
           <p className="mt-2 max-w-3xl text-[13px] leading-relaxed text-ink-700">
-            The real problem isn't document upload. It's <span className="font-semibold text-ink-900">controlled document execution</span>: making sure the right document, with the right terms, is approved by the right people, signed by the right counterparty, and stored with an audit trail that flows back into the Light ledger. This wraps DocuSign for the legally binding signature, and adds the workflow layer Light actually needs.
+            The stated pain (manual Word edits and hand-placed DocuSign fields) is real, and this build kills both
+            directly. While we&apos;re in there, every signed contract becomes structured data that flows back into
+            the system of record. The PDF is the audit artifact; the data is the product.
           </p>
-
-          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-ink-500">
-            <span className="font-medium uppercase tracking-wider text-ink-700">Try:</span>
-            <span className="inline-flex items-center gap-1">
-              <Undo2 className="h-3 w-3 text-ink-400" />
-              Approve a row, then "Undo my approval"
-            </span>
-            <span>·</span>
-            <Link href="/templates" className="inline-flex items-center gap-1 hover:text-ink-900">
-              <BellRing className="h-3 w-3 text-ink-400" />
-              Rogue templates: Archive + Notify owner
-            </Link>
-          </div>
 
           <Link
             href="/about"

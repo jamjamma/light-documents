@@ -7,9 +7,9 @@
 
 ## 1. The reframe (one sentence)
 
-**The pain isn't "manually edit Word and DocuSign". The pain is *controlled document execution*: there's no single path from approved business terms to a signed agreement whose data flows back into Light's ledger.** Fix that one thing and the editing pain disappears as a side effect.
+**The stated pain (Word edits and hand-placed DocuSign fields) is real, and the workflow below kills both directly. The bigger prize uniquely available to Light: every signed contract is structured data that belongs in the systems of record.** Other CLMs ship integrations into N ERPs. Light *is* the ERP.
 
-The PDF is the audit artifact, not the product. Contracts are streams of structured data (MRR, headcount, equity, vendor obligations) that belong in the ledger.
+The PDF is the audit artifact; the data is the product. Routing per document type: MSAs / Order Forms → revenue and billing, Employment → headcount and compensation, Warrants → cap table, Vendor → AP, NDAs → retention metadata only (see ADR 14).
 
 ---
 
@@ -49,7 +49,7 @@ The PDF is the audit artifact, not the product. Contracts are streams of structu
         └────────┘ └────────┘ └────────┘ └──────────┘
 ```
 
-The four exits (Slack / DocuSign / Email / Ledger) are the four real-world surfaces that matter. Three are simulated in the prototype; the ledger writeback is the strategic moat.
+The four exits (Slack / DocuSign / Email / writeback) are the four real-world surfaces that matter. All four are simulated in the prototype; the structured writeback into systems of record is the strategic extension.
 
 ---
 
@@ -125,7 +125,7 @@ Defined in `lib/contract-store.ts:VALID_TRANSITIONS`. Every command:
 - returns a new immutable `Contract`,
 - appends an `AuditEvent` atomically.
 
-`localStorage` key `light-documents-state` holds `{version, contracts, manualSourceRecords?, rogueActions?, seededAt}`. Bumping `STATE_VERSION` invalidates old state and re-seeds. Current version: **7** (added `rogueActions` for archive/notify decisions on detected rogue templates).
+`localStorage` key `light-documents-state` holds `{version, contracts, manualSourceRecords?, rogueActions?, seededAt}`. Bumping `STATE_VERSION` invalidates old state and re-seeds. Current version: **9** (bumped to invalidate stale flat-shape `ledger` data and force re-seed with the new structured `journalEntry` / `hrisRecord` / `capTableDelta` blocks).
 
 ---
 
@@ -145,7 +145,7 @@ Two-stage:
 
 1. **Rule layer** (`routing-rules.ts`): 13 typed `RoutingRule` objects with `appliesTo`, `trigger`, `approver` (a role), `channel`, `autoApproveIfStandard`, `reason`. `computeRouting()` deduplicates by role, picks the most-restrictive channel on collision, and emits the chain. Committee roles (`all_required` strategy) emit one `Approval` per member so `allApproved()` actually requires every vote.
 
-2. **Directory layer** (`approver-directory.ts`): for each role, an `ApproverGroup` holds 1..N members with specialty tags (`type:Warrant`, `jurisdiction:UK`, `entity:Light Ltd …`) and a `strategy` (`specialty_match` / `named_default` / `all_required` / `any_round_robin`). `selectApprover()` scores members by weighted specialty match (type=10, entity=2, jurisdiction=1) so a UK MSA picks Anna Lind over Sara Friis, and a Warrant picks Plesner over either in-house counsel. Active PTO `Delegation` entries automatically reroute to the named backup with `delegateOfName` set for the UI.
+2. **Directory layer** (`approver-directory.ts`): for each role, an `ApproverGroup` holds 1..N members with specialty tags (`type:Warrant`, `jurisdiction:UK`, `entity:Light Ltd …`) and a `strategy` (`specialty_match` / `named_default` / `all_required` / `any_round_robin`). `selectApprover()` scores members by weighted specialty match (type=10, entity=2, jurisdiction=1) so a UK MSA picks the UK in-house counsel over the Danish one, and a Warrant picks outside counsel over either in-house counsel. Active PTO `Delegation` entries automatically reroute to the named backup with `delegateOfName` set for the UI.
 
 ### 5c. Signer routing — `lib/signer-routing.ts`
 `ENTITY_SIGNERS[Jurisdiction]` maps each Light entity (DK / UK / US) to its statutory CEO + title. `LIGHT_SIGNER_POLICY[DocumentType]` declares which Light-side roles must sign per doc type (MSA → CEO, Warrant → CFO + CEO + Witness, Vendor → Head of F&O). `resolveSigners(contract, template)` returns the ordered envelope with rationale per signer. `primaryLightSignerActor()` is the audit-trail string used by `simulateSigned()` so a UK contract reads "Jonathan Sanders (CEO, Light Ltd)" instead of just "(CEO)".
@@ -166,7 +166,7 @@ Two-stage:
 | `signer-routing.ts` | Light-side signer policy per template + entity. Counterparty, light signer, witness. | `resolveSigners`, `resolveLightSigners`, `resolveCounterpartySigner`, `resolveWitnessSigner`, `primaryLightSignerActor`, `lightSignerRationale` |
 | `routing-rules.ts` | 13 routing rules + `computeRouting()`. Channel collision resolution. Committee emission for `all_required` groups. | `ROUTING_RULES`, `computeRouting`, `allApproved` |
 | `contract-store.ts` | The operating core. State machine, immutable updates, localStorage persistence, journey commands, workflow actions. | `getContract`, `listContracts`, `createContract`, `runClauseChecks`, `approve`, `reassignApproval`, `rejectApproval`, `repingApproval`, `saveDraftAndExit`, `send`, `simulateSigned`, `resetDemo`, `computeKpis` |
-| `mock-data.ts` | 8 templates with full clause rules + DocuSign config + version history + conditional sections. 8+ source records across Salesforce / HubSpot / Attio / Personio / Ashby / Manual. 8 seed contracts pre-hydrated through `runChecks` + `computeRouting`. | `TEMPLATES`, `SOURCE_RECORDS`, `SEED_CONTRACTS`, `ROGUE_TEMPLATES`, `getTemplate`, `getSourceRecord`, `LIGHT_ENTITIES` |
+| `mock-data.ts` | 8 templates with full clause rules + DocuSign config + version history + conditional sections. 14 source records across Salesforce / HubSpot / Attio / Personio / Ashby / Manual. 14 seed contracts (10 in-flight + 4 signed) pre-hydrated through `runChecks` + `computeRouting`. 4 rogue templates. | `TEMPLATES`, `SOURCE_RECORDS`, `SEED_CONTRACTS`, `ROGUE_TEMPLATES`, `getTemplate`, `getSourceRecord`, `LIGHT_ENTITIES` |
 | `format.ts` | EUR + date + initials helpers. | `formatEur`, `formatEurCompact`, `formatDate`, `formatDateTime`, `relativeDays`, `initials` |
 
 ---
@@ -180,7 +180,7 @@ Two-stage:
 `Sidebar` (slide-in drawer on mobile, collapse-to-icons on desktop, state persists in localStorage), `MobileTopBar` (sticky top bar that hosts the hamburger on mobile so it has a clear anchor instead of floating over scrolled content), `MobileNavContext` (shared drawer-open state between Sidebar and MobileTopBar), `Header` (stacks title + actions on mobile, normal padding on desktop), `Breadcrumb`, `DemoBanner`.
 
 ### Domain widgets
-- **`ContractsTable`** — sortable, filter tabs (All / Awaiting me / Blocked / Signed this month). Tabs scroll horizontally on mobile so they don't wrap.
+- **`ContractsTable`** — sortable, stage filter tabs (All in-flight / Awaiting me / Blocked / In review) plus a type-chip row (All types / MSA / Order Form / NDA / Employment / Warrant). The two filters compose. Tabs and chips scroll horizontally on mobile.
 - **`KpiStrip`** — responsive KPI row. 2x2 grid on mobile, single row on `sm+`. Used on Dashboard + Archive.
 - **`ClauseDiff`** — clause-by-clause diff with severity coloring (info / warn / block). Stacked cards on mobile, table on desktop.
 - **`RoutingPanel`** — *why* this chain exists (rule reasons).
@@ -211,7 +211,7 @@ Two-stage:
 | `/contracts/[id]` | Contract detail | Stale-template banner, ClauseDiff, RoutingPanel, ApprovalChain with action menus, DocuSign send card with Save Draft / Preview / Send |
 | `/contracts/[id]/signed` | Signed record | PDF callout, audit trail, ledger impact panel, linked records |
 | `/archive` | All filed contracts | Lifetime KPIs, signed-record table |
-| `/about` | In-app submission memo | Same problem reframe + build-vs-buy as the README, plus a "Legal keeps Word, not us" callout and a "A note on the names in this demo" cast list that labels every persona (Sara Friis, Martina Holst, Tom Bauer, Sara Lindberg, Anna Lind, Plesner, Pia Andersen, Astrid/Christian/Emma) as illustrative. |
+| `/about` | In-app submission memo | Same problem reframe + build-vs-buy as the README, plus a "Legal keeps Word, not us" callout and a one-sentence cast-list note that all personas are illustrative stand-ins. |
 
 ---
 
@@ -461,7 +461,7 @@ light-documents/
 └── package.json, tsconfig.json, tailwind.config.ts, next.config.ts, postcss.config.mjs
 ```
 
-Total: ~10k lines of TypeScript across `lib/` + `components/` + `app/`. Heaviest file is `mock-data.ts` (~1500 lines of templates + seed data).
+Heaviest file is `mock-data.ts` (templates + seed data + version history). Everything else is small and focused per the file-per-concern split documented above.
 
 ---
 
@@ -527,18 +527,20 @@ Total: ~10k lines of TypeScript across `lib/` + `components/` + `app/`. Heaviest
 
 ## 16. What I'd build next, in priority order
 
-| # | Integration | Why first |
+| # | Integration | Why |
 |---|---|---|
-| 1 | Slack (interactive Approve / Reject in DM) | Everyone is in Slack. Zero new tool to learn. Closes the loop on the workflow actions. |
-| 2 | Salesforce + HubSpot read | 30-50 contracts / month originate from Sales. |
-| 3 | DocuSign API (real envelopes + Connect webhooks) | Replaces simulated send. Well-documented. Low risk. |
-| 4 | HRIS read (Personio, Ashby, Workday) | 10-20 contracts / month from People Ops. |
-| 5 | Drive / SharePoint template sync | Replaces ad-hoc folder. Required for version control + compliance. |
-| 6 | Email magic links | Handles board, external counsel, non-Slack users. |
-| 7 | **Light ledger writeback (internal API)** | The strategic moat. Light's wedge made operational. |
+| 1 | Slack (interactive Approve / Reject in DM) | Everyone is in Slack. Zero new tool to learn. The adoption gate. |
+| 2 | **Light writeback (ledger / HRIS / cap table)** | The strategic extension. Built in parallel with Slack so the first signed contract has somewhere structured to land, not just Drive. Production depends on Light exposing the receiving endpoints; the prototype emits the shape. |
+| 3 | Salesforce + HubSpot read | 30-50 contracts / month originate from Sales. |
+| 4 | DocuSign API (real envelopes + Connect webhooks) | Replaces simulated send. Well-documented. Low risk. |
+| 5 | HRIS read (Personio, Ashby, Workday) | 10-20 contracts / month from People Ops. |
+| 6 | Drive / SharePoint template sync | Replaces ad-hoc folder. Required for version control + compliance. |
+| 7 | Email magic links | Handles board, external counsel, non-Slack users. |
 | 8 | Calendar alerts for renewals | Closes the loop on obligations. |
 | 9 | Settings → Approvers UI | Closes the "Head of F&O owns this file" promise. |
 | 10 | Postgres + S3 backend | Replaces localStorage. Multi-user real. |
+
+Slack-first is for adoption; writeback at #2 is the strategic extension. In an actual rollout I would build the two in parallel.
 
 ---
 

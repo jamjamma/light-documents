@@ -316,9 +316,36 @@ export interface AuditEvent {
   meta?: string;
 }
 
+/**
+ * Structured writeback emitted on `envelope-completed`. Each system-of-record
+ * target (Light ledger / HRIS / cap table) renders a slightly different shape.
+ * The summary `headline` + `rows` are always present so the UI can fall back to
+ * a flat summary; richer surfaces (the journal entry, HRIS payload, cap-table
+ * row) are optional and gate on the document type.
+ */
 export interface LedgerImpact {
   headline: string;
   rows: { label: string; value: string; note?: string }[];
+  /** GL journal entry for revenue-bearing contracts (MSA, Order Form). */
+  journalEntry?: {
+    entryNumber: string;
+    postedAt: string;
+    debit: { account: string; amount: string };
+    credit: { account: string; amount: string };
+    dimensions: { label: string; value: string }[];
+  };
+  /** HRIS writeback summary for Employment contracts. */
+  hrisRecord?: {
+    employeeId: string;
+    payrollUpdate: string;
+    fields: { label: string; value: string }[];
+  };
+  /** Cap-table delta for Warrant contracts. */
+  capTableDelta?: {
+    stakeholder: string;
+    grantId: string;
+    fields: { label: string; value: string }[];
+  };
 }
 
 export interface Contract {
@@ -352,8 +379,10 @@ export interface Contract {
 }
 
 export interface DashboardKpis {
-  inFlight: number;
+  awaitingMe: number;
   blocked: number;
+  inReview: number;
+  inFlight: number;
   signedThisWeek: number;
   avgCycleDays: number;
 }

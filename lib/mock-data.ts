@@ -80,7 +80,7 @@ export const TEMPLATES: Template[] = [
     versionHistory: [
       { version: "v3.1", releasedAt: "2026-02-14", status: "current", author: "Sara Friis (counsel)", changeNote: "Current. Added UK jurisdiction addendum, residuals carve-out tightened." },
       { version: "v3.0", releasedAt: "2025-09-08", status: "deprecated", deprecatedAt: "2026-02-14", author: "Sara Friis (counsel)", changeNote: "Major rewrite for GDPR alignment. Replaced one-sided NDA boilerplate with mutual default." },
-      { version: "v2.4", releasedAt: "2025-03-22", status: "archived", deprecatedAt: "2025-09-08", author: "Outside counsel (Plesner)", changeNote: "Earlier mutual NDA from the company's first year." },
+      { version: "v2.4", releasedAt: "2025-03-22", status: "archived", deprecatedAt: "2025-09-08", author: "Outside counsel", changeNote: "Earlier mutual NDA from the company's first year." },
     ],
   },
   {
@@ -185,7 +185,7 @@ export const TEMPLATES: Template[] = [
       { version: "v4.2", releasedAt: "2026-02-14", status: "current", author: "Sara Friis (counsel)", changeNote: "Current. Liability cap raised to €500k. UK addendum added post-Brexit. SLA exhibit clarified." },
       { version: "v4.1", releasedAt: "2025-11-14", status: "deprecated", deprecatedAt: "2026-02-14", author: "Sara Friis (counsel)", changeNote: "Indemnity clause tightened after Anderson Inc dispute. Customer-only indemnity now requires explicit Legal approval." },
       { version: "v4.0", releasedAt: "2025-08-22", status: "deprecated", deprecatedAt: "2025-11-14", author: "Sara Friis (counsel)", changeNote: "Major rewrite when Sara joined. Cleaner liability section, dedicated SLA exhibit, EU SCCs incorporated for GDPR." },
-      { version: "v3.5", releasedAt: "2025-01-08", status: "archived", deprecatedAt: "2025-08-22", author: "Outside counsel (Plesner)", changeNote: "Pre-rewrite MSA used during company's first year. Two signed contracts still active on this version." },
+      { version: "v3.5", releasedAt: "2025-01-08", status: "archived", deprecatedAt: "2025-08-22", author: "Outside counsel", changeNote: "Pre-rewrite MSA used during company's first year. Two signed contracts still active on this version." },
     ],
   },
   {
@@ -394,7 +394,7 @@ export const TEMPLATES: Template[] = [
     versionHistory: [
       { version: "v2.0", releasedAt: "2026-01-22", status: "current", author: "Pia Andersen + Sara Friis", changeNote: "Current. Updated for new variable comp plan + revised IP assignment language. Added equity grant addendum hook." },
       { version: "v1.4", releasedAt: "2025-07-15", status: "deprecated", deprecatedAt: "2026-01-22", author: "Pia Andersen + Sara Friis", changeNote: "Added probation period flexibility and Copenhagen-specific work location defaults." },
-      { version: "v1.0", releasedAt: "2024-09-03", status: "archived", deprecatedAt: "2025-07-15", author: "Outside counsel (Plesner)", changeNote: "Original Funktionærloven-compliant template from the first wave of hires." },
+      { version: "v1.0", releasedAt: "2024-09-03", status: "archived", deprecatedAt: "2025-07-15", author: "Outside counsel", changeNote: "Original Funktionærloven-compliant template from the first wave of hires." },
     ],
   },
   {
@@ -496,8 +496,8 @@ export const TEMPLATES: Template[] = [
     ],
     versionHistory: [
       { version: "v1.5", releasedAt: "2025-12-19", status: "current", author: "Sara Friis + Magnus (CFO)", changeNote: "Current. Tightened board resolution gate. Witness signer made mandatory for valid grant." },
-      { version: "v1.4", releasedAt: "2025-05-30", status: "deprecated", deprecatedAt: "2025-12-19", author: "Outside counsel (Plesner)", changeNote: "Added eIDAS QES requirement for advisors and board members." },
-      { version: "v1.0", releasedAt: "2024-11-08", status: "archived", deprecatedAt: "2025-05-30", author: "Outside counsel (Plesner)", changeNote: "First warrant template after the seed round. Used for the first 3 advisor grants." },
+      { version: "v1.4", releasedAt: "2025-05-30", status: "deprecated", deprecatedAt: "2025-12-19", author: "Outside counsel", changeNote: "Added eIDAS QES requirement for advisors and board members." },
+      { version: "v1.0", releasedAt: "2024-11-08", status: "archived", deprecatedAt: "2025-05-30", author: "Outside counsel", changeNote: "First warrant template after the seed round. Used for the first 3 advisor grants." },
     ],
   },
   {

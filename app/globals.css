@@ -42,3 +42,118 @@ html, body {
     @apply text-[11px] uppercase tracking-wider text-ink-400 font-medium;
   }
 }
+
+/* ── Guided tour (driver.js) theme ──────────────────────────────────────────
+   Overrides driver.js defaults so the popover and overlay match the
+   ink/accent palette used everywhere else. We keep driver.js's own layout
+   logic; only color / typography / radius are retuned. */
+
+.driver-popover.light-tour-popover {
+  background: #ffffff;
+  color: #161611;
+  border: 1px solid #e4e4dc;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.18);
+  padding: 16px 18px;
+  max-width: 360px;
+  font-family: inherit;
+}
+
+.driver-popover.light-tour-popover .driver-popover-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #161611;
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+
+.driver-popover.light-tour-popover .driver-popover-description {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #3f3f37;
+  margin: 0 0 12px;
+}
+
+.driver-popover.light-tour-popover .driver-popover-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.driver-popover.light-tour-popover .driver-popover-progress-text {
+  font-size: 11px;
+  color: #6f6f63;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-right: auto;
+}
+
+.driver-popover.light-tour-popover .driver-popover-prev-btn,
+.driver-popover.light-tour-popover .driver-popover-next-btn {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+  text-shadow: none;
+}
+
+.driver-popover.light-tour-popover .driver-popover-prev-btn {
+  background: #ffffff;
+  color: #3f3f37;
+  border-color: #e4e4dc;
+}
+.driver-popover.light-tour-popover .driver-popover-prev-btn:hover {
+  background: #f5f5ee;
+}
+
+.driver-popover.light-tour-popover .driver-popover-next-btn {
+  background: #161611;
+  color: #ffffff;
+  border-color: #161611;
+}
+.driver-popover.light-tour-popover .driver-popover-next-btn:hover {
+  background: #2e2e22;
+}
+
+.driver-popover.light-tour-popover .driver-popover-close-btn {
+  color: #8b8b7a;
+  font-size: 18px;
+  font-family: inherit;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: transparent;
+}
+.driver-popover.light-tour-popover .driver-popover-close-btn:hover {
+  background: #f5f5ee;
+  color: #161611;
+}
+
+.driver-popover.light-tour-popover .driver-popover-arrow {
+  border-color: transparent;
+}
+.driver-popover.light-tour-popover .driver-popover-arrow-side-bottom {
+  border-bottom-color: #ffffff;
+}
+.driver-popover.light-tour-popover .driver-popover-arrow-side-top {
+  border-top-color: #ffffff;
+}
+.driver-popover.light-tour-popover .driver-popover-arrow-side-left {
+  border-left-color: #ffffff;
+}
+.driver-popover.light-tour-popover .driver-popover-arrow-side-right {
+  border-right-color: #ffffff;
+}
+
+/* The cutout stage that highlights the focused element. */
+.driver-active-element {
+  border-radius: 12px !important;
+}

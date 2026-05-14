@@ -4,13 +4,13 @@ Target: 4 to 5 minutes. Narrate the click path, lead with the reframe, end on th
 
 ## 0:00 to 0:30 — The reframe
 
-> "The brief talks about manually editing Word docs and highlighting DocuSign fields by hand. That is the visible pain. But the real problem for Light specifically is controlled document execution. There is no single path from approved business terms to a signed agreement whose data flows back into the Light ledger. So my answer is: wrap DocuSign as infrastructure, keep Word for authoring, and build a workflow layer between them. Let me show you."
+> "The stated pain is manually editing Word docs and highlighting DocuSign fields by hand. The workflow you're about to see kills that directly. While we're in there, there's a bigger prize uniquely available to Light: every signed contract is structured data that belongs in the systems of record. Other CLMs ship integrations into N ERPs. Light *is* the ERP. So my answer is: wrap DocuSign as infrastructure, keep Word for authoring, and build a workflow layer between them whose output flows into the ledger."
 
 Open `http://localhost:3000`. Point at the AboutWidget on the Dashboard. Read the one sentence.
 
 ## 0:30 to 1:30 — Dashboard + the high-risk path (Bolt MSA)
 
-> "Dashboard shows 10 contracts in flight, 4 blocked, 3 signed this week, average cycle 3 days. Let me click into the high-risk one."
+> "Dashboard is built for an operator. The top KPIs are 'Awaiting me', 'Blocked over 3 days', and 'In review'. What Martina has to act on, not vanity counts. Cycle health is demoted below. There's a 'Try the MSA flow' callout for first-time reviewers. Let me click into the high-risk one."
 
 Click Bolt MSA.
 
@@ -46,11 +46,11 @@ Click Send via DocuSign. Wait for the simulated 1.5 seconds.
 
 > "Signed and filed."
 
-## 3:30 to 4:00 — The ledger writeback (the strategic moat)
+## 3:30 to 4:00 — The structured writeback
 
 Point at the LedgerImpactPanel on the Signed Record page.
 
-> "This is the part that makes the answer Light-specific. The signed contract just wrote MRR and ARR to the Light ledger. Contract start date, renewal date, Salesforce link, all populated automatically. No RevOps manually retyping anything. For an AI-native ERP whose wedge is a rebuilt general ledger, contracts have to be born from ledger data and return as ledger data. The PDF is just the audit artifact."
+> "This is the part that makes the answer Light-specific. The signed contract emits a structured writeback like this. The prototype renders the shape. In production it lands wherever Light exposes an endpoint: ledger, billing, CRM. The structural argument is that Light is positioned to receive this because Light is the ERP. Other CLMs ship integrations into N ERPs; Light is one of them. The PDF stays as the audit artifact, the data is the product."
 
 Point at the Audit Trail.
 

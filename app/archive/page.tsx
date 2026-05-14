@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { KpiStrip } from "@/components/KpiStrip";
 import { DocumentTypeBadge, DocumentTypeIcon } from "@/components/DocumentTypeIcon";
 import { listContracts } from "@/lib/contract-store";
-import { formatDateTime, formatEur, formatEurCompact, initials } from "@/lib/format";
+import { formatDateTime, formatEurCompact, initials } from "@/lib/format";
 import { Archive as ArchiveIcon, ChevronRight, FileCheck } from "lucide-react";
 import type { Contract, DocumentType } from "@/lib/types";
 
@@ -30,32 +30,50 @@ export default function ArchivePage() {
     [contracts],
   );
 
-  const kpis = useMemo(() => computeLifetimeKpis(signed), [signed]);
+  const kpis = useMemo(() => computeArchiveKpis(signed), [signed]);
 
   if (contracts === null) {
     return (
       <>
-        <Header title="Archive" subtitle="Loading..." />
+        <Header title="Signed contracts" />
       </>
     );
   }
 
+  const customerCount = (kpis.byType.get("MSA") ?? 0) + (kpis.byType.get("Order Form") ?? 0) + (kpis.byType.get("NDA") ?? 0);
+  const peopleCount = kpis.byType.get("Employment") ?? 0;
+  const equityCount = kpis.byType.get("Warrant") ?? 0;
+
   return (
     <>
       <Header
-        title="Archive"
-        subtitle="All signed and filed contracts. Lifetime ledger impact across the company."
-        breadcrumb={[{ label: "Dashboard", href: "/" }, { label: "Archive" }]}
+        title="Signed contracts"
+        subtitle="Past signed contracts."
+        breadcrumb={[{ label: "Dashboard", href: "/" }, { label: "Signed contracts" }]}
       />
       <div className="space-y-4 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
         <KpiStrip
           kpis={[
-            { label: "Signed total", value: String(kpis.totalSigned) },
-            { label: "Lifetime ARR booked", value: formatEur(kpis.totalArr) },
-            { label: "Headcount added", value: String(kpis.totalHires) },
-            { label: "Equity granted", value: kpis.totalEquityBps > 0 ? `${(kpis.totalEquityBps / 100).toFixed(2)}%` : "—" },
+            { label: "Total signed", value: String(kpis.totalSigned) },
+            { label: "Customer contracts", value: String(customerCount), hint: "MSAs, Order Forms, NDAs" },
+            { label: "People", value: String(peopleCount), hint: "Employment contracts" },
+            { label: "Equity", value: String(equityCount), hint: "Warrant agreements" },
           ]}
         />
+
+        {/* Entity breakdown: a secondary line, not a KPI tile */}
+        {kpis.byEntity.size > 0 && (
+          <div className="flex flex-wrap items-center gap-3 rounded-lg bg-ink-50 px-4 py-2 text-[12px] text-ink-500">
+            <span className="font-medium text-ink-700">By entity</span>
+            <span className="text-ink-300">·</span>
+            {Array.from(kpis.byEntity.entries()).map(([entity, count]) => (
+              <span key={entity} className="inline-flex items-center gap-1.5">
+                <span className="text-ink-700">{entity}</span>
+                <span className="tabular-nums text-ink-500">{count}</span>
+              </span>
+            ))}
+          </div>
+        )}
 
         <Card title="Signed and filed contracts" subtitle={`${signed.length} record${signed.length === 1 ? "" : "s"}, most recent first.`}>
           {signed.length === 0 ? (
@@ -116,7 +134,11 @@ export default function ArchivePage() {
             </div>
             <div className="text-[12px] text-ink-600">
               <span className="demo-note mr-2">Production note</span>
-              Archive view also shows: 7-year retention status, deletion holds (for litigation or audit), and re-signed replacements. Each filed PDF is stored in the customer's Drive folder plus our S3 cold storage with WORM (write-once-read-many) compliance for finance regulations.
+              ARR booked, headcount, and equity granted live on Light&apos;s main dashboard, not here. This view is for
+              retrieval and retention: who signed what, when, against which template version. Also surfaces 7-year
+              retention status, deletion holds (for litigation or audit), and re-signed replacements. Each filed PDF is
+              stored in the customer&apos;s Drive folder plus our S3 cold storage with WORM (write-once-read-many)
+              compliance for finance regulations.
             </div>
           </div>
         </Card>
@@ -125,31 +147,20 @@ export default function ArchivePage() {
   );
 }
 
-interface LifetimeKpis {
+interface ArchiveKpis {
   totalSigned: number;
-  totalArr: number;
-  totalHires: number;
-  totalEquityBps: number;
   byType: Map<DocumentType, number>;
+  byEntity: Map<string, number>;
 }
 
-function computeLifetimeKpis(signed: Contract[]): LifetimeKpis {
-  let totalArr = 0;
-  let totalHires = 0;
-  let totalEquityBps = 0;
+function computeArchiveKpis(signed: Contract[]): ArchiveKpis {
   const byType = new Map<DocumentType, number>();
+  const byEntity = new Map<string, number>();
   for (const c of signed) {
     byType.set(c.type, (byType.get(c.type) ?? 0) + 1);
-    if (c.type === "MSA" || c.type === "Order Form") {
-      totalArr += c.valueEur ?? 0;
-    }
-    if (c.type === "Employment") {
-      totalHires += 1;
-      totalEquityBps += c.fields.equityBps ?? 0;
-    }
-    if (c.type === "Warrant") {
-      totalEquityBps += Math.round((c.fields.warrantPct ?? 0) * 100);
+    if (c.fields.lightEntity) {
+      byEntity.set(c.fields.lightEntity, (byEntity.get(c.fields.lightEntity) ?? 0) + 1);
     }
   }
-  return { totalSigned: signed.length, totalArr, totalHires, totalEquityBps, byType };
+  return { totalSigned: signed.length, byType, byEntity };
 }

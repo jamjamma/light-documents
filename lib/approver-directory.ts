@@ -70,9 +70,9 @@ const APPROVER_GROUPS: ApproverGroup[] = [
         specialties: ["type:Employment"],
       },
       {
-        userId: "u_plesner",
-        name: "Plesner (outside counsel)",
-        email: "warrants@plesner.com",
+        userId: "u_outside_counsel",
+        name: "Nordic Counsel Partners (outside counsel)",
+        email: "warrants@nordic-counsel.example",
         title: "Outside counsel (warrants)",
         avatarColor: "bg-ink-100 text-ink-700",
         specialties: ["type:Warrant"],

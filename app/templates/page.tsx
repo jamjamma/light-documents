@@ -62,7 +62,7 @@ export default function TemplatesPage() {
     <>
       <Header
         title="Templates"
-        subtitle="Master Word documents owned by Legal. Synced from Google Drive. Versioned. Rogue copies detected."
+        subtitle="8 master templates synced from Drive."
         actions={
           <Link href="/contracts/new">
             <Button size="sm" leadingIcon={<Plus className="h-3.5 w-3.5" />}>New contract</Button>
@@ -190,6 +190,7 @@ export default function TemplatesPage() {
                             variableCount={meta.variableCount}
                             anchorTagCount={meta.anchorTagCount}
                             onClick={() => setSelectedTemplate(template)}
+                            hideCategoryPill
                           />
                         );
                       })}

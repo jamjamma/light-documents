@@ -107,7 +107,7 @@ export default function SignedRecordPage({ params }: { params: Promise<{ id: str
             </Card>
           </div>
 
-          <div className="space-y-4">
+          <div className="tour-anchor-ledger space-y-4">
             {contract.ledger ? (
               <LedgerImpactPanel ledger={contract.ledger} />
             ) : (

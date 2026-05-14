@@ -18,21 +18,27 @@ The key architectural and product decisions, with alternatives considered and wh
 2. Light's pain is upstream and downstream of DocuSign, not in DocuSign itself.
 3. Maximum leverage per engineering hour. We touch only the surface that needs touching.
 
-## 2. Contracts are first-class ledger objects, not files
+## 2. Contracts are first-class structured data, written to the relevant system of record
 
-**Decision:** Treat contracts as structured data that flows into Light's general ledger after signing. The PDF is the audit artifact, not the product.
+**Decision:** Every signed contract emits structured data into the relevant system of record. The PDF is the audit artifact, not the product. Routing per document type:
+
+- **MSAs and Order Forms** → revenue and billing (MRR, ARR, renewal date)
+- **Employment contracts** → headcount and compensation
+- **Warrant agreements** → cap table
+- **Vendor agreements** → AP and obligation tracking
+- **NDAs** → retention metadata only (no commercial impact; see ADR 14)
 
 **Alternatives considered:**
 
-- Store signed PDFs in Drive and let RevOps manually update the ledger (status quo). **Rejected.** This is the entire problem.
-- Store contract metadata in a separate "contracts DB" disconnected from the ledger. **Rejected.** Creates a second source of truth that has to reconcile.
-- **Chosen:** Every signed contract writes structured data directly into the Light ledger (MRR, headcount, cap table, vendor record).
+- Store signed PDFs in Drive and let RevOps manually update each system (status quo). **Rejected.** This is the entire problem.
+- Store contract metadata in a separate "contracts DB" disconnected from the systems of record. **Rejected.** Creates a second source of truth that has to reconcile.
+- **Chosen:** Type-conditional writeback into the system of record that matters for that document type.
 
 **Why:**
-1. Matches Light's product thesis: the rebuilt general ledger is the wedge. Contracts feeding directly into it is the obvious extension.
-2. Eliminates manual re-keying by RevOps.
+1. Matches Light's product thesis: Light is the ERP. Other CLMs ship integrations into N ERPs; Light is inside one.
+2. Eliminates manual re-keying.
 3. Closes the loop on obligations (renewal alerts, payment schedules, vesting tracking).
-4. Sets up Light Documents to ship as a customer-facing module after internal use.
+4. Sets up Light Documents to ship as a customer-facing module after internal use proves it.
 
 ## 3. Counsel never leaves Word
 
@@ -82,15 +88,17 @@ The key architectural and product decisions, with alternatives considered and wh
 3. Manual entry as a fallback for stakeholders, vendors, ad-hoc records.
 4. Demonstrates architectural maturity even if a specific customer uses just one system.
 
-## 6. Three Light entities
+## 6. Three Light entities (assumed)
 
-**Decision:** Light ApS (Denmark, primary), Light Ltd (United Kingdom), Light Inc. (US Delaware).
+**Decision:** Assume three entities: Light ApS (Denmark, primary), Light Ltd (United Kingdom), Light Inc. (US Delaware). Would verify with Head of F&O in week one.
 
-**Why:**
-1. Realistic Series A multi-jurisdiction setup.
-2. UK split required post-Brexit for UK customers (GDPR boundary).
-3. US Delaware Inc. typical for US expansion (Series A press mentions NYC office).
-4. Affects governing law defaults, jurisdiction clauses, and employment templates per entity.
+**Why this is the realistic shape:**
+1. Standard Series A multi-jurisdiction setup for a Danish-headquartered SaaS company.
+2. UK split is the post-Brexit norm when serving UK customers under GDPR.
+3. US Delaware Inc. is the typical structure for US expansion (and Light has signalled US presence in Series A press).
+4. The shape affects governing law defaults, jurisdiction clauses, and employment templates per entity, so the prototype models it end-to-end.
+
+The numbers and named entities are inputs; if Light is on a different structure the same engines run unchanged.
 
 ## 7. Deterministic rules engine for clause check (in this prototype)
 
@@ -181,11 +189,11 @@ The key architectural and product decisions, with alternatives considered and wh
 
 **Decision:** NDAs are filed for retention only. They do not produce a Light ledger entry. The audit trail is the system of record (who signed, when, on which template version). The signed-record page surfaces this explicitly: "NDAs do not write to the ledger by design. There is no MRR, headcount, or equity to record."
 
-**Why this exists:** ADR 2 says contracts are first-class ledger objects. The implicit assumption — that every contract type maps to a ledger object — is wrong for NDAs. An NDA has no commercial value, no headcount, no cap-table impact, and no obligation worth posting to the GL. Forcing one in would create a phantom record that downstream consumers (renewal alerts, MRR rollups, board reporting) would have to filter out anyway. Better to keep the ledger clean and let the audit trail carry the retention story.
+**Why this exists:** ADR 2 says contracts emit structured data into a system of record. The implicit assumption (that every contract type maps to the *ledger*) is wrong for NDAs. An NDA has no commercial value, no headcount, no cap-table impact, and no obligation worth posting to the GL. Forcing one in would create a phantom record that downstream consumers (renewal alerts, MRR rollups, board reporting) would have to filter out anyway. The system of record for an NDA is the retention metadata + audit trail; that is intentional, not an omission.
 
 **Where it lives in code:** `buildLedgerImpact()` in `lib/contract-store.ts` short-circuits with `null` for `type === "NDA"`. `simulateSigned()` only attaches `contract.ledger` when the result is non-null, and the audit event reads "Filed to Drive (retention only, no ledger writeback)" instead of the standard "Filed to Drive, ledger updated".
 
-**General rule this implies:** when a strategic claim is type-conditional ("contracts are ledger objects"), the catch-all path in code must distinguish "real exception" from "type we forgot to handle". Generic fallthroughs in dispatch logic are a smell: they tend to absorb cases that should have been explicit exceptions, producing copy that contradicts the narrative elsewhere in the product.
+**General rule this implies:** when a strategic claim is type-conditional ("contracts are structured data"), the catch-all path in code must distinguish "real exception" from "type we forgot to handle". Generic fallthroughs in dispatch logic are a smell: they tend to absorb cases that should have been explicit exceptions, producing copy that contradicts the narrative elsewhere in the product.
 
 ## 15. What we deliberately did NOT build
 
@@ -196,7 +204,6 @@ Each cut listed below was deliberate, to keep the case study right-sized.
 - **Real Slack notifications.** Audit trail shows "Slack DM sent" events. Real product fires the DMs.
 - **OAuth integrations for source systems.** Mock data prefills source records.
 - **Authentication.** Single-user demo. Real product has SSO + RBAC.
-- **Mobile responsive.** Desktop-only internal tool. Documented.
 - **Counterparty redline portal.** Phase 3.
 - **Renewal and obligation tracking with calendar alerts.** Phase 3, very high value.
 - **Inbound vendor contracts.** Phase 3.

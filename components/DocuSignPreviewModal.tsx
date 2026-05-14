@@ -74,7 +74,7 @@ export function DocuSignPreviewModal({ open, onClose, contract, template, onSend
       }
       subtitle={
         <span>
-          <strong>Subject:</strong> {subject} · <strong>Expiry:</strong> {template.docusignFeatures.expiryDays ?? 14} days · <strong>Reminders:</strong> day {template.docusignFeatures.reminderDays?.join(", ") ?? "3, 7"} · <strong>Routing:</strong> {template.docusignFeatures.signingOrder ?? "sequential"}
+          <strong>Subject:</strong> {subject}
         </span>
       }
       footer={
@@ -165,9 +165,19 @@ function RecipientSidebar({ signers, template }: { signers: SignerDef[]; templat
         </ol>
       </div>
 
-      <div className="rounded-lg border border-ink-100 bg-white p-3 text-[11px]">
-        <div className="demo-note mb-2">DocuSign features</div>
-        <ul className="space-y-1 text-ink-700">
+      <details className="group rounded-lg border border-ink-100 bg-white p-3 text-[11px]">
+        <summary className="flex cursor-pointer list-none items-center justify-between text-[11px] font-medium text-ink-700">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="demo-note">Envelope configuration</span>
+            <span className="text-ink-500">audit view</span>
+          </span>
+          <span className="text-[10px] uppercase tracking-wider text-ink-400 group-open:hidden">Expand</span>
+          <span className="hidden text-[10px] uppercase tracking-wider text-ink-400 group-open:inline">Collapse</span>
+        </summary>
+        <ul className="mt-2 space-y-1 text-ink-700">
+          <li className="text-ink-600">Expiry: {template.docusignFeatures.expiryDays ?? 14} days</li>
+          <li className="text-ink-600">Reminders: day {template.docusignFeatures.reminderDays?.join(", ") ?? "3, 7"}</li>
+          <li className="text-ink-600">Routing: {template.docusignFeatures.signingOrder ?? "sequential"}</li>
           {template.docusignFeatures.qesRequired && (
             <li className="flex items-center gap-1.5"><ShieldCheck className="h-3 w-3 text-sage-500" />eIDAS QES verification</li>
           )}
@@ -184,7 +194,7 @@ function RecipientSidebar({ signers, template }: { signers: SignerDef[]; templat
             <li className="text-ink-600">Bulk Send capable</li>
           )}
         </ul>
-      </div>
+      </details>
 
       <div className="rounded-lg border border-ink-100 bg-ink-50/40 p-2.5 text-[10px] text-ink-500">
         <span className="demo-note mr-1">Demo</span>
