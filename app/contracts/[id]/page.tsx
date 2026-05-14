@@ -106,13 +106,18 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
           }, 100);
           break;
         case "approval:open-actions":
+          // Stepping back to the actions-menu step from the reassign walk:
+          // make sure the Reassign modal is closed so the menu underneath is
+          // actually visible. Idempotent if no modal is open.
+          setReassignFor(null);
           // Programmatically click the "..." button inside the operator's
           // actions-menu wrapper so the menu is visibly open while the tour
           // popover narrates its contents. ApprovalActionsMenu owns its own
           // open state; a real click toggles it the same as a user click.
           // Defer so the click lands AFTER any previous mousedown listeners
           // (the menu has a click-away mousedown listener; a click in the
-          // same tick would close it).
+          // same tick would close it), and AFTER setReassignFor(null) has
+          // unmounted the modal.
           window.setTimeout(() => {
             const btn = document.querySelector<HTMLButtonElement>(
               ".tour-anchor-approval-actions-menu button[aria-haspopup='menu']",
@@ -121,6 +126,32 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
               btn.click();
             }
           }, 50);
+          break;
+        case "approval:open-reassign": {
+          // Resolve the operator's pending approval directly from the store
+          // (the closure-captured `contract` is the initial null; the store
+          // returns the latest). Idempotent: if no pending operator row
+          // exists (operator already approved before reaching this step),
+          // we no-op rather than opening a modal for a stale row.
+          const fresh = getContract(id);
+          const pending = fresh?.approvals?.find(
+            (a) => a.assignedName === OPERATOR_NAME && a.status === "pending",
+          );
+          if (pending) {
+            // Close the actions menu underneath so the modal isn't stacked
+            // on top of an open popover menu.
+            const menuBtn = document.querySelector<HTMLButtonElement>(
+              ".tour-anchor-approval-actions-menu button[aria-haspopup='menu']",
+            );
+            if (menuBtn && menuBtn.getAttribute("aria-expanded") === "true") {
+              menuBtn.click();
+            }
+            setReassignFor(pending);
+          }
+          break;
+        }
+        case "approval:close-reassign":
+          setReassignFor(null);
           break;
       }
     };

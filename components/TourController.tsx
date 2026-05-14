@@ -140,7 +140,8 @@ export function TourController() {
         const initialDelay =
           step.effect?.startsWith("modal:") ||
           step.effect?.startsWith("template:") ||
-          step.effect === "approval:open-actions"
+          step.effect === "approval:open-actions" ||
+          step.effect === "approval:open-reassign"
             ? 300
             : 0;
         window.setTimeout(() => tryRender(25), initialDelay);

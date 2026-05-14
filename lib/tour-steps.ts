@@ -96,6 +96,15 @@ export type TourEffect =
   // the operator's approval row. Used so the tour shows the actual menu
   // content (Reassign / Re-ping / Reject) instead of just describing it.
   | "approval:open-actions"
+  // Open the Reassign modal for the operator's pending approval. The page
+  // resolves which Approval to open from contract.approvals (the row
+  // assigned to the operator and still pending). Idempotent: firing while
+  // the modal is already open is a no-op.
+  | "approval:open-reassign"
+  // Close the Reassign modal. Used when stepping forward to approval-approve
+  // (where the modal needs to be out of the way so the user can click
+  // Approve on the operator's row underneath).
+  | "approval:close-reassign"
   // Open the TemplateDetailModal on a canonical template (MSA v4.2) so the
   // tour can walk through Source file, Ownership, Clause rules, DocuSign
   // features, and Anchor tags inside it.
@@ -326,6 +335,100 @@ export const TOUR_STEPS: TourStep[] = [
     next: "advance",
   },
   {
+    id: "approval-actions-menu",
+    chapter: "workflow",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-approval-actions-menu",
+    side: "left",
+    title: "The row actions menu",
+    description: `
+      <p>We just opened the <strong>...</strong> menu on Martina's row for you. Three actions live here:</p>
+      <ul>
+        <li><strong>Reassign / Pass on...</strong> Switch the approver (out of office, conflict of interest, workload balancing).</li>
+        <li><strong>Re-ping.</strong> Resend the Slack DM if it's been sitting too long.</li>
+        <li><strong>Reject...</strong> Block the contract and return it to the owner with a reason.</li>
+      </ul>
+      <p class="muted">Every action writes a row to the audit trail. We'll open Reassign next to walk through that flow.</p>
+    `,
+    next: "advance",
+    // Programmatically open the menu so the popover describes what's
+    // actually on screen, not what would be on screen if the user clicked.
+    effect: "approval:open-actions",
+  },
+  {
+    id: "approval-reassign-intent",
+    chapter: "workflow",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-reassign-intent",
+    side: "bottom",
+    title: "Reassign vs Pass on",
+    description: `
+      <p>Two intents, same destination:</p>
+      <ul>
+        <li><strong>Reassign.</strong> Operator override: you (as Head of F&amp;O) or the contract owner change who is on the hook.</li>
+        <li><strong>Pass on.</strong> Current assignee delegates voluntarily ("I'm out, please cover").</li>
+      </ul>
+      <p class="muted">Same outcome on the chain, different audit story and different notification fan-out (we'll see that in a second).</p>
+    `,
+    next: "advance",
+    effect: "approval:open-reassign",
+  },
+  {
+    id: "approval-reassign-picker",
+    chapter: "workflow",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-reassign-picker",
+    side: "right",
+    title: "Pick a new approver",
+    description: `
+      <p>Every active member of the same approver group, with the context you need to pick:</p>
+      <ul>
+        <li><strong>Specialty tags.</strong> Mono chips (e.g. <code>eu-msa</code>, <code>warrants</code>) so you don't pick a generalist for a specialist deal.</li>
+        <li><strong>Out-of-office.</strong> Amber pill with delegation reason; we surface PTO so you don't reassign to someone who can't act either.</li>
+        <li><strong>Current pill.</strong> Greys out the original assignee so you can't reassign to themselves.</li>
+      </ul>
+      <p class="muted">Membership lives in <em>Settings → Approvers</em>; this picker is for routing within an existing group.</p>
+    `,
+    next: "advance",
+    effect: "approval:open-reassign",
+  },
+  {
+    id: "approval-reassign-reason",
+    chapter: "workflow",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-reassign-reason",
+    side: "top",
+    title: "Why (required, audit trail)",
+    description: `
+      <p>Reason is required because it's the audit story for the override:</p>
+      <ul>
+        <li><strong>Chips.</strong> Common reasons in one click (workload, specialty mismatch, PTO, escalation).</li>
+        <li><strong>Free-text.</strong> For anything chips don't cover.</li>
+      </ul>
+      <p class="muted">Stored verbatim against the audit row. Finance regulators see exactly why the chain changed.</p>
+    `,
+    next: "advance",
+    effect: "approval:open-reassign",
+  },
+  {
+    id: "approval-reassign-notification",
+    chapter: "workflow",
+    path: `/contracts/${HERO_CONTRACT_ID}`,
+    selector: ".tour-anchor-reassign-notification",
+    side: "top",
+    title: "Notification fan-out",
+    description: `
+      <p>Reassign and Pass on don't fire the same Slack DMs:</p>
+      <ul>
+        <li><strong>Reassign</strong> notifies the new approver, the old one (removed from queue), and the contract owner.</li>
+        <li><strong>Pass on</strong> also loops in <em>Head of F&amp;O</em> so workload and specialty imbalances are visible over time.</li>
+      </ul>
+      <p class="muted">No one finds out from a stale Slack thread. The chain change is broadcast on the same channels the approvals run on.</p>
+    `,
+    next: "advance",
+    effect: "approval:open-reassign",
+  },
+  {
     id: "approval-approve",
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
@@ -333,10 +436,14 @@ export const TOUR_STEPS: TourStep[] = [
     side: "left",
     title: "Approve your own row",
     description: `
+      <p>We've closed the Reassign modal so you can see your row again.</p>
       <p><strong>Click Approve</strong> on the Martina Holst row (your row). The pill flips green and an <strong>Undo</strong> chip appears next to it.</p>
       <p class="muted">This is the only "real" approval; the other rows are simulations of Slack-DM responses.</p>
     `,
     next: "advance",
+    // Close the Reassign modal so the popover anchored on the operator row
+    // isn't covered by it. Idempotent if the modal is already closed.
+    effect: "approval:close-reassign",
   },
   {
     id: "approval-undo",
@@ -355,27 +462,6 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted">Undo is refused once the envelope is in DocuSign. That's the line.</p>
     `,
     next: "advance",
-  },
-  {
-    id: "approval-actions-menu",
-    chapter: "workflow",
-    path: `/contracts/${HERO_CONTRACT_ID}`,
-    selector: ".tour-anchor-approval-actions-menu",
-    side: "left",
-    title: "Reassign, Re-ping, Reject",
-    description: `
-      <p>We just opened the <strong>...</strong> menu on Martina's row for you. Three actions:</p>
-      <ul>
-        <li><strong>Reassign / Pass on...</strong> Switch the approver (out of office, conflict of interest).</li>
-        <li><strong>Re-ping.</strong> Resend the Slack DM if it's been sitting too long.</li>
-        <li><strong>Reject...</strong> Block the contract and return it to the owner with a reason.</li>
-      </ul>
-      <p class="muted">Every action writes a row to the audit trail.</p>
-    `,
-    next: "advance",
-    // Programmatically open the menu so the popover describes what's
-    // actually on screen, not what would be on screen if the user clicked.
-    effect: "approval:open-actions",
   },
   {
     id: "approval-simulate-others",

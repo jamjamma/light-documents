@@ -210,7 +210,7 @@ export function ReassignModal({ open, approval, onClose, onConfirm }: Props) {
           />
         </div>
 
-        <div className="rounded-lg border border-ink-100 bg-ink-50/40 px-3 py-2.5 text-[11px] text-ink-600">
+        <div className="tour-anchor-reassign-notification rounded-lg border border-ink-100 bg-ink-50/40 px-3 py-2.5 text-[11px] text-ink-600">
           <span className="demo-note mr-1.5">Notification fan-out</span>
           {intent === "reassign" ? (
             <>
