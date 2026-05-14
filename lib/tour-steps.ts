@@ -95,8 +95,8 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/",
     title: "Welcome",
     description: `
-      <p class="lead">A short walk through Light Documents, menu by menu. About 90 seconds.</p>
-      <p class="muted">Use <kbd>Esc</kbd> or the <strong>&times;</strong> to exit. You can restart anytime from <em>Take the tour</em> in the sidebar.</p>
+      <p class="lead">A 90-second walk, menu by menu.</p>
+      <p class="muted"><kbd>Esc</kbd> to exit. Restart anytime via <em>Take the tour</em>.</p>
     `,
     next: "advance",
     nextLabel: "Start",
@@ -109,13 +109,12 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "Operator KPIs",
     description: `
-      <p>Three tiles for what an ops lead actually acts on:</p>
       <ul>
         <li><strong>Awaiting me.</strong> Your queue.</li>
-        <li><strong>Blocked.</strong> Approvers haven't responded.</li>
-        <li><strong>In review.</strong> Clause check or legal review running.</li>
+        <li><strong>Blocked.</strong> No approver response.</li>
+        <li><strong>In review.</strong> Clause check or legal.</li>
       </ul>
-      <p>Each tile is clickable: it filters the table below. Cycle health (avg create-to-signed) sits as a secondary line beneath, since it's a leadership metric, not a daily action.</p>
+      <p class="muted">Click any tile to filter the table.</p>
     `,
     next: "advance",
     effect: "filter:all",
@@ -127,8 +126,11 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "Stage tabs and type chips",
     description: `
-      <p>Two filters compose: stage on top, document type below.</p>
-      <p>The same workflow engine handles all 8 templates (NDA, MSA, MSA Pilot, Order Form, Employment DK, Employment UK, Warrant, Advisor Warrant). Same intake, same clause check, same writeback shape per type.</p>
+      <ul>
+        <li><strong>Stage tabs.</strong> All in-flight / Awaiting me / Blocked / In review.</li>
+        <li><strong>Type chips.</strong> MSA, Order Form, NDA, Employment, Warrant.</li>
+      </ul>
+      <p class="muted">Same engine handles all 8 templates.</p>
     `,
     next: "advance",
   },
@@ -139,14 +141,13 @@ export const TOUR_STEPS: TourStep[] = [
     side: "right",
     title: "The sidebar",
     description: `
-      <p>Four destinations:</p>
       <ul>
-        <li><strong>Dashboard.</strong> The in-flight queue (here).</li>
-        <li><strong>Templates.</strong> Master template catalog plus rogue-template governance.</li>
-        <li><strong>Signed contracts.</strong> Retrieval surface for past records.</li>
-        <li><strong>About this build.</strong> The full submission memo.</li>
+        <li><strong>Dashboard.</strong> In-flight queue.</li>
+        <li><strong>Templates.</strong> Catalog plus rogue governance.</li>
+        <li><strong>Signed contracts.</strong> Past records.</li>
+        <li><strong>About.</strong> Submission memo.</li>
       </ul>
-      <p>Below the divider: <strong>New contract</strong>, <strong>Take the tour</strong> (you can re-trigger from here), and <strong>Reset demo data</strong>.</p>
+      <p class="muted">Bottom: New contract, Take the tour, Reset demo.</p>
     `,
     next: "advance",
   },
@@ -159,8 +160,8 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "Awaiting me",
     description: `
-      <p>Filtered to <strong>your queue</strong>: contracts where Martina's approval is the next thing blocking the workflow.</p>
-      <p>In production each row links to the same contract detail you'd reach from a Slack notification. The Slack notification is the action layer; the dashboard is the catch-up view.</p>
+      <p>Your queue: contracts where Martina's approval is next.</p>
+      <p class="muted">In production, Slack is the action layer; the dashboard is the catch-up view.</p>
     `,
     next: "advance",
     effect: "filter:awaiting_me",
@@ -172,8 +173,8 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "Blocked",
     description: `
-      <p>Filtered to contracts where an approver hasn't responded yet.</p>
-      <p>Rows that have sat for 3+ days get a <em>stale</em> badge so urgency stays visible even without a separate column.</p>
+      <p>Contracts an approver hasn't responded to.</p>
+      <p class="muted">Rows sitting 3+ days get a <em>stale</em> badge.</p>
     `,
     next: "advance",
     effect: "filter:blocked",
@@ -185,8 +186,8 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "In review",
     description: `
-      <p>Filtered to contracts the clause checker or counsel is actively reviewing.</p>
-      <p><strong>Bolt MSA</strong> is the hero example: a EUR 180k customer MSA with 3 clause deviations from the master template. Click Next to open it and walk the workflow.</p>
+      <p>Clause checker or counsel actively reviewing.</p>
+      <p><strong>Bolt MSA</strong>: EUR 180k, 3 clause deviations. Hero example for the workflow walk.</p>
     `,
     next: "navigate",
     goto: `/contracts/${HERO_CONTRACT_ID}`,
@@ -202,13 +203,13 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Clause checker",
     description: `
-      <p>Bolt MSA has 3 deviations from the master template:</p>
+      <p>3 deviations vs the master template:</p>
       <ul>
-        <li><strong>Net 60</strong> (vs Net 30)</li>
-        <li><strong>Unlimited liability</strong> (vs EUR 500k cap)</li>
-        <li><strong>Customer-only indemnity</strong> (vs mutual)</li>
+        <li>Net 60 (vs Net 30)</li>
+        <li>Unlimited liability (vs EUR 500k cap)</li>
+        <li>Customer-only indemnity (vs mutual)</li>
       </ul>
-      <p><em>In production Claude proposes deviations; the rules engine decides who approves. Separating the two keeps it auditable.</em></p>
+      <p class="muted"><em>Claude proposes; the rules engine decides who approves.</em></p>
     `,
     next: "advance",
   },
@@ -219,13 +220,13 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Routing rules",
     description: `
-      <p>13 typed rules fire based on contract fields. Bolt triggers three:</p>
+      <p>Bolt triggers 3 of 13 rules:</p>
       <ul>
-        <li><strong>Legal.</strong> Clause deviations flagged.</li>
+        <li><strong>Legal.</strong> Clause deviations.</li>
         <li><strong>Head of F&amp;O.</strong> ARR &gt; EUR 50k.</li>
         <li><strong>CFO.</strong> ARR &gt; EUR 100k.</li>
       </ul>
-      <p>Each row carries its <em>why</em> for the audit log. Head of F&amp;O owns this engine in production.</p>
+      <p class="muted">Each row carries its <em>why</em> for the audit log.</p>
     `,
     next: "advance",
   },
@@ -236,9 +237,12 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Approve, then Undo",
     description: `
-      <p>Find the <strong>Head of Finance &amp; Ops</strong> row (Martina Holst). That's your row, so the button reads <strong>Approve</strong>, not Simulate.</p>
-      <p>Click Approve. The pill flips green and an <strong>Undo</strong> appears next to it. Other rows show <em>Simulate X approves</em> because they represent Slack DM responses from other people; only your own approval is Undo-able.</p>
-      <p><em>Once DocuSign has the envelope, Undo is refused. That's the line.</em></p>
+      <ul>
+        <li>Find the <strong>Martina Holst</strong> row (Head of F&amp;O).</li>
+        <li>Click <strong>Approve</strong>. Pill flips green; <strong>Undo</strong> appears.</li>
+        <li>Other rows show <em>Simulate</em> (DM responses from others).</li>
+      </ul>
+      <p class="muted"><em>Once DocuSign has the envelope, Undo is refused.</em></p>
     `,
     next: "advance",
   },
@@ -249,8 +253,8 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Anchor-tag envelope",
     description: `
-      <p><strong>Click Preview envelope</strong> below to see the populated MSA with signature fields auto-placed by anchor tags Counsel typed once into the Word template. Config (expiry, reminders, QES) sits behind a collapsed audit disclosure.</p>
-      <p>Close the modal when you're done, then click <strong>Next</strong> to look at outputs.</p>
+      <p>Click <strong>Preview envelope</strong> below: populated MSA with signature fields auto-placed by anchor tags from the Word template.</p>
+      <p class="muted">Config (expiry, reminders, QES) sits behind a collapsed audit disclosure. Close the modal, then click Next.</p>
     `,
     next: "navigate",
     goto: "/archive",
@@ -263,8 +267,11 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/archive",
     title: "Signed contracts",
     description: `
-      <p>Past signed contracts live here for retrieval. KPIs are <strong>counts</strong>, not financial totals: ARR, headcount, and equity totals belong on Light's real dashboards.</p>
-      <p>Each row links to its signed record: PDF, audit trail, structured writeback. Click Next to open Acme MSA's signed page.</p>
+      <p>Retrieval surface for past records.</p>
+      <ul>
+        <li>KPIs are <strong>counts</strong>, not financial totals.</li>
+        <li>Each row links to PDF, audit trail, writeback.</li>
+      </ul>
     `,
     next: "navigate",
     goto: `/contracts/${SIGNED_DEMO_ID}/signed`,
@@ -277,14 +284,13 @@ export const TOUR_STEPS: TourStep[] = [
     side: "left",
     title: "Structured writeback",
     description: `
-      <p>Every signed contract emits structured data into the relevant system of record:</p>
       <ul>
-        <li><strong>MSA / Order Form.</strong> Ledger journal entry plus customer, source, entity, renewal as dimensions.</li>
-        <li><strong>Employment.</strong> HRIS record (start date, role, comp, manager).</li>
-        <li><strong>Warrant.</strong> Cap-table grant (stakeholder, percentage, vesting, board resolution).</li>
-        <li><strong>NDA.</strong> Retention metadata only. No commercial impact.</li>
+        <li><strong>MSA / Order Form.</strong> Ledger journal entry plus dimensions.</li>
+        <li><strong>Employment.</strong> HRIS record.</li>
+        <li><strong>Warrant.</strong> Cap-table grant.</li>
+        <li><strong>NDA.</strong> Retention metadata only.</li>
       </ul>
-      <p><em>The prototype emits this on the DocuSign <code>envelope-completed</code> webhook. Production posts to whichever endpoint Light exposes. Both sides of the integration are stubbed in this build.</em></p>
+      <p class="muted"><em>Fires on DocuSign <code>envelope-completed</code>. Both sides of the integration are stubbed in this build.</em></p>
     `,
     next: "navigate",
     goto: "/contracts/new",
@@ -299,13 +305,11 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "Create a new contract",
     description: `
-      <p>The 3-step new-contract form:</p>
       <ul>
-        <li><strong>1. Template.</strong> 8 master Word docs synced from Drive.</li>
-        <li><strong>2. Source record.</strong> Pulled from Salesforce / HubSpot / Personio. Or manual entry for off-CRM records.</li>
-        <li><strong>3. Confirm.</strong> Prefilled fields with live validation. Clause check runs on submit.</li>
+        <li><strong>1. Template.</strong> 8 master Word docs.</li>
+        <li><strong>2. Source record.</strong> Salesforce, HubSpot, Personio, or manual.</li>
+        <li><strong>3. Confirm.</strong> Prefilled fields, clause check on submit.</li>
       </ul>
-      <p>Once submitted, the same workflow you just walked through begins.</p>
     `,
     next: "navigate",
     goto: "/templates",
@@ -316,8 +320,11 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/templates",
     title: "Templates and rogue governance",
     description: `
-      <p>Master templates live as Word docs in Drive, owned by Legal. <strong>Counsel keeps Word for authoring</strong>: they edit where they already edit, with Track Changes and all. Our platform watches the folder and syncs. (Counsel may still log in to approve a clause deviation when one is routed to them; what stays out is authoring, not review.)</p>
-      <p>Scroll down for the <strong>Rogue templates</strong> panel: a Phase-2 governance demo. A daily scan flags docs outside <code>/Master Templates/</code> with Archive + Notify Owner actions.</p>
+      <ul>
+        <li><strong>Master templates.</strong> Word docs in Drive, owned by Legal.</li>
+        <li><strong>Counsel keeps Word for authoring.</strong> They may still log in to approve a deviation; what stays out is authoring, not review.</li>
+        <li><strong>Rogue panel</strong> (scroll down). Daily scan flags docs outside <code>/Master Templates/</code>.</li>
+      </ul>
     `,
     next: "advance",
     nextLabel: "Wrap up",
@@ -329,16 +336,15 @@ export const TOUR_STEPS: TourStep[] = [
     path: "*",
     title: "Tour complete",
     description: `
-      <p>You've seen:</p>
       <ul>
-        <li><strong>Dashboard.</strong> KPIs, stage tabs, type chips, sidebar.</li>
+        <li><strong>Dashboard.</strong> KPIs, filters, sidebar.</li>
         <li><strong>Filter walk.</strong> Awaiting me, Blocked, In review.</li>
-        <li><strong>Workflow.</strong> Clause check, routing, approvals, Undo, anchor-tag envelope.</li>
-        <li><strong>Outputs.</strong> Signed archive, structured writeback.</li>
+        <li><strong>Workflow.</strong> Clause check, routing, approvals, envelope.</li>
+        <li><strong>Outputs.</strong> Archive and structured writeback.</li>
         <li><strong>Intake.</strong> 3-step new-contract form.</li>
-        <li><strong>Templates.</strong> Drive-backed master templates, rogue governance.</li>
+        <li><strong>Templates.</strong> Drive-backed plus rogue governance.</li>
       </ul>
-      <p>Re-take the tour anytime from the sidebar. <em>Reset demo data</em> wipes state and re-seeds.</p>
+      <p class="muted">Re-take from the sidebar anytime.</p>
     `,
     next: "advance",
     nextLabel: "Finish",

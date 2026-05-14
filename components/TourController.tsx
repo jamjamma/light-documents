@@ -100,12 +100,16 @@ export function TourController() {
 
         destroyDriver();
 
+        // Only pass `side` when there's an actual element to anchor to.
+        // For centered popovers (no element) driver.js floats them in the
+        // viewport; passing side="bottom" mistakenly pins them to the
+        // bottom of the page instead of centering.
         const driveStep: DriveStep = {
           element: el ?? undefined,
           popover: {
             title: step.title,
             description: step.description,
-            side: step.side ?? "bottom",
+            ...(el ? { side: step.side ?? "bottom" } : {}),
             showButtons: step.hideBack
               ? ["close", "next"]
               : ["close", "previous", "next"],
