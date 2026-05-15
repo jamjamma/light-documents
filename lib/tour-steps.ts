@@ -1514,6 +1514,29 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted">Re-take the tour or pick a single chapter anytime from the sidebar's tour button.</p>
     `,
     next: "advance",
+    nextLabel: "Next",
+  },
+  // ── Finish line: centered, no anchor, celebratory ─────────────────────
+  {
+    id: "tour-complete",
+    chapter: "intake",
+    path: "/",
+    title: "Tour complete · Thanks for walking",
+    description: `
+      <p class="lead">You've walked all six chapters of the build.</p>
+      <ul>
+        <li>✓ <strong>Dashboard.</strong> Orientation, KPIs, filters.</li>
+        <li>✓ <strong>Workflow.</strong> Bolt MSA from review to send.</li>
+        <li>✓ <strong>Signed record.</strong> Audit trail and writeback.</li>
+        <li>✓ <strong>Signed archive.</strong> Filed contracts by type.</li>
+        <li>✓ <strong>Templates.</strong> Catalog and rogue governance.</li>
+        <li>✓ <strong>New contract.</strong> Three-step intake to clause check.</li>
+      </ul>
+      <p>Next: open <strong>About this build</strong> in the sidebar for the full memo, or browse the dashboard freely. Re-take the tour anytime from the sidebar's tour button.</p>
+      <p class="muted">Thanks for taking the time. — Jeewoo</p>
+    `,
+    hideBack: true,
+    next: "advance",
     nextLabel: "Finish",
   },
 ];
@@ -1785,24 +1808,28 @@ export interface ChapterMeta {
   estSeconds: number;
 }
 
+// Per-chapter time estimates. These sum to ~540s (~9 min) so the chapter
+// chooser's "about 9 minutes" claim matches what the About page's tour CTA
+// promises. Real walk time depends on how long the user pauses to read each
+// popover; these numbers assume light skimming.
 export const CHAPTERS: ChapterMeta[] = [
   {
     id: "dashboard",
     title: "Dashboard",
     blurb: "Orientation, KPIs, filters.",
-    estSeconds: 60,
+    estSeconds: 45,
   },
   {
     id: "workflow",
     title: "Workflow walk",
     blurb: "Bolt MSA from review to send.",
-    estSeconds: 150,
+    estSeconds: 130,
   },
   {
     id: "signed",
     title: "Signed record",
     blurb: "Audit trail and writeback.",
-    estSeconds: 120,
+    estSeconds: 85,
   },
   {
     id: "archive",
@@ -1814,13 +1841,13 @@ export const CHAPTERS: ChapterMeta[] = [
     id: "templates",
     title: "Templates",
     blurb: "Catalog and rogue-template governance.",
-    estSeconds: 360,
+    estSeconds: 180,
   },
   {
     id: "intake",
     title: "New contract",
-    blurb: "Three-step intake into clause check.",
-    estSeconds: 75,
+    blurb: "Intake, clause check, tour wrap-up.",
+    estSeconds: 70,
   },
 ];
 
