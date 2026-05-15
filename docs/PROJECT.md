@@ -166,7 +166,7 @@ Two-stage:
 | `template-meta-icons.tsx` | The JSX icons for category section headers, separated from `template-meta.ts` so the data module stays pure. | `CATEGORY_ICON` |
 | `template-bullets.tsx` | Per-template bullets shown on cards. Tiny mapping function. | `bulletsForTemplate` |
 | `clause-checker.ts` | Pure rules engine. Runs every clause rule attached to a template against contract fields. | `runChecks`, `countDeviations`, `hasBlockingDeviation`, `allStandard`, `summarizeChecks` |
-| `approver-directory.ts` | 6 approver groups (Legal, Head of F&O, CFO, People Ops, CEO, Board) with 13 members total. PTO delegation (Anna Lind 2026-05-10 → 2026-05-20). Specialty matching with weighted classes. | `selectApprover`, `selectAllMembers`, `listMembers`, `findMember`, `getApproverGroup`, `listActiveDelegations` |
+| `approver-directory.ts` | 6 approver groups (Counsel, Head of F&O, CFO, People Ops, CEO, Board) with 13 members total. PTO delegation (Anna Lind 2026-05-10 → 2026-05-20). Specialty matching with weighted classes. | `selectApprover`, `selectAllMembers`, `listMembers`, `findMember`, `getApproverGroup`, `listActiveDelegations` |
 | `signer-routing.ts` | Light-side signer policy per template + entity. Counterparty, light signer, witness. | `resolveSigners`, `resolveLightSigners`, `resolveCounterpartySigner`, `resolveWitnessSigner`, `primaryLightSignerActor`, `lightSignerRationale` |
 | `routing-rules.ts` | 14 routing rules + `computeRouting()`. Channel collision resolution. Committee emission for `all_required` groups. | `ROUTING_RULES`, `computeRouting`, `allApproved` |
 | `contract-store.ts` | The operating core. State machine, immutable updates, localStorage persistence, journey commands, workflow actions. | `getContract`, `listContracts`, `createContract`, `runClauseChecks`, `approve`, `reassignApproval`, `rejectApproval`, `repingApproval`, `saveDraftAndExit`, `send`, `simulateSigned`, `resetDemo`, `computeKpis` |
@@ -479,7 +479,7 @@ Heaviest file is `mock-data.ts` (templates + seed data + version history). Every
 | 4 | Click **"+ New contract"** in modal header | Lands on `/contracts/new?template=msa_v4_2`, jumps directly to step 2 (record picker) |
 | 5 | Pick a Salesforce deal | Step 3: intake form prefilled with deal data, live warnings (ARR ≥ €100k → CFO approval; Net 60 → non-standard) |
 | 6 | Click **Run checks** | Detail page renders: stale-template banner if applicable, ClauseDiff with 5 rules, RoutingPanel ("triggered by" rules), ApprovalChain with assigned individuals + selection reasons |
-| 7 | Click ⋯ on the **Legal** row → **Reassign** | Modal with all 4 Legal members, specialty chips, amber OOO badge on Anna Lind. Pick Anna, type a reason, confirm. Watch the row update and the audit trail capture the override. |
+| 7 | Click ⋯ on the **Counsel** row → **Reassign** | Modal with all 4 Counsel members, specialty chips, amber OOO badge on Anna Lind. Pick Anna, type a reason, confirm. Watch the row update and the audit trail capture the override. |
 | 8 | Click ⋯ on the **CFO** row → **Re-ping** | Audit appends "Re-pinged Magnus" + "Slack DM re-sent" |
 | 9 | Click ⋯ on the **CEO** row → **Reject** | Modal with reason presets. Confirm. Contract bounces to `needs_info`, rose-tinted rejection callout appears under the row. |
 | 10 | (For committee demo) Open an existing **Warrant** contract | Notice **3 separate Board rows** (Astrid, Christian, Emma). Approve only Astrid → "Send" stays blocked. |
@@ -512,7 +512,7 @@ Heaviest file is `mock-data.ts` (templates + seed data + version history). Every
 **Honest acknowledgements (audit-flagged but kept as Phase 2):**
 - Specialty weights are constants in TS, not config-editable by Head of F&O
 - Round-robin strategy named but implemented as deterministic-first-pick
-- No load balancing on Legal (Anna gets all UK MSAs because UK specialty wins)
+- No load balancing within the Counsel group (Anna gets all UK MSAs because UK specialty wins)
 - No "rejection re-route" path beyond bouncing to owner
 - Delegation source is a code constant, not a Calendar OOO integration
 - Local-director slot defined in `signer-routing.ts` but only `group CEO` ever picked
@@ -550,7 +550,7 @@ Slack-first is for adoption; writeback at #2 is the strategic extension. In an a
 
 ## 17. Tech stack one-liner
 
-Next.js 15 App Router · TypeScript strict · Tailwind 3.4 · React 19 · lucide-react · clsx · localStorage state machine · no backend.
+Next.js 15 App Router · TypeScript strict · Tailwind 3.4 · React 19 · lucide-react · clsx · driver.js (tour) · localStorage state machine · no backend.
 
 Production stack would add: Postgres, S3, Redis (BullMQ), Vercel/AWS, Google SSO, OAuth per vendor, Slack Bolt, DocuSign REST v2.1, Drive Watch API.
 

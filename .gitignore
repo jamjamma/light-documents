@@ -22,6 +22,7 @@ yarn-error.log*
 *.pem
 .idea/
 .vscode/
+.obsidian/
 *.swp
 
 # Local scratch
@@ -29,3 +30,6 @@ _smoke*.ts
 _smoke*.mts
 _qc*.ts
 *.bak
+
+# Stray local-only Obsidian vault artefact (untracked, not project content)
+/Light documetns/

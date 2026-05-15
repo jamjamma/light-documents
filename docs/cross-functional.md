@@ -5,30 +5,31 @@ How Light Documents lives in the real organisation: who uses what, how handoffs 
 ## Integration architecture
 
 ```
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│ Salesforce / │  │ Personio /   │  │ Google Drive │  │ Light Ledger │
-│ HubSpot /    │  │ Ashby /      │  │ (master      │  │ (MRR, HC,    │
-│ Attio (deals)│  │ Workday (HR) │  │  templates)  │  │  cap table)  │
-└───────┬──────┘  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘
-        │  read           │  read          │  read+write    │  read+write
-        └─────────────────┼────────────────┼────────────────┘
-                          ▼                ▼
-                  ┌───────────────────────────────┐
-                  │   LIGHT DOCUMENTS             │
-                  │   workflow + state machine    │
-                  └───────┬───────────┬──────┬────┘
-                          │           │      │
-                          ▼           ▼      ▼
-                    ┌─────────┐ ┌─────────┐ ┌────────┐
-                    │  Slack  │ │DocuSign │ │ Email  │
-                    │ DM +    │ │envelope │ │ magic  │
-                    │ channel │ │ create  │ │ links  │
-                    └─────────┘ └─────────┘ └────────┘
-                          │           │         │
-                          ▼           ▼         ▼
-                    Internal       Counter-   Board /
-                    approvers      party      external
-                                              counsel
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│ Salesforce / │  │ Personio /   │  │ Google Drive │
+│ HubSpot /    │  │ Ashby /      │  │ (master      │
+│ Attio (deals)│  │ Workday (HR) │  │  templates)  │
+└───────┬──────┘  └──────┬───────┘  └──────┬───────┘
+        │  read           │  read          │  read
+        └─────────────────┼────────────────┘
+                          ▼
+                 ┌───────────────────────────────┐
+                 │   LIGHT DOCUMENTS             │
+                 │   workflow + state machine    │
+                 └────┬─────────┬─────────┬──────┬┘
+                      │         │         │      │
+                      ▼         ▼         ▼      ▼
+                ┌─────────┐ ┌────────┐ ┌──────┐ ┌──────────┐
+                │  Slack  │ │DocuSign│ │Email │ │  Light   │
+                │ DM +    │ │envelope│ │magic │ │  ledger  │
+                │ channel │ │ create │ │links │ │+MRR +HC  │
+                └────┬────┘ └───┬────┘ └──┬───┘ └─────┬────┘
+                     │          │         │           │
+                     ▼          ▼         ▼           ▼
+                Internal    Counter-    Board /    Structured
+                approvers   party       external   writeback
+                                        counsel    to systems
+                                                   of record
 ```
 
 ## Who is involved and what they do
@@ -42,7 +43,7 @@ How Light Documents lives in the real organisation: who uses what, how handoffs 
 | Head of People | | All employment contracts | Above-band salary approvals | | Slack + Light Documents |
 | Head of Finance & Ops (the case study role) | Owns routing rules + thresholds | All contracts | Threshold approvals, daily digest reviewer | | Light Documents (primary user) |
 | Finance / accounting | | Reads signed contracts for revrec | | | Light ledger |
-| In-house counsel / Legal | | Clause deviations, master templates | Clause deviations | | Slack + Light + Word |
+| In-house Counsel | | Clause deviations, master templates | Clause deviations | | Slack + Light + Word |
 | Outside counsel | | Bespoke (warrants, M&A) | | | Email + Word |
 | CFO | | Above-threshold contracts | High-value deals, warrants, vendor | | Slack |
 | CEO | | | Strategic deals | Most contracts on Light side | DocuSign emails |
@@ -97,7 +98,7 @@ Three surfaces, used for different audiences.
 | Recruiter | own roles | own | | | | |
 | Head of People | all employment | | employment templates | salary bands | above-band exceptions | |
 | Head of Finance & Ops | all | | | all routing rules | threshold approvals | yes |
-| Legal | all | | master templates + clause rules | clause-related | clause deviations | |
+| Counsel | all | | master templates + clause rules | clause-related | clause deviations | |
 | CFO | all | | | financial thresholds | high-value, warrants | yes |
 | CEO | all | | | | strategic + signs | yes |
 | Board | warrants + equity only | | | | equity approvals | |

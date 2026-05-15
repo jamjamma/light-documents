@@ -150,7 +150,7 @@ The numbers and named entities are inputs; if Light is on a different structure 
 
 ## 10. Group-based approver selection (added 2026-05-12)
 
-**Decision:** Routing rules name a role (Legal, CFO). The role is resolved to an individual at routing time by `lib/approver-directory.ts`, which holds an `ApproverGroup` per role with 1..N members, specialty tags, and active PTO delegations.
+**Decision:** Routing rules name a role (Counsel, CFO). The role is resolved to an individual at routing time by `lib/approver-directory.ts`, which holds an `ApproverGroup` per role with 1..N members, specialty tags, and active PTO delegations.
 
 **Why this exists:** the first prototype had role-to-person resolution hard-coded in three files (`components/ApprovalChain.tsx`, `app/contracts/[id]/page.tsx`, `components/DocuSignPreviewModal.tsx`), each mapping each role to exactly one person. A reviewer rightly asked "if Legal is a team, how is *Sara* picked over the others?". There was no engine, only a constant.
 

@@ -87,7 +87,7 @@ The PDF is the audit artifact, the data is the product. That is the strategic op
 
 ```
 Source records                Master templates             Approver directory
-(SF / HubSpot / Attio /       (Word docs in Drive,         (Legal, F&O, CFO, People,
+(SF / HubSpot / Attio /       (Word docs in Drive,         (Counsel, F&O, CFO, People,
  Personio / Ashby /            owned by Legal)              CEO, Board) with PTO
  Manual entry)                                              delegations
         │                              │                              │
@@ -282,7 +282,7 @@ npm run dev
 
 Requires Node 20+. No env vars, no auth, no database. State persists in localStorage. Reset demo data anytime via the sidebar button.
 
-Tech stack: Next.js 15 App Router, TypeScript strict, Tailwind 3.4, lucide-react, clsx, React 19. localStorage state machine with immutable updates. No backend in this prototype.
+Tech stack: Next.js 15 App Router, TypeScript strict, Tailwind 3.4, React 19, lucide-react, clsx, driver.js (tour). localStorage state machine with immutable updates. No backend in this prototype.
 
 For production: Postgres for contracts and templates, S3 / GCS for signed PDFs, Redis for queues, Vercel or AWS for hosting, SSO via Google Workspace or Okta, OAuth integrations per source system.
 

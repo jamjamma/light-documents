@@ -3,26 +3,28 @@
 ## High-level flow
 
 ```
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│ Salesforce / │  │ Personio /   │  │ Google Drive │  │ Light Ledger │
-│ HubSpot /    │  │ Ashby /      │  │ (master      │  │ (MRR, HC,    │
-│ Attio (deals)│  │ Workday (HR) │  │  templates)  │  │  cap table)  │
-└───────┬──────┘  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘
-        │  read           │  read          │  read+write    │  read+write
-        └─────────────────┼────────────────┼────────────────┘
-                          ▼                ▼
-                  ┌───────────────────────────────┐
-                  │   LIGHT DOCUMENTS             │
-                  │   workflow + state machine    │
-                  └───────┬───────────┬──────┬────┘
-                          │           │      │
-                          ▼           ▼      ▼
-                    ┌─────────┐ ┌─────────┐ ┌────────┐
-                    │  Slack  │ │DocuSign │ │ Email  │
-                    │ DM +    │ │envelope │ │ magic  │
-                    │ channel │ │ create  │ │ links  │
-                    └─────────┘ └─────────┘ └────────┘
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│ Salesforce / │  │ Personio /   │  │ Google Drive │
+│ HubSpot /    │  │ Ashby /      │  │ (master      │
+│ Attio (deals)│  │ Workday (HR) │  │  templates)  │
+└───────┬──────┘  └──────┬───────┘  └──────┬───────┘
+        │  read           │  read          │  read
+        └─────────────────┼────────────────┘
+                          ▼
+                 ┌───────────────────────────────┐
+                 │   LIGHT DOCUMENTS             │
+                 │   workflow + state machine    │
+                 └────┬─────────┬─────────┬──────┬┘
+                      │         │         │      │
+                      ▼         ▼         ▼      ▼
+                ┌─────────┐ ┌────────┐ ┌──────┐ ┌──────────┐
+                │  Slack  │ │DocuSign│ │Email │ │  Light   │
+                │ DM +    │ │envelope│ │magic │ │  ledger  │
+                │ channel │ │ create │ │links │ │+MRR +HC  │
+                └─────────┘ └────────┘ └──────┘ └──────────┘
 ```
+
+Four exits, four real-world surfaces. Slack, DocuSign, and Email handle who must act. The structured writeback to Light's ledger (and adjacent receivers: HRIS, cap table) is the strategic exit. That is what turns the PDF from system-of-record into audit artifact, with the data landing natively in Light's systems.
 
 ## State model
 

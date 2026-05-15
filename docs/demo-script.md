@@ -18,13 +18,13 @@ Click Bolt MSA.
 
 Scroll to Routing.
 
-> "The routing rules engine fires three approvers: Legal because of clause deviations, Head of Finance because ARR is over €50k, CFO because ARR is over €100k. Each approval has its 'why' attached so the audit is clean."
+> "The routing rules engine fires three approvers: Counsel because of clause deviations, Head of Finance because ARR is over €50k, CFO because ARR is over €100k. Each approval has its 'why' attached so the audit is clean."
 
 Scroll to Approval chain.
 
-> "Approvers are notified via Slack DM. Demo affordance: let me simulate Legal approving. Note my own row says 'Approve' instead of 'Simulate', because I'm signed in as Martina. The product is honest about who's actually clicking what."
+> "Approvers are notified via Slack DM. Demo affordance: let me simulate Counsel approving. Note my own row says 'Approve' instead of 'Simulate', because I'm signed in as Martina. The product is honest about who's actually clicking what."
 
-Click "Simulate Sara approves" (Legal). Chip flips green.
+Click "Simulate Sara approves" (Counsel). Chip flips green.
 
 ## 1:30 to 2:30: The DocuSign envelope (the field placement answer)
 

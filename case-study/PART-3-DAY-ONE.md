@@ -52,7 +52,7 @@ Lowest cost to consume, useful in parallel.
 
 ## Who I would talk to
 
-Martina is the destination. Everyone else is mapped to a specific handoff — that is where this role's leverage lives.
+Martina is the destination. Everyone else is mapped to a specific handoff. That is where this role's leverage lives.
 
 | Person | Handoff they sit on | What I want from them |
 |---|---|---|

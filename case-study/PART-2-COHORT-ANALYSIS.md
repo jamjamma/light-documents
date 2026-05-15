@@ -36,7 +36,7 @@ Revenue-weighted blending is used so larger cohorts carry proportionally more we
 > - **Mid-cycle (M3 → M6) is breaking.** Expansion in this window fell from +9pp to +2pp across four cohorts.
 > - **The renewal moment looks intact.** Q1 2024 jumped from 123.6% at M12 to 147.3% at M18. One data point with a clean shape.
 >
-> The symptom is concrete. The cause is not visible in this data. **First check: pull contract structure for Q1 and Q2 2024** — cheap to verify, would rebase everything else.
+> The symptom is concrete. The cause is not visible in this data. **First check: pull contract structure for Q1 and Q2 2024.** Cheap to verify, would rebase everything else.
 
 ### Step 1: Retention triangle
 
