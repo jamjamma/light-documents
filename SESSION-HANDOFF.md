@@ -766,3 +766,73 @@ itself is removed, so the class no longer renders).
 - All 9 tour anchor classes referenced in `lib/tour-steps.ts` are
   rendered in the codebase.
 - All 6 tour-visited routes return 200 on dev server.
+
+---
+
+## QA pass 2026-05-15
+
+End-to-end QA pass combining a static code audit (Claude Code) with a live
+browser walk of the Vercel deploy (Claude Desktop). Findings landed in
+`QA-FINDINGS-2026-05-15.md`. Fixes shipped in commits `10c480f` (Counsel
+role rename) and `f98c7da` (tour copy + outside-click + step-9 title +
+doc strikes), on top of the user's parallel polish commits.
+
+**Findings fixed**
+
+1. **Routing-rules off-by-one.** Tour `routing` step said "3 of 13 rules";
+   `ROUTING_RULES.length === 14`. Fixed pre-walk in an earlier commit.
+2. **Templates chapter duration.** `estSeconds: 90` for a 22-step chapter
+   that takes ~6 minutes to walk. Fixed pre-walk to `estSeconds: 360`.
+3. **DocuSign envelope-preview filename leak.** Hardcoded
+   `{contract.id}.docx · Acme MSA` regardless of which contract was being
+   previewed. Fixed to `{contract.id}.docx · {contract.name}`.
+4. **Intake step 3 source-systems copy.** Tour copy named Personio but the
+   customer-template tab strip shows Attio (Personio applies on the
+   Employment path). Fixed to "Salesforce, HubSpot, or Attio per template
+   type (Personio and Ashby on the Employment path)".
+5. **Counsel / Legal role rename.** `ApproverRole` enum migrated `"Legal"`
+   to `"Counsel"`. Propagates to routing-rules, approver-directory, audit
+   events, form warnings, clause-rule reason strings, and tour copy. Three
+   "Legal team" function-references (template ownership, anchor-tag
+   authorship, edit-access) preserved as distinct from the role label. One
+   `mock-data.ts` MSA document-body line (`[Unlimited - non-standard,
+   requires Legal review]`) preserved as in-contract verbiage.
+6. **Tour backdrop-click dismissal.** `allowClose: true` was stranding
+   users: backdrop click closed the tour but left underlying modals (Slack
+   DM preview, Reassign, DocuSign preview) open. Changed to
+   `allowClose: false`. Esc + X + Forward/Back remain as exit paths.
+7. **Step 9 title.** Title read "Tour complete" but two steps follow
+   (`about-this-build`, `about-this-build-sidebar`). Renamed to "That's the
+   workflow" with a "Two more pages to point at" lead-in.
+
+**Findings deliberately not changed**
+
+- "Legal team" wherever it describes a body of people (template ownership
+  in `template-meta.ts` + tour ownership lines + DocuSign / template-detail
+  modal copy). Function reference, distinct from the role label.
+- `mock-data.ts:19` `ownerTeam: "Legal"`. Surfaces as "Owner team" in the
+  template detail modal; refers to the function.
+- `IntakeForm.tsx:174` `<GridSection title="Legal">`. Section heading for
+  legal-related fields (governing law), content category not role.
+- `DocuSignPreviewModal.tsx:459` rendered-MSA-body text referencing "Legal
+  review". This is the contract's own verbiage, preserved for document
+  realism.
+
+**Verification done**
+
+- `npm run build` returns 0 after each batch of edits.
+- Counsel surface grep clean (no `"Legal"` literal in role-label position
+  outside the preserved function references).
+
+**Verification still needed (browser, before sending the link to a reviewer)**
+
+- Re-walk the Counsel rename surfaces: routing panel, approval chain
+  badges, audit trail events. The role string flows through several UI
+  surfaces and a regression here would be loud.
+- Confirm DocuSign envelope preview filename now reads
+  `{id}.docx · {contract.name}` on every in-flight contract.
+- Confirm tour backdrop-click no longer dismisses, and that the X / Esc /
+  Forward / Back paths still exit cleanly.
+- Confirm intake step 9 popover header is "That's the workflow", and that
+  the final step's "Finish" button still wraps the tour.
+- Final Vercel deploy green; tag the commit hash here.
