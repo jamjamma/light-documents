@@ -114,12 +114,10 @@ The headline 127.9% NRR averages both and hides both. The symptom is concrete; t
 
 ### Step 7: Candidate causes for the mid-cycle drop
 
-Four hypotheses worth ruling in or out, in order of how I would test each:
+Two hypotheses worth ruling in or out, in order of how I would test each:
 
 - **CS coverage failing to scale.** Cohort sizes doubled. CS team may not have. Easy to test: CS headcount vs active accounts over time.
-- **Product packaging or pricing change.** A move that left less room for early upsell (e.g., starter plans already include what used to be add-ons).
 - **Weaker activation.** Customers landing below the usage threshold where mid-cycle upsell makes sense. Test against activation cohort metrics.
-- **Deliberate commercial decision** to consolidate expansion at renewal rather than mid-cycle. Confirm with Sales leadership before assuming a leak.
 
 ### Step 8: What to verify first
 

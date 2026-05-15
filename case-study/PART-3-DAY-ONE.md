@@ -32,7 +32,7 @@ Useful after Lens 1, so the delta between stated and lived becomes visible.
 | Source | What I am looking for |
 |---|---|
 | Strategy docs, OKRs, current-quarter priorities | What leadership says the company is doing. Half-written and "v1" docs often tell you more than the polished ones. |
-| Recent all-hands recordings and internal video updates | Where the CEO directs attention is the de facto priority list. |
+| Recent all-hands recordings and internal video updates | Where the CEO directs attention tells you what is actually being prioritised, not what the docs say. |
 | Pricing, packaging, and discount-approval policy | Where the commercial model meets reality. |
 | Martina's last team update or all-hands segment | So I am not asking her to repeat what she has said publicly. |
 | My own job description, re-read | What the role actually means given what the company is trying to do. |
@@ -44,7 +44,6 @@ Lowest cost to consume, useful in parallel.
 | Source | What I am looking for |
 |---|---|
 | Publicly available investor framing (Balderton's piece; Atomico's blog where published) | Investor logic is closer to ground truth than founder narrative. |
-| Jonathan's public talks and recent press (Slush, TechCrunch, podcasts) | The through-line: Pleo → Juni → Light. The NetSuite frustration is documented down to page-load speed. |
 | NetSuite vs. AI-native ERP coverage (Rillet, Campfire teardowns) | How Light is framed inside the wave. |
 | Adjacent battles Light is not fighting yet (Pennylane in France; Brex / Ramp at the spend layer) | What Light might inherit at the next stage. |
 | Practitioner threads on NetSuite-to-AI-native migrations (Reddit `r/Accounting`, LinkedIn FinOps) | Where the real customer friction lives. |
@@ -85,17 +84,16 @@ The case study's contract problem is itself a handoff problem dressed as a docum
 
 My bias: find the handoff where manual work today will break at next quarter's volume, and fix one cleanly, rather than chase whichever process is loudest in standup this week.
 
-### 2. The internal practice is product research
+### 2. Instrument before you fix
 
-Light sells AI-native finance to companies still running on spreadsheets, DocuSign, and Word templates. The case study is a Light example of that pattern.
+A workflow change that saves five hours next month and zero hours every month after is a one-off, not a fix. The trap is improving something nobody can prove improved.
 
-Not a contradiction. Every Series A startup runs internally on duct tape. But it is the most legitimate place for an F&O hire to start — every internal workflow I clean up is a candidate spec for what Light could one day sell.
+My bias is to put a single number on the workflow before changing it: time spent, exceptions per week, where it stalls. That makes the before / after auditable to Martina and to anyone who follows me.
 
-- Linear runs on Linear.
-- Lovable, a Light customer, runs on Lovable.
+This is the same logic the build memo applies to the contract workflow. The structured payload is the measurement, not a side effect.
 
-F&O at Light has an unusual property: the internal work is also product research.
+### 3. Take work off Martina's plate, do not compete for hers
 
-### 3. Earn the right to bigger opinions later
+The Head of F&O at a 30x-growth company is the highest-leverage seat on the org chart. The fastest way I become useful is to own the half-built workflows she has been carrying personally, not to compete for the strategic calls she is paid to make.
 
-I would rather come to Martina at the end of the quarter with one clean diagnosis of one workflow than five half-formed takes at the end of week one. The failure mode I want to avoid: being the new hire with opinions before data.
+For the first 90 days, my default would be the unglamorous end-of-month, end-of-quarter, end-of-deal work — the things that drain her week but do not move the company forward when she is the one doing them.
