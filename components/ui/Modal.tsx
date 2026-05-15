@@ -39,8 +39,8 @@ export function Modal({ open, title, subtitle, headerActions, onClose, children,
       <div className="absolute inset-0 bg-ink-950/40" onClick={onClose} aria-hidden />
       <div className={`relative z-10 w-full ${sizeClass[size]} overflow-hidden rounded-2xl bg-white shadow-2xl`}>
         {(title || subtitle) && (
-          <header className="flex items-start justify-between gap-4 border-b border-ink-100 px-6 py-4">
-            <div>
+          <header className="flex items-start justify-between gap-3 border-b border-ink-100 px-4 py-3.5 sm:gap-4 sm:px-6 sm:py-4">
+            <div className="min-w-0">
               {title && <h3 className="text-base font-semibold text-ink-900">{title}</h3>}
               {subtitle && <p className="mt-0.5 text-sm text-ink-500">{subtitle}</p>}
             </div>
@@ -56,9 +56,12 @@ export function Modal({ open, title, subtitle, headerActions, onClose, children,
             </div>
           </header>
         )}
-        <div className="max-h-[70vh] overflow-y-auto px-6 py-5">{children}</div>
+        <div className="max-h-[70vh] overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">{children}</div>
         {footer && (
-          <footer className="flex items-center justify-end gap-3 border-t border-ink-100 bg-ink-50/60 px-6 py-3">
+          // flex-wrap + smaller side padding on mobile so multi-button footers
+          // (the DocuSign preview has 4: Show API / Save draft / Close / Send)
+          // don't push the primary action off-screen on a 375px phone.
+          <footer className="flex flex-wrap items-center justify-end gap-2 border-t border-ink-100 bg-ink-50/60 px-4 py-3 sm:gap-3 sm:px-6">
             {footer}
           </footer>
         )}

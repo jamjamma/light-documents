@@ -292,7 +292,11 @@ function RogueRow({
         isFirst && "tour-anchor-rogue-row",
       )}
     >
-      <div className="flex items-start gap-3">
+      {/* Mobile: stack the action buttons below the icon+content row instead
+          of squeezing them into a third column. Desktop keeps the 3-column
+          row layout (icon | content | actions). */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-3">
+        <div className="flex min-w-0 flex-1 items-start gap-3">
         <div
           className={clsx(
             "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
@@ -394,11 +398,14 @@ function RogueRow({
             </div>
           )}
         </div>
+        </div>
 
-        {/* Action buttons (right column on desktop, wraps under content on narrow) */}
+        {/* Action buttons. On mobile: full-width horizontal row beneath the
+            content so the content above isn't squeezed by a fixed actions
+            column. Desktop: vertical column on the right of the row. */}
         <div
           className={clsx(
-            "flex shrink-0 flex-col gap-1.5",
+            "flex shrink-0 flex-row gap-2 sm:flex-col sm:gap-1.5",
             isFirst && "tour-anchor-rogue-actions",
           )}
         >
@@ -408,7 +415,7 @@ function RogueRow({
               size="sm"
               leadingIcon={<ArchiveIcon className="h-3.5 w-3.5" />}
               onClick={onArchive}
-              className={clsx(isFirst && "tour-anchor-rogue-archive-button")}
+              className={clsx("flex-1 sm:flex-none", isFirst && "tour-anchor-rogue-archive-button")}
             >
               Archive
             </Button>
@@ -420,7 +427,7 @@ function RogueRow({
               leadingIcon={<BellRing className="h-3.5 w-3.5" />}
               onClick={onOpenNotify}
               title={`Open Slack DM preview for ${target.recipient}`}
-              className={clsx(isFirst && "tour-anchor-rogue-notify-button")}
+              className={clsx("flex-1 sm:flex-none", isFirst && "tour-anchor-rogue-notify-button")}
             >
               Notify owner
             </Button>

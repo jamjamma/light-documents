@@ -224,12 +224,20 @@ function Stepper({ step, onJump, canJumpTo }: { step: Step; onJump: (s: Step) =>
               >
                 {status === "done" ? <Check className="h-3 w-3" /> : s.id}
               </span>
-              <span className={clsx("text-[12px] font-medium", status === "active" ? "text-ink-900" : "text-ink-500")}>
+              {/* Mobile: only the active step shows its label so 3 steps +
+                  connectors fit cleanly on a 375px viewport. Desktop shows
+                  every label as before. */}
+              <span
+                className={clsx(
+                  "text-[12px] font-medium",
+                  status === "active" ? "inline text-ink-900" : "hidden text-ink-500 sm:inline",
+                )}
+              >
                 {s.label}
               </span>
             </button>
             {i < STEPS.length - 1 && (
-              <div className={clsx("mx-3 h-px flex-1", status === "done" ? "bg-sage-500" : "bg-ink-200")} />
+              <div className={clsx("mx-2 h-px flex-1 sm:mx-3", status === "done" ? "bg-sage-500" : "bg-ink-200")} />
             )}
           </div>
         );
@@ -250,28 +258,33 @@ function SourceContextBar({
   onChangeTemplate: () => void;
 }) {
   return (
-    <div className="sticky top-0 z-10 flex items-center gap-3 rounded-xl border border-ink-200 bg-white px-4 py-2.5 shadow-card">
-      <DocumentTypeIcon type={template.type} size="sm" />
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <span className="text-[13px] font-semibold text-ink-900">{template.name}</span>
-          <span className="font-mono text-[11px] text-ink-500">{template.version}</span>
-          <span className="text-ink-400">·</span>
-          <span className="text-[13px] text-ink-800">{source.display}</span>
-          <span className="text-[11px] text-ink-500">via {source.system}{source.externalRef ? ` ${source.externalRef}` : ""}</span>
+    // Mobile: 2-row layout (info above, change-buttons below) so the
+    // template name + version + source display has room to breathe.
+    // Desktop: 3-column row with change buttons pinned right.
+    <div className="sticky top-0 z-10 flex flex-col gap-2 rounded-xl border border-ink-200 bg-white px-4 py-2.5 shadow-card sm:flex-row sm:items-center sm:gap-3">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <DocumentTypeIcon type={template.type} size="sm" />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+            <span className="text-[13px] font-semibold text-ink-900">{template.name}</span>
+            <span className="font-mono text-[11px] text-ink-500">{template.version}</span>
+            <span className="hidden text-ink-400 sm:inline">·</span>
+            <span className="text-[13px] text-ink-800">{source.display}</span>
+            <span className="text-[11px] text-ink-500">via {source.system}{source.externalRef ? ` ${source.externalRef}` : ""}</span>
+          </div>
+          <div className="text-[11px] text-ink-500">{source.subtitle}</div>
         </div>
-        <div className="text-[11px] text-ink-500">{source.subtitle}</div>
       </div>
       <div className="flex shrink-0 items-center gap-1.5">
         <button
           onClick={onChangeTemplate}
-          className="inline-flex items-center gap-1 rounded-md border border-ink-200 px-2 py-1 text-[11px] text-ink-700 hover:bg-ink-50"
+          className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border border-ink-200 px-2 py-1.5 text-[11px] text-ink-700 hover:bg-ink-50 sm:flex-none"
         >
           <Pencil className="h-3 w-3" /> template
         </button>
         <button
           onClick={onChangeSource}
-          className="inline-flex items-center gap-1 rounded-md border border-ink-200 px-2 py-1 text-[11px] text-ink-700 hover:bg-ink-50"
+          className="inline-flex flex-1 items-center justify-center gap-1 rounded-md border border-ink-200 px-2 py-1.5 text-[11px] text-ink-700 hover:bg-ink-50 sm:flex-none"
         >
           <Pencil className="h-3 w-3" /> source
         </button>
