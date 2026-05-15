@@ -52,16 +52,19 @@ export function ApprovalActionsMenu({ approval, onReassign, onReping, onReject }
         aria-haspopup="menu"
         aria-expanded={open}
         className={clsx(
-          "inline-flex h-7 w-7 items-center justify-center rounded-md text-ink-500 transition-colors",
+          // h-9 on mobile (~36px) so the touch target clears the iOS HIG 44px
+          // safe zone with comfortable padding; h-7 on sm+ keeps the dense
+          // desktop scan-rhythm next to the status pill.
+          "inline-flex h-9 w-9 items-center justify-center rounded-md text-ink-500 transition-colors sm:h-7 sm:w-7",
           open ? "bg-ink-100 text-ink-900" : "hover:bg-ink-100 hover:text-ink-900",
         )}
       >
-        <MoreHorizontal className="h-3.5 w-3.5" />
+        <MoreHorizontal className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
       </button>
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-full z-30 mt-1 w-52 overflow-hidden rounded-lg border border-ink-200 bg-white py-1 shadow-lg"
+          className="absolute right-0 top-full z-30 mt-1 w-56 overflow-hidden rounded-lg border border-ink-200 bg-white py-1 shadow-lg sm:w-52"
         >
           <MenuItem icon={<UserPlus className="h-3.5 w-3.5" />} onClick={handle(onReassign)}>
             Reassign / Pass on…
@@ -96,7 +99,9 @@ function MenuItem({
       role="menuitem"
       onClick={onClick}
       className={clsx(
-        "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors",
+        // py-2.5 + text-[13px] on mobile lands each item at ~40px tall.
+        // Tighter on sm+ to match the dense desktop menu rhythm.
+        "flex w-full items-center gap-2 px-3 py-2.5 text-left text-[13px] transition-colors sm:py-1.5 sm:text-[12px]",
         danger ? "text-rose-600 hover:bg-rose-50" : "text-ink-800 hover:bg-ink-50",
       )}
     >

@@ -22,26 +22,27 @@ interface Props {
 export function KpiStrip({ kpis, trailing }: Props) {
   return (
     <div className="panel overflow-hidden">
-      <div className="grid grid-cols-2 divide-x divide-y divide-ink-100 sm:flex sm:items-stretch sm:divide-y-0">
+      {/* Mobile: 3-up grid (one per KPI), so 3 KPIs never leave an empty cell
+          and 4+ wrap into a 3-then-N layout. Desktop: flex strip. */}
+      <div className="grid grid-cols-3 divide-x divide-ink-100 sm:flex sm:items-stretch">
         {kpis.map((k, i) => {
           const interactive = !!k.onClick;
           const inner = (
             <>
-              <div className="text-[11px] uppercase tracking-wider text-ink-500">{k.label}</div>
+              <div className="text-[10px] uppercase tracking-wider text-ink-500 sm:text-[11px]">{k.label}</div>
               <div
                 className={clsx(
-                  "mt-1 text-xl font-semibold tracking-tight sm:text-2xl",
+                  "mt-1 text-lg font-semibold tracking-tight sm:text-2xl",
                   k.emphasis ? "text-rose-500" : "text-ink-900",
                 )}
               >
                 {k.value}
               </div>
-              {k.hint && <div className="mt-1 text-[11px] leading-snug text-ink-500 sm:text-xs">{k.hint}</div>}
+              {k.hint && <div className="mt-1 hidden text-[11px] leading-snug text-ink-500 sm:block sm:text-xs">{k.hint}</div>}
             </>
           );
           const cls = clsx(
-            "px-4 py-3 text-left sm:flex-1 sm:px-5 sm:py-4",
-            i < 2 ? "sm:border-t-0" : "",
+            "px-2.5 py-3 text-left sm:flex-1 sm:px-5 sm:py-4",
             interactive && "transition-colors hover:bg-ink-50",
             k.active && "bg-ink-900/[0.03] ring-1 ring-inset ring-ink-900/15",
             k.className,
@@ -65,7 +66,7 @@ export function KpiStrip({ kpis, trailing }: Props) {
             </div>
           );
         })}
-        {trailing && <div className="col-span-2 flex items-center border-t border-ink-100 px-4 py-3 sm:col-auto sm:border-t-0 sm:px-5">{trailing}</div>}
+        {trailing && <div className="col-span-3 flex items-center border-t border-ink-100 px-4 py-3 sm:col-auto sm:border-t-0 sm:px-5">{trailing}</div>}
       </div>
     </div>
   );
