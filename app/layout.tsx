@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
 import { DemoBanner } from "@/components/DemoBanner";
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <TourController />
           <TourMenu />
         </MobileNavProvider>
+        <Analytics />
       </body>
     </html>
   );
