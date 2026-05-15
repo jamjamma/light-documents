@@ -17,6 +17,9 @@ import {
   writeAllProgress,
   clearAllProgress,
   chapterProgressLabel,
+  markTourRecentlyClosed,
+  wasTourRecentlyClosed,
+  clearTourRecentlyClosed,
 } from "@/lib/tour-steps";
 
 /**
@@ -344,6 +347,15 @@ export function TourController() {
       destroyDriver();
       return;
     }
+    // Defence in depth: if the user just clicked X, suppress any re-render
+    // for the cooldown window even if state.active somehow flipped back to
+    // true. Catches race conditions where a late-firing observer or
+    // strict-mode double effect tries to revive the popover.
+    if (wasTourRecentlyClosed()) {
+      writeTourState({ ...state, active: false });
+      destroyDriver();
+      return;
+    }
     let stepIndex = state.stepIndex;
     let step = TOUR_STEPS[stepIndex];
     if (!step) {
@@ -521,6 +533,10 @@ export function TourController() {
       writeTourState({ ...state, active: false, stepIndex: 0 });
       setTourDismissed(true);
       markTourSeen();
+      // Stamp a cooldown so anything that might race a reopen (path-change
+      // effect, late observer fire, React strict-mode double invocation, a
+      // pending auto-next event) sees the recent close and bails.
+      markTourRecentlyClosed();
       destroyDriver();
     },
   };

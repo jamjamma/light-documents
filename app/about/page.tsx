@@ -52,39 +52,76 @@ export default function AboutPage() {
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center gap-1.5 text-[13px] font-medium text-ink-900">
               <BookOpen className="h-3.5 w-3.5" />
-              The full case study
+              The full case study has three parts
             </div>
             <p className="text-[12.5px] text-ink-600">
-              This page is Part 1 (the build memo). The full submission has three parts plus the source.
+              You are on <strong className="text-ink-900">Part 1</strong> right now (this page is the build memo).
+              Parts 2 and 3 are linked below, alongside the long-form README and the source.
             </p>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-              <PrimaryLinkTile href={README_URL} title="README.md" detail="Long-form of this page, on GitHub." icon={<FileText className="h-3.5 w-3.5" />} />
-              <PrimaryLinkTile href={PART_2_URL} title="Case Part 2" detail="Cohort analysis." />
-              <PrimaryLinkTile href={PART_3_URL} title="Case Part 3" detail="Day-one plan." />
-              <PrimaryLinkTile href={REPO_URL} title="Repo" detail="Source + decision log." icon={<Github className="h-3.5 w-3.5" />} />
+              <PrimaryLinkTile href={PART_2_URL} title="Part 2 →" detail="SaaS cohort analysis." />
+              <PrimaryLinkTile href={PART_3_URL} title="Part 3 →" detail="Day-one mindset + the 1-1 plan." />
+              <PrimaryLinkTile href={README_URL} title="README.md →" detail="Long-form of this page (Part 1)." icon={<FileText className="h-3.5 w-3.5" />} />
+              <PrimaryLinkTile href={REPO_URL} title="Repo →" detail="Source code + decision log." icon={<Github className="h-3.5 w-3.5" />} />
             </div>
           </div>
         </Card>
 
         {/* ─────────────────────────  1. PROBLEM + REFRAME  ───────────────────────── */}
         <Section title="The problem, and the reframe" icon={<Target className="h-4 w-4" />}>
-          <p>
-            The stated pain (manual Word edits and hand-placed DocuSign fields) is real. The workflow below kills both directly.
-          </p>
-          <div className="rounded-lg border border-ink-100 bg-ink-50/60 p-3.5 text-[13px] leading-relaxed">
-            <div className="demo-note mb-2">The reframe</div>
-            <ul className="space-y-2 text-ink-700">
+
+          {/* The problem */}
+          <div>
+            <div className="demo-note mb-2">The problem</div>
+            <ul className="space-y-1.5 text-[13px]">
               <li className="flex gap-2">
                 <span className="text-ink-400">•</span>
                 <span>
-                  <strong>Commercial contracts carry structured data.</strong> MSAs and Order Forms → revenue and billing.
-                  Employment → headcount. Warrants → cap table. Vendor → AP.
+                  <strong>Manual Word edits per contract.</strong> Counterparty, value, payment terms, governing law,
+                  signers, more depending on template. Every field is a place for a typo or a stale value.
                 </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-ink-400">•</span>
                 <span>
-                  <strong>NDAs are the exception.</strong> No commercial value to post. They file for retention only.
+                  <strong>Hand-placed DocuSign fields.</strong> Signature, date, initial blocks dragged into position
+                  per envelope, per signer, every time.
+                </span>
+              </li>
+            </ul>
+            <p className="mt-2 text-[12.5px] text-ink-600">
+              At Light&apos;s stated 50 to 100 contracts / month, the friction is a steady operational tax. Worse, the
+              structured data inside each contract is lost on the way out, so RevOps re-keys it later. The workflow
+              below kills both at the root.
+            </p>
+          </div>
+
+          {/* The reframe */}
+          <div className="rounded-lg border border-ink-100 bg-ink-50/60 p-3.5 text-[13px] leading-relaxed">
+            <div className="demo-note mb-2">The reframe</div>
+            <p className="mb-2.5 text-ink-700">
+              Most contracts already carry the data Light needs. The opportunity is to capture it on the way out,
+              not re-key it later.
+            </p>
+            <ul className="space-y-2.5 text-ink-700">
+              <li>
+                <div className="flex gap-2">
+                  <span className="text-ink-400">•</span>
+                  <span>
+                    <strong>Commercial contracts → structured data.</strong>
+                  </span>
+                </div>
+                <ul className="ml-5 mt-1 space-y-0.5 text-ink-600">
+                  <li>– MSAs and Order Forms → revenue and billing (MRR, ARR, renewal date)</li>
+                  <li>– Employment → headcount and compensation</li>
+                  <li>– Warrants → cap table</li>
+                  <li>– Vendor → AP and obligation tracking</li>
+                </ul>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-ink-400">•</span>
+                <span>
+                  <strong>NDAs are the exception.</strong> No commercial value to post; they file for retention only.
                 </span>
               </li>
               <li className="flex gap-2">
@@ -95,8 +132,9 @@ export default function AboutPage() {
                 </span>
               </li>
             </ul>
-            <p className="mt-2.5 text-ink-600">
-              The PDF is the audit artifact, the data is the product. That is the strategic opening, conditional on Light&apos;s product direction.
+            <p className="mt-3 text-ink-600">
+              <strong className="text-ink-900">The PDF is the audit artifact. The data is the product.</strong>{" "}
+              That is the strategic opening, conditional on Light&apos;s product direction.
             </p>
           </div>
         </Section>
@@ -219,8 +257,9 @@ export default function AboutPage() {
             </li>
           </ul>
           <div className="rounded-lg border border-ink-100 bg-ink-50/60 p-3 text-[12.5px] text-ink-600">
-            <strong className="text-ink-900">Why this is load-bearing.</strong> Counsel may still log in to approve a
-            clause deviation when one is flagged. Authoring stays in Word; review happens here.
+            <strong className="text-ink-900">What we ask of Counsel.</strong> Drafting stays in Word, exactly as today.
+            Counsel logs into Light Documents only when a clause deviation is flagged for their review. No new editor,
+            no new place to author.
           </div>
         </Section>
 

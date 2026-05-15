@@ -1670,6 +1670,50 @@ export function markTourSeen(): void {
 }
 
 /**
+ * Tracks when the user explicitly closed the tour. Used as a defence-in-depth
+ * gate so that race-condition reopens (path change firing the same tick as a
+ * close, React strict-mode double effects, late-firing observers) cannot pop
+ * the tour back onto the screen. Any auto-open path should consult this and
+ * bail if the close happened within the cooldown window.
+ *
+ * Cooldown is intentionally short so that an explicit user-initiated re-open
+ * (Take the Tour from the sidebar) feels responsive.
+ */
+const TOUR_RECENT_CLOSE_KEY = "tour-recent-close-at";
+export const TOUR_REOPEN_COOLDOWN_MS = 3000;
+
+export function markTourRecentlyClosed(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(TOUR_RECENT_CLOSE_KEY, String(Date.now()));
+  } catch {
+    // ignore
+  }
+}
+
+export function clearTourRecentlyClosed(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(TOUR_RECENT_CLOSE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+export function wasTourRecentlyClosed(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const raw = window.localStorage.getItem(TOUR_RECENT_CLOSE_KEY);
+    if (!raw) return false;
+    const ts = Number(raw);
+    if (!Number.isFinite(ts)) return false;
+    return Date.now() - ts < TOUR_REOPEN_COOLDOWN_MS;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Wipe every tour-related flag. Called from Reset demo data so a single
  * click returns the operator to a first-visit-ever state (tour will
  * auto-start again on next dashboard load).
@@ -1683,6 +1727,7 @@ export function resetTourState(): void {
     window.localStorage.removeItem(TOUR_CHAPTERS_DONE_KEY);
     window.localStorage.removeItem(TOUR_CHAPTER_PROGRESS_KEY);
     window.localStorage.removeItem(TOUR_ALL_PROGRESS_KEY);
+    window.localStorage.removeItem(TOUR_RECENT_CLOSE_KEY);
   } catch {
     // ignore
   }

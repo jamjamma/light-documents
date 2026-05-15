@@ -20,6 +20,7 @@ import {
   writeTourState,
   markTourSeen,
   setTourDismissed,
+  clearTourRecentlyClosed,
   resetTourState,
   formatTotalTourDuration,
 } from "@/lib/tour-steps";
@@ -89,6 +90,7 @@ export function TourMenu() {
     resetDemo();
     resetTourState();
     markTourSeen();
+    clearTourRecentlyClosed();
     writeTourState({ active: true, stepIndex: 0, mode: "all" });
     setOpen(false);
     // Hard reload to "/" so the dashboard mounts with fresh contracts and the
@@ -102,6 +104,7 @@ export function TourMenu() {
     // Resume: do NOT reset demo data. Continue from saved global step
     // index. Hard reload to the step's path so the page DOM is fresh.
     markTourSeen();
+    clearTourRecentlyClosed();
     writeTourState({ active: true, stepIndex: savedAllIdx, mode: "all" });
     // Persist the same value so the next dismissal still has it.
     writeAllProgress(savedAllIdx);
@@ -125,6 +128,7 @@ export function TourMenu() {
       }
     }
     markTourSeen();
+    clearTourRecentlyClosed();
     const stepIndex = firstStepIndexOf(chapter);
     writeTourState({ active: true, stepIndex, mode: "chapter", chapter });
     setOpen(false);
@@ -147,6 +151,7 @@ export function TourMenu() {
     const stepIndex =
       typeof saved === "number" ? saved : firstStepIndexOf(chapter);
     markTourSeen();
+    clearTourRecentlyClosed();
     writeTourState({ active: true, stepIndex, mode: "chapter", chapter });
     setOpen(false);
     const path = TOUR_STEPS[stepIndex]?.path ?? "/";
