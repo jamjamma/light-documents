@@ -306,6 +306,21 @@ export const TOUR_STEPS: TourStep[] = [
     next: "advance",
     effect: "filter:in_review",
   },
+  // ── Chapter transition: into Workflow walk ────────────────────────────
+  {
+    id: "workflow-intro",
+    chapter: "workflow",
+    path: "/",
+    // Centered popover (no selector) so this reads as a section divider,
+    // not as a callout on any particular element.
+    title: "Chapter 2 of 6 · Workflow walk",
+    description: `
+      <p class="lead">We'll walk one contract end-to-end: Bolt MSA, from in-review to signed.</p>
+      <p>Clause check → routing → approvals → envelope preview → send. About 2 minutes.</p>
+    `,
+    next: "advance",
+    nextLabel: "Start chapter",
+  },
   {
     id: "hero-row",
     chapter: "workflow",
@@ -670,7 +685,20 @@ export const TOUR_STEPS: TourStep[] = [
     hideNext: true,
   },
 
-  // ── Act 5: Bolt's signed page ─────────────────────────────────────────
+  // ── Chapter transition: into Signed record ────────────────────────────
+  {
+    id: "signed-intro",
+    chapter: "signed",
+    path: `/contracts/${HERO_CONTRACT_ID}/signed`,
+    title: "Chapter 3 of 6 · Signed record",
+    description: `
+      <p class="lead">Bolt is signed. Now we walk what got recorded.</p>
+      <p>Signed banner → PDF retention → audit trail event by event → structured writeback.</p>
+    `,
+    next: "advance",
+    nextLabel: "Start chapter",
+  },
+  // ── Bolt's signed page ────────────────────────────────────────────────
   {
     id: "signed-banner",
     chapter: "signed",
@@ -836,17 +864,17 @@ export const TOUR_STEPS: TourStep[] = [
     nextLabel: "Next",
   },
 
-  // ── Act 5: Signed contracts archive ───────────────────────────────────
+  // ── Chapter transition: into Signed archive ───────────────────────────
   {
     id: "archive-landing",
     chapter: "archive",
     path: "/archive",
     selector: ".tour-anchor-sidebar-archive",
     side: "right",
-    title: "We're in Signed contracts now",
+    title: "Chapter 4 of 6 · Signed archive",
     description: `
-      <p>This is the <strong>Signed contracts</strong> section of the sidebar, now highlighted because we navigated here from Bolt's signed record.</p>
-      <p class="muted">Every filed contract from every template type lands here. The dashboard above is in-flight work; this is the past record.</p>
+      <p class="lead">Every filed contract, by template type. The dashboard is in-flight work; this is the past record.</p>
+      <p class="muted">Highlighted in the sidebar because we navigated here from Bolt's signed record.</p>
     `,
     next: "advance",
   },
@@ -916,17 +944,17 @@ export const TOUR_STEPS: TourStep[] = [
     effect: "archive:filter:equity",
   },
 
-  // ── Act 6: Templates walked section by section ────────────────────────
+  // ── Chapter transition: into Templates ────────────────────────────────
   {
     id: "templates-landing",
     chapter: "templates",
     path: "/templates",
     selector: ".tour-anchor-sidebar-templates",
     side: "right",
-    title: "We're in Templates now",
+    title: "Chapter 5 of 6 · Templates",
     description: `
-      <p>This is the <strong>Templates</strong> section of the sidebar, now highlighted because we navigated here.</p>
-      <p class="muted">Master Word docs live here, alongside the rogue-template governance panel.</p>
+      <p class="lead">Master Word docs and the rogue-template governance panel.</p>
+      <p class="muted">Highlighted in the sidebar because we navigated here.</p>
     `,
     next: "advance",
   },
@@ -1313,7 +1341,19 @@ export const TOUR_STEPS: TourStep[] = [
     hideNext: true,
   },
 
-  // ── Act 7: New contract intake (end-to-end) ───────────────────────────
+  // ── Chapter transition: into New contract ─────────────────────────────
+  {
+    id: "intake-intro",
+    chapter: "intake",
+    path: "/contracts/new",
+    title: "Chapter 6 of 6 · New contract",
+    description: `
+      <p class="lead">Last chapter. We'll start a contract from scratch.</p>
+      <p>Pick a template → pick a source record → confirm fields → run checks. The same engine you saw on Bolt MSA fires again.</p>
+    `,
+    next: "advance",
+    nextLabel: "Start chapter",
+  },
   {
     id: "intake-stepper",
     chapter: "intake",
