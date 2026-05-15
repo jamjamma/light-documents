@@ -14,6 +14,9 @@ import {
   stepIndexWithinChapter,
   readChaptersDone,
   readChapterProgress,
+  readAllProgress,
+  clearAllProgress,
+  writeAllProgress,
   writeTourState,
   markTourSeen,
   setTourDismissed,
@@ -78,6 +81,9 @@ export function TourMenu() {
 
   const done = new Set(readChaptersDone());
   const progress = readChapterProgress();
+  const savedAllIdx = readAllProgress();
+  const canResumeAll =
+    typeof savedAllIdx === "number" && savedAllIdx > 0 && savedAllIdx < TOUR_STEPS.length;
 
   const startWalkEverything = () => {
     resetDemo();
@@ -89,6 +95,19 @@ export function TourMenu() {
     // TourController picks up the new tour-state. Avoids stale store snapshots
     // when the user is mid-flight on another page.
     if (typeof window !== "undefined") window.location.href = "/";
+  };
+
+  const resumeWalkEverything = () => {
+    if (!canResumeAll) return;
+    // Resume: do NOT reset demo data. Continue from saved global step
+    // index. Hard reload to the step's path so the page DOM is fresh.
+    markTourSeen();
+    writeTourState({ active: true, stepIndex: savedAllIdx, mode: "all" });
+    // Persist the same value so the next dismissal still has it.
+    writeAllProgress(savedAllIdx);
+    setOpen(false);
+    const path = TOUR_STEPS[savedAllIdx]?.path ?? "/";
+    if (typeof window !== "undefined") window.location.href = path === "*" ? "/" : path;
   };
 
   const startChapter = (chapter: ChapterId) => {
@@ -172,20 +191,38 @@ export function TourMenu() {
         </div>
       ) : (
         <div className="space-y-3">
-          <button
-            onClick={startWalkEverything}
-            className="flex w-full items-start gap-3 rounded-xl border border-ink-900 bg-ink-900 px-4 py-3 text-left text-white transition-colors hover:bg-ink-800"
-          >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-300/20 text-accent-300">
-              <Sparkles className="h-4 w-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-[14px] font-semibold">Walk everything in order</div>
-              <div className="mt-0.5 text-[12px] text-white/70">
-                All 6 chapters, end-to-end. About {formatTotalTourDuration()}.
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+            <button
+              onClick={startWalkEverything}
+              className="flex flex-1 items-start gap-3 rounded-xl border border-ink-900 bg-ink-900 px-4 py-3 text-left text-white transition-colors hover:bg-ink-800"
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-300/20 text-accent-300">
+                <Sparkles className="h-4 w-4" />
               </div>
-            </div>
-          </button>
+              <div className="min-w-0 flex-1">
+                <div className="text-[14px] font-semibold">
+                  {canResumeAll ? "Restart everything" : "Walk everything in order"}
+                </div>
+                <div className="mt-0.5 text-[12px] text-white/70">
+                  All 6 chapters, end-to-end. About {formatTotalTourDuration()}.
+                </div>
+              </div>
+            </button>
+            {canResumeAll && (
+              <button
+                onClick={resumeWalkEverything}
+                className="flex shrink-0 items-center justify-center gap-2 rounded-xl border border-accent-300 bg-accent-50 px-4 py-3 text-left text-accent-700 transition-colors hover:bg-accent-100 sm:w-44"
+              >
+                <Clock className="h-4 w-4" />
+                <div className="min-w-0">
+                  <div className="text-[13px] font-semibold">Resume</div>
+                  <div className="text-[11px] text-accent-700/80">
+                    Step {savedAllIdx + 1} of {TOUR_STEPS.length}
+                  </div>
+                </div>
+              </button>
+            )}
+          </div>
 
           <div className="-mb-1 pt-1 text-[10px] font-semibold uppercase tracking-wider text-ink-400">
             Or pick a chapter

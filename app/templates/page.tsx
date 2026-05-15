@@ -264,7 +264,7 @@ export default function TemplatesPage() {
                         const meta = SYNC_META[template.id];
                         const isMsa = template.id === "msa_v4_2";
                         return (
-                          <div key={template.id} className={isMsa ? "tour-anchor-template-msa-card" : undefined}>
+                          <div key={template.id}>
                             <TemplateCard
                               template={template}
                               sourceFileName={meta.fileName}
@@ -273,6 +273,7 @@ export default function TemplatesPage() {
                               anchorTagCount={meta.anchorTagCount}
                               onClick={() => setSelectedTemplate(template)}
                               hideCategoryPill
+                              innerClassName={isMsa ? "tour-anchor-template-msa-card" : undefined}
                             />
                           </div>
                         );
@@ -289,7 +290,7 @@ export default function TemplatesPage() {
                 const meta = SYNC_META[template.id];
                 const isMsa = template.id === "msa_v4_2";
                 return (
-                  <div key={template.id} className={isMsa ? "tour-anchor-template-msa-card" : undefined}>
+                  <div key={template.id}>
                     <TemplateCard
                       template={template}
                       sourceFileName={meta.fileName}
@@ -297,6 +298,7 @@ export default function TemplatesPage() {
                       variableCount={meta.variableCount}
                       anchorTagCount={meta.anchorTagCount}
                       onClick={() => setSelectedTemplate(template)}
+                      innerClassName={isMsa ? "tour-anchor-template-msa-card" : undefined}
                     />
                   </div>
                 );

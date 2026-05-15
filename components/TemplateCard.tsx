@@ -22,9 +22,16 @@ interface Props {
   onClick: () => void;
   /** Hide the category pill when the card is already grouped under a section header for that category. */
   hideCategoryPill?: boolean;
+  /**
+   * Optional class applied to the inner "View details" button only. Used for
+   * tour anchoring so the highlight does not include the "Use this template"
+   * Link that lives outside the inner button (and would navigate away if
+   * clicked during the tour).
+   */
+  innerClassName?: string;
 }
 
-export function TemplateCard({ template, sourceFileName, syncedAgo, anchorTagCount, onClick, hideCategoryPill }: Props) {
+export function TemplateCard({ template, sourceFileName, syncedAgo, anchorTagCount, onClick, hideCategoryPill, innerClassName }: Props) {
   const history = template.versionHistory ?? [];
   const currentAuthor = history.find((v) => v.status === "current")?.author;
   const bullets = bulletsForTemplate(template);
@@ -38,7 +45,7 @@ export function TemplateCard({ template, sourceFileName, syncedAgo, anchorTagCou
         type="button"
         onClick={onClick}
         aria-label={`View details for ${template.name}`}
-        className="flex flex-1 flex-col text-left"
+        className={clsx("flex flex-1 flex-col text-left", innerClassName)}
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2.5">

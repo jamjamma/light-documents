@@ -593,16 +593,20 @@ export const TOUR_STEPS: TourStep[] = [
     id: "modal-pagenav",
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
-    selector: ".tour-anchor-modal-pagenav",
+    // Anchor on the ACTIVE page button (whichever number is currently
+    // selected). The DocuSignPreviewModal applies the active class to the
+    // selected button and re-applies on every page change. The modal also
+    // dispatches `tour:reanchor` on each click so driver.js re-renders the
+    // highlight on the new active button. Effect: the popover visually
+    // follows the operator as they click through pages 1, 2, 3, ...
+    selector: ".tour-anchor-modal-pagenav-active",
     side: "top",
     title: "Flip through the pages",
     description: `
-      <p><strong>Click any page number</strong> in the nav below to preview that page. Click the <strong>last page</strong> to jump to the signature block; the tour follows automatically.</p>
+      <p><strong>Click any page number</strong> below to preview that page. Click the <strong>last page</strong> to jump to the signature block; the tour follows automatically.</p>
     `,
     // Only paging to the last page (in-app) or Back advances the tour. The
-    // modal dispatches `tour:auto-next` when page === totalPages. Other
-    // buttons in the modal are blocked by driver.js's overlay; the page-nav
-    // buttons inside the highlight stage stay clickable.
+    // modal dispatches `tour:auto-next` when page === totalPages.
     hideNext: true,
     effect: "modal:open",
   },
@@ -1092,9 +1096,11 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted">Click any row to expand the changelog and the diff against the previous version.</p>
     `,
     next: "advance",
-    // Closing the modal here so the next step (templates-counsel) renders
-    // against the catalog page, not behind a still-open modal.
-    effect: "template:close-detail",
+    // Step 12 lives INSIDE the modal; the defensive watcher in templates/page
+    // keeps the modal open while we are on any templates-detail-* step. The
+    // modal-close effect was moved to step 13 (templates-counsel) so the
+    // close happens at the boundary out of the detail walk, not during it.
+    effect: "template:open-detail",
   },
   {
     id: "templates-counsel",
@@ -1103,6 +1109,9 @@ export const TOUR_STEPS: TourStep[] = [
     selector: ".tour-anchor-counsel-section",
     side: "bottom",
     title: "Counsel keeps Word for authoring",
+    // Close the MSA detail modal as we leave the templates-detail-* walk
+    // so the counsel callout on the catalog page is fully visible.
+    effect: "template:close-detail",
     description: `
       <p>This panel explains how Word documents connect. Master templates stay as <code>.docx</code> in <strong>Google Drive or SharePoint</strong>, edited where Counsel already edits. A folder-watch webhook fires on every save; our platform parses the docx, extracts <code>{{variables}}</code> and <code>\\sig:anchor\\</code> tags, and caches.</p>
       <p class="muted">The Legal team (illustrated in this demo by Sara Friis) may still log in to approve a clause deviation when one is routed to them. What stays out is authoring, not review.</p>
@@ -1379,6 +1388,9 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted">Click <strong>Next</strong> to wrap up on the dashboard.</p>
     `,
     next: "advance",
+    // Block Preview envelope click on this step. We are wrapping the tour,
+    // not walking the modal again. User must click Next on the popover.
+    lockInteraction: true,
   },
 
   // ── Wrap up ───────────────────────────────────────────────────────────
@@ -1436,6 +1448,8 @@ export const TOUR_DISMISSED_KEY = "tour-dismissed";
 export const TOUR_SEEN_KEY = "tour-seen";
 export const TOUR_CHAPTERS_DONE_KEY = "tour-chapters-done";
 export const TOUR_CHAPTER_PROGRESS_KEY = "tour-chapter-progress";
+/** Saved step index for the walk-everything mode so users can resume mid-walk. */
+export const TOUR_ALL_PROGRESS_KEY = "tour-all-progress";
 
 /**
  * The active tour state.
@@ -1543,6 +1557,37 @@ export function clearChapterProgress(chapter: ChapterId): void {
   }
 }
 
+/** Step index of last viewed step in walk-everything mode, for Resume. */
+export function readAllProgress(): number | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(TOUR_ALL_PROGRESS_KEY);
+    if (raw === null) return null;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+  } catch {
+    return null;
+  }
+}
+
+export function writeAllProgress(stepIndex: number): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(TOUR_ALL_PROGRESS_KEY, String(stepIndex));
+  } catch {
+    // ignore
+  }
+}
+
+export function clearAllProgress(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(TOUR_ALL_PROGRESS_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 export function isTourDismissed(): boolean {
   if (typeof window === "undefined") return true;
   try {
@@ -1602,6 +1647,7 @@ export function resetTourState(): void {
     window.localStorage.removeItem(TOUR_SEEN_KEY);
     window.localStorage.removeItem(TOUR_CHAPTERS_DONE_KEY);
     window.localStorage.removeItem(TOUR_CHAPTER_PROGRESS_KEY);
+    window.localStorage.removeItem(TOUR_ALL_PROGRESS_KEY);
   } catch {
     // ignore
   }

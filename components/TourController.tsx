@@ -14,6 +14,8 @@ import {
   markChapterDone,
   writeChapterProgress,
   clearChapterProgress,
+  writeAllProgress,
+  clearAllProgress,
   chapterProgressLabel,
 } from "@/lib/tour-steps";
 
@@ -403,8 +405,11 @@ export function TourController() {
           markChapterDone(state.chapter);
           clearChapterProgress(state.chapter);
         } else {
-          // Walk-everything: mark all chapters done.
+          // Walk-everything: mark all chapters done + clear the saved
+          // walk-everything progress so the menu offers a fresh Restart
+          // (not Resume from the last step) on next open.
           (["dashboard", "workflow", "signed", "archive", "templates", "intake"] as const).forEach(markChapterDone);
+          clearAllProgress();
         }
         destroyDriver();
         // Land the operator back on the dashboard so they see the AboutWidget
@@ -442,6 +447,10 @@ export function TourController() {
       writeTourState({ ...state, active: true, stepIndex: nextIdx });
       if (state.mode === "chapter" && state.chapter) {
         writeChapterProgress(state.chapter, nextIdx);
+      } else if (state.mode === "all") {
+        // Persist walk-everything progress so a mid-walk dismissal can be
+        // resumed from the same step on the next "Walk everything" open.
+        writeAllProgress(nextIdx);
       }
 
       // The CURRENT step decides how navigation happens.
@@ -479,6 +488,8 @@ export function TourController() {
       writeTourState({ ...state, active: true, stepIndex: prevIdx });
       if (state.mode === "chapter" && state.chapter) {
         writeChapterProgress(state.chapter, prevIdx);
+      } else if (state.mode === "all") {
+        writeAllProgress(prevIdx);
       }
       if (prevStep.path === "*" || prevStep.path === pathname) {
         window.setTimeout(() => renderStep(prevIdx, prevStep), 0);
@@ -493,6 +504,10 @@ export function TourController() {
       // (user dismissed mid-flow). Mark seen so auto-start doesn't fire.
       if (state.mode === "chapter" && state.chapter) {
         writeChapterProgress(state.chapter, state.stepIndex);
+      } else if (state.mode === "all") {
+        // Walk-everything dismissal: persist position so the chooser can
+        // offer Resume on the next open.
+        writeAllProgress(state.stepIndex);
       }
       writeTourState({ ...state, active: false, stepIndex: 0 });
       setTourDismissed(true);
@@ -540,6 +555,28 @@ export function TourController() {
     window.addEventListener("tour:auto-next", handler);
     return () => window.removeEventListener("tour:auto-next", handler);
   }, []);
+
+  // Listen for "tour:reanchor" events. Pages dispatch this when the
+  // anchor element for the current step changes (e.g. the modal's active
+  // page button). driver.js's `refresh()` only re-positions the popover
+  // for the SAME element; here we destroy and re-render so the popover
+  // anchors on the new element matching the same selector. fromStepId
+  // guard avoids spurious re-renders from stale dispatches.
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ fromStepId?: string }>).detail;
+      const state = readTourState();
+      if (!state.active) return;
+      const step = TOUR_STEPS[state.stepIndex];
+      if (!step) return;
+      if (detail?.fromStepId && detail.fromStepId !== step.id) return;
+      // Force a re-render: clear the de-dupe guard then re-render the step.
+      renderedStepIdRef.current = null;
+      renderStep(state.stepIndex, step);
+    };
+    window.addEventListener("tour:reanchor", handler);
+    return () => window.removeEventListener("tour:reanchor", handler);
+  }, [renderStep]);
 
   // Re-render on path change.
   useEffect(() => {
