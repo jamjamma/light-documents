@@ -15,11 +15,18 @@ export function AboutWidget() {
       <div className="flex items-stretch">
         <div className="hidden w-1 shrink-0 bg-accent-400 sm:block" />
         <div className="flex-1 px-5 py-4">
-          {/* Header */}
-          <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-ink-500">
-            <Workflow className="h-3.5 w-3.5" />
-            About this build
+          {/* Header — explicit demo-only framing so reviewers don't mistake
+              this widget for a production-product surface. */}
+          <div className="flex items-center gap-2">
+            <span className="demo-note">Demo only</span>
+            <span className="text-[11px] font-medium uppercase tracking-wider text-ink-500">
+              <Workflow className="mr-1 inline h-3.5 w-3.5 align-[-2px]" />
+              About this build
+            </span>
           </div>
+          <p className="mt-1 text-[11px] text-ink-500">
+            Reviewer orientation. A production operator would never see this on the dashboard.
+          </p>
 
           {/* One-line answer — only the verbs are bold so the eye can scan
               the three actions instead of reading a wall of bold text. */}

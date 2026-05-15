@@ -86,6 +86,12 @@ export default function DashboardPage() {
       />
 
       <div className="space-y-4 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+        {/* Reviewer orientation. First thing on the dashboard so the tour's
+            opening step lands where the eye naturally goes, and so the
+            "demo-only scaffolding" framing is unmistakable. A real operator
+            in production would never see this widget. */}
+        <AboutWidget />
+
         {/* Primary KPI strip: operator-actionable. Click any tile to filter the table below. */}
         <div className="tour-anchor-kpis">
           <KpiStrip
@@ -134,8 +140,6 @@ export default function DashboardPage() {
             Signed contracts →
           </Link>
         </div>
-
-        <AboutWidget />
 
         <ContractsTable
           contracts={contracts}
