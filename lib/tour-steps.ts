@@ -194,6 +194,20 @@ export const TOUR_STEPS: TourStep[] = [
     hideBack: true,
   },
   {
+    id: "orientation-widget",
+    chapter: "dashboard",
+    path: "/",
+    selector: ".tour-anchor-about-widget",
+    side: "bottom",
+    title: "What you're looking at",
+    description: `
+      <p>Before we walk the build, the orientation widget answers the first question every reviewer asks: <em>"what is this?"</em></p>
+      <p>The thesis lives up top (<strong>Wrap. Keep. Build.</strong>) and the build's logic sits in three beats below (<strong>Problem → Answer → Wedge</strong>).</p>
+      <p class="muted">From here, two paths: this tour walks the build surface by surface; <em>About this build</em> opens the full memo. We'll come back here at the end of the tour to point you at the memo.</p>
+    `,
+    next: "advance",
+  },
+  {
     id: "kpis",
     chapter: "dashboard",
     path: "/",
@@ -1442,25 +1456,11 @@ export const TOUR_STEPS: TourStep[] = [
         <li><strong>Templates.</strong> Catalog + rogue governance.</li>
         <li><strong>Intake.</strong> 3-step new-contract form.</li>
       </ul>
-      <p class="lead">Two more pages to point at, then we're done. Click <strong>Next</strong> to land on the dashboard.</p>
+      <p class="lead">One more pointer, then we're done. Click <strong>Next</strong> to land back on the dashboard.</p>
     `,
     next: "navigate",
     goto: "/",
     nextLabel: "Next",
-  },
-  {
-    id: "about-this-build",
-    chapter: "intake",
-    path: "/",
-    selector: ".tour-anchor-about-widget",
-    side: "bottom",
-    title: "Orientation widget",
-    description: `
-      <p>This widget answers the first question a reviewer asks on landing: <em>"what am I looking at?"</em></p>
-      <p>It gives the thesis up front (<strong>Wrap. Keep. Build.</strong>) and frames the build in three beats (<strong>Problem → Answer → Wedge</strong>) before any clicking is required.</p>
-      <p>From here, two paths: read the full memo, or skip reading and take the tour. Both stay one click away on every dashboard visit.</p>
-    `,
-    next: "advance",
   },
   {
     id: "about-this-build-sidebar",
@@ -1468,10 +1468,10 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/",
     selector: ".tour-anchor-sidebar-about",
     side: "right",
-    title: "Full submission memo",
+    title: "More detail lives here",
     description: `
-      <p>The <strong>About this build</strong> link in the sidebar opens the full memo: the three case-study parts, source + reference docs, the problem and reframe, build vs buy, the five key decisions, what's real vs stubbed, and the 90-day plan.</p>
-      <p class="muted">Take the tour or pick a single chapter anytime from the sidebar's tour button.</p>
+      <p>You opened with the orientation widget; this is where the full memo lives. The <strong>About this build</strong> link in the sidebar opens it: the three case-study parts, source + reference docs, problem and reframe, build vs buy, five key decisions, what's real vs stubbed, and the 90-day plan.</p>
+      <p class="muted">Re-take the tour or pick a single chapter anytime from the sidebar's tour button.</p>
     `,
     next: "advance",
     nextLabel: "Finish",
@@ -1749,8 +1749,8 @@ export const CHAPTERS: ChapterMeta[] = [
   {
     id: "dashboard",
     title: "Dashboard",
-    blurb: "Operator KPIs and filters.",
-    estSeconds: 45,
+    blurb: "Orientation, KPIs, filters.",
+    estSeconds: 60,
   },
   {
     id: "workflow",
