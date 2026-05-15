@@ -46,11 +46,11 @@ export function AboutWidget() {
           <div className="mt-3.5 flex flex-wrap items-center gap-2">
             <Link
               href="/about"
-              className="inline-flex items-center gap-2.5 rounded-lg bg-ink-900 px-3 py-2 text-sm text-white transition-colors hover:bg-ink-800"
+              className="inline-flex items-center gap-2.5 rounded-lg border border-ink-200 bg-white px-3 py-2 text-sm font-medium text-ink-900 transition-colors hover:bg-ink-50"
             >
               <Info className="h-4 w-4 shrink-0" />
               About this build
-              <ArrowRight className="h-3 w-3 shrink-0 opacity-70" />
+              <ArrowRight className="h-3 w-3 shrink-0 text-ink-400" />
             </Link>
             <button
               type="button"

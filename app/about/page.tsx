@@ -35,15 +35,18 @@ export default function AboutPage() {
       <div className="mx-auto max-w-4xl space-y-5 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
 
         {/* ─────────────────────────  TOP: TOUR CTA  ───────────────────────── */}
-        <div className="rounded-lg border border-accent-300 bg-accent-50/60 px-4 py-3">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-[13px] text-ink-700">
-              <strong className="text-ink-900">Short on time?</strong> The Take the Tour button in the sidebar walks
-              the whole build in ~9 minutes with popovers explaining each surface. It was built to save you the time
-              of reading this memo. Six chapters; start any one on its own.
+        <div className="rounded-lg border border-accent-300 bg-accent-50/60 px-4 py-3.5">
+          <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="text-[14px] font-semibold text-ink-900">
+                Short on time? Take the tour instead.
+              </div>
+              <div className="mt-1 text-[12.5px] text-ink-600">
+                Walks the whole build with popovers explaining each surface. Six chapters; start any one on its own.
+              </div>
             </div>
-            <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-ink-700 ring-1 ring-inset ring-ink-200">
-              ~9 min guided walk
+            <span className="shrink-0 rounded-full bg-white px-3 py-1 text-[11.5px] font-medium text-ink-900 ring-1 ring-inset ring-ink-200">
+              ~9 min · faster than reading
             </span>
           </div>
         </div>
@@ -79,26 +82,32 @@ export default function AboutPage() {
               />
             </div>
 
-            {/* Build-side reading */}
-            <div className="mt-1 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              <PrimaryLinkTile
-                href={README_URL}
-                title="README.md →"
-                detail="Long-form of this build memo, on GitHub."
-                icon={<FileText className="h-3.5 w-3.5" />}
-              />
-              <PrimaryLinkTile
-                href={PROJECT_DOC_URL}
-                title="docs/PROJECT.md →"
-                detail="Technical deep-dive: state machine, engines, every workflow branch."
-                icon={<FileText className="h-3.5 w-3.5" />}
-              />
-              <PrimaryLinkTile
-                href={REPO_URL}
-                title="Repo →"
-                detail="Source code + the 15 architectural decision records."
-                icon={<Github className="h-3.5 w-3.5" />}
-              />
+            {/* Build-side reading: visually separated from the case-study parts */}
+            <div className="mt-3 border-t border-ink-100 pt-3">
+              <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink-500">
+                <Github className="h-3 w-3" />
+                For the engineer reviewing the build
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                <PrimaryLinkTile
+                  href={README_URL}
+                  title="README.md →"
+                  detail="Long-form of this build memo, on GitHub."
+                  icon={<FileText className="h-3.5 w-3.5" />}
+                />
+                <PrimaryLinkTile
+                  href={PROJECT_DOC_URL}
+                  title="docs/PROJECT.md →"
+                  detail="Technical deep-dive: state machine, engines, every workflow branch."
+                  icon={<FileText className="h-3.5 w-3.5" />}
+                />
+                <PrimaryLinkTile
+                  href={REPO_URL}
+                  title="Repo →"
+                  detail="Source code + the 14 architectural decision records."
+                  icon={<Github className="h-3.5 w-3.5" />}
+                />
+              </div>
             </div>
           </div>
         </Card>
@@ -381,49 +390,118 @@ export default function AboutPage() {
 
         {/* ─────────────────────────  9. NEXT 90 DAYS  ───────────────────────── */}
         <Section title="What I would build next (90 days)" icon={<Workflow className="h-4 w-4" />}>
-          <p className="text-[13px] text-ink-600">
-            Order matters. <strong className="text-ink-900">#1 is the adoption gate</strong> (Slack);{" "}
-            <strong className="text-ink-900">#2 is the strategic extension</strong> (writeback), built parallel not sequential;{" "}
-            <strong className="text-ink-900">#3 to #6 replace the demo stubs</strong> with real integrations;{" "}
-            <strong className="text-ink-900">#7 to #8 close the loop</strong> on external signers and renewals.
-          </p>
-          <div className="overflow-x-auto -mx-1">
-            <table className="min-w-full text-[13px]">
-              <thead>
-                <tr className="border-b border-ink-100">
-                  <th className="py-2 pr-3 align-bottom">#</th>
-                  <th className="py-2 pr-3 align-bottom">Integration</th>
-                  <th className="py-2 align-bottom">Why first</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-ink-100">
-                {/* Adoption gate */}
-                <NextRow n="1" group="Adoption" what="Slack (interactive approvals via DM)" why="Everyone is in Slack. Zero new tool to learn." />
-                {/* Strategic extension */}
-                <NextRow n="2" group="Strategic" what="Light writeback (ledger / HRIS / cap table)" why="Built parallel with Slack so the first signed contract lands somewhere structured if the receiver is ready. Conditional on which receivers Light has exposed." />
-                {/* Replace stubs with real integrations */}
-                <NextRow n="3" group="Integrate" what="Salesforce + HubSpot deal read" why="Most contracts originate from Sales." />
-                <NextRow n="4" group="Integrate" what="DocuSign API (real envelopes + Connect webhooks)" why="Replaces simulated send. Well-documented. Low risk." />
-                <NextRow n="5" group="Integrate" what="HRIS read (Personio, Ashby, Workday)" why="Offer letters originate from People Ops." />
-                <NextRow n="6" group="Integrate" what="Drive / SharePoint template sync" why="Replaces ad-hoc folder. Version control + compliance." />
-                {/* Close the loop */}
-                <NextRow n="7" group="Loop close" what="Email magic links" why="Board, external counsel, non-Slack users." />
-                <NextRow n="8" group="Loop close" what="Calendar alerts for renewals" why="Closes the loop on obligations." />
-              </tbody>
-            </table>
-          </div>
+          <NextGroup
+            label="Adoption gate"
+            tone="accent"
+            items={[
+              { n: "1", what: "Slack (interactive approvals via DM)", why: "Everyone is in Slack. Zero new tool to learn." },
+            ]}
+          />
+          <NextGroup
+            label="Strategic extension (built parallel with Slack)"
+            tone="sage"
+            items={[
+              { n: "2", what: "Light writeback (ledger / HRIS / cap table)", why: "So the first signed contract lands somewhere structured. Conditional on which receivers Light has exposed." },
+            ]}
+          />
+          <NextGroup
+            label="Replace demo stubs with real integrations"
+            tone="slate"
+            items={[
+              { n: "3", what: "Salesforce + HubSpot deal read", why: "Most contracts originate from Sales." },
+              { n: "4", what: "DocuSign API (real envelopes + Connect webhooks)", why: "Replaces simulated send. Well-documented. Low risk." },
+              { n: "5", what: "HRIS read (Personio, Ashby, Workday)", why: "Offer letters originate from People Ops." },
+              { n: "6", what: "Drive / SharePoint template sync", why: "Replaces ad-hoc folder. Version control + compliance." },
+            ]}
+          />
+          <NextGroup
+            label="Close the loop"
+            tone="slate"
+            items={[
+              { n: "7", what: "Email magic links", why: "Board, external counsel, non-Slack users." },
+              { n: "8", what: "Calendar alerts for renewals", why: "Closes the loop on obligations." },
+            ]}
+          />
         </Section>
 
         {/* ─────────────────────────  10. ASSUMPTIONS  ───────────────────────── */}
         <Section title="Stated assumptions" icon={<AlertTriangle className="h-4 w-4" />}>
-          <ol className="ml-5 list-decimal space-y-1.5 text-[13px]">
-            <li>Light has master Word templates in Drive (or SharePoint) owned by Legal and People, not yet connected to source systems.</li>
-            <li>DocuSign is the existing signing tool, with partial template / AutoPlace usage but inconsistent practice.</li>
-            <li>Source data lives in Salesforce or HubSpot (deals), an HRIS (employees), and Light&apos;s own ledger (vendors, cap table).</li>
-            <li>Approvers are real humans on Slack. Routing rules are owned by Head of Finance &amp; Ops.</li>
-            <li>Volume is the stated 50 to 100 contracts / month. CLM-scale tools are overkill at this throughput.</li>
-            <li>Light operates three legal entities (assumed): Light ApS (Denmark, primary), Light Ltd (UK), Light Inc. (US Delaware). Would verify with Head of F&amp;O in week one.</li>
-          </ol>
+          <div className="rounded-lg border-l-4 border-accent-400 border-y border-r border-y-accent-200 border-r-accent-200 bg-accent-50/60 p-4">
+            <p className="mb-3 text-[13px] text-ink-700">
+              <strong className="text-ink-900">Worth verifying in week one with Head of F&amp;O.</strong>{" "}
+              The build holds if these are roughly right; specific endpoints may differ.
+            </p>
+            <div className="space-y-3.5 text-[13px]">
+
+              {/* Tools today */}
+              <div>
+                <div className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-wider text-accent-700">
+                  About the tools Light uses today
+                </div>
+                <ul className="ml-1 space-y-1.5 text-ink-700">
+                  <li className="flex gap-2">
+                    <span className="text-ink-400">•</span>
+                    <span>
+                      <strong className="text-ink-900">Master Word templates in Drive</strong> (or SharePoint), owned by Legal and People, not yet connected to source systems.
+                    </span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-ink-400">•</span>
+                    <span>
+                      <strong className="text-ink-900">DocuSign is the existing signing tool</strong>, with partial template / AutoPlace usage but inconsistent practice.
+                    </span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-ink-400">•</span>
+                    <span>
+                      <strong className="text-ink-900">Source data lives in Salesforce or HubSpot</strong> (deals), an HRIS (employees), and Light&apos;s own internal systems (vendors, cap table).
+                    </span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-ink-400">•</span>
+                    <span>
+                      <strong className="text-ink-900">Approvers are real humans on Slack.</strong> Routing rules are owned by Head of Finance &amp; Ops.
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Scale */}
+              <div>
+                <div className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-wider text-accent-700">
+                  About scale (from the brief)
+                </div>
+                <ul className="ml-1 space-y-1.5 text-ink-700">
+                  <li className="flex gap-2">
+                    <span className="text-ink-400">•</span>
+                    <span>
+                      <strong className="text-ink-900">50 to 100 contracts / month.</strong> CLM-scale tools are overkill at this throughput.
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Org structure */}
+              <div>
+                <div className="mb-1.5 text-[10.5px] font-semibold uppercase tracking-wider text-accent-700">
+                  About corporate structure (assumed)
+                </div>
+                <ul className="ml-1 space-y-1.5 text-ink-700">
+                  <li className="flex gap-2">
+                    <span className="text-ink-400">•</span>
+                    <span>
+                      <strong className="text-ink-900">Three legal entities:</strong>{" "}
+                      <strong className="text-ink-900">Light ApS</strong> (Denmark, primary),{" "}
+                      <strong className="text-ink-900">Light Ltd</strong> (UK, post-Brexit),{" "}
+                      <strong className="text-ink-900">Light Inc.</strong> (US Delaware, for US expansion).
+                      Realistic Series A multi-jurisdiction shape for a Danish-headquartered SaaS company.
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
         </Section>
 
         {/* ─────────────────────────  12. NAMES + STACK  ───────────────────────── */}
@@ -482,30 +560,44 @@ function BvBRow({
   );
 }
 
-function NextRow({
-  n,
-  group,
-  what,
-  why,
+function NextGroup({
+  label,
+  tone,
+  items,
 }: {
-  n: string;
-  group?: string;
-  what: string;
-  why: string;
+  label: string;
+  tone: "accent" | "sage" | "slate";
+  items: { n: string; what: string; why: string }[];
 }) {
+  const toneClass =
+    tone === "accent"
+      ? "border-accent-300 bg-accent-50/30"
+      : tone === "sage"
+        ? "border-sage-500/30 bg-sage-50/40"
+        : "border-ink-200 bg-white";
+  const labelClass =
+    tone === "accent"
+      ? "text-accent-700"
+      : tone === "sage"
+        ? "text-sage-600"
+        : "text-ink-600";
   return (
-    <tr>
-      <td className="py-2.5 pr-3 align-top font-mono text-[12px] text-ink-500">{n}</td>
-      <td className="py-2.5 pr-3 align-top">
-        {group ? (
-          <div className="mb-0.5 text-[10.5px] font-semibold uppercase tracking-wider text-ink-400">
-            {group}
-          </div>
-        ) : null}
-        <div className="font-medium text-ink-900">{what}</div>
-      </td>
-      <td className="py-2.5 align-top text-ink-600">{why}</td>
-    </tr>
+    <div className={`rounded-lg border ${toneClass} p-3`}>
+      <div className={`mb-2 text-[10.5px] font-semibold uppercase tracking-wider ${labelClass}`}>
+        {label}
+      </div>
+      <ul className="space-y-2">
+        {items.map((item) => (
+          <li key={item.n} className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[13px]">
+            <span className="row-span-2 mt-0.5 font-mono text-[11.5px] text-ink-400">
+              {item.n}.
+            </span>
+            <div className="font-medium text-ink-900">{item.what}</div>
+            <div className="text-[12.5px] text-ink-600">{item.why}</div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
