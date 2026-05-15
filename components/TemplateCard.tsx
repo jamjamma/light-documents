@@ -40,7 +40,7 @@ export function TemplateCard({ template, sourceFileName, syncedAgo, anchorTagCou
 
   const useHref = `/contracts/new?template=${encodeURIComponent(template.id)}`;
   return (
-    <div className="group flex w-full flex-col rounded-xl border border-ink-200 bg-white p-4 transition-all hover:border-ink-300 hover:shadow-card">
+    <div className="group flex h-full w-full flex-col rounded-xl border border-ink-200 bg-white p-4 transition-all hover:border-ink-300 hover:shadow-card">
       <button
         type="button"
         onClick={onClick}
