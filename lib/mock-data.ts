@@ -183,7 +183,7 @@ export const TEMPLATES: Template[] = [
     ],
     versionHistory: [
       { version: "v4.2", releasedAt: "2026-02-14", status: "current", author: "Sara Friis (counsel)", changeNote: "Current. Liability cap raised to €500k. UK addendum added post-Brexit. SLA exhibit clarified." },
-      { version: "v4.1", releasedAt: "2025-11-14", status: "deprecated", deprecatedAt: "2026-02-14", author: "Sara Friis (counsel)", changeNote: "Indemnity clause tightened after Anderson Inc dispute. Customer-only indemnity now requires explicit Legal approval." },
+      { version: "v4.1", releasedAt: "2025-11-14", status: "deprecated", deprecatedAt: "2026-02-14", author: "Sara Friis (counsel)", changeNote: "Indemnity clause tightened after Anderson Inc dispute. Customer-only indemnity now requires explicit Counsel approval." },
       { version: "v4.0", releasedAt: "2025-08-22", status: "deprecated", deprecatedAt: "2025-11-14", author: "Sara Friis (counsel)", changeNote: "Major rewrite when Sara joined. Cleaner liability section, dedicated SLA exhibit, EU SCCs incorporated for GDPR." },
       { version: "v3.5", releasedAt: "2025-01-08", status: "archived", deprecatedAt: "2025-08-22", author: "Outside counsel", changeNote: "Pre-rewrite MSA used during company's first year. Two signed contracts still active on this version." },
     ],

@@ -1454,10 +1454,11 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/",
     selector: ".tour-anchor-about-widget",
     side: "bottom",
-    title: "About this build",
+    title: "Orientation widget",
     description: `
-      <p>Top-of-dashboard preamble. One-line answer (<strong>Wrap</strong> · <strong>Keep</strong> · <strong>Build</strong>), three tiles (<strong>Problem</strong> / <strong>Answer</strong> / <strong>Wedge</strong>), and two buttons: <em>About this build</em> for the full memo, <em>Take the tour</em> for the guided walk.</p>
-      <p class="muted">Stays visible whenever you land on the dashboard so reviewers can re-enter the memo or the tour from any session.</p>
+      <p>This widget answers the first question a reviewer asks on landing: <em>"what am I looking at?"</em></p>
+      <p>It gives the thesis up front (<strong>Wrap. Keep. Build.</strong>) and frames the build in three beats (<strong>Problem → Answer → Wedge</strong>) before any clicking is required.</p>
+      <p>From here, two paths: read the full memo, or skip reading and take the tour. Both stay one click away on every dashboard visit.</p>
     `,
     next: "advance",
   },

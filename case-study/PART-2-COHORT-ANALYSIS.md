@@ -97,22 +97,26 @@ Expansion in this window has fallen from ~9pp to ~2pp across four cohorts. M3 it
 
 Q1 2024 is flat M9 → M12 (123.6% → 123.6%) then jumps to 147.3% by M18 (+23.7pp). The shape is not smooth organic growth. It looks like customers re-contracting with bigger commitments, multi-year upgrades, or seat true-ups at the anniversary.
 
-### Step 6: What this likely means
+### Step 6: Hypothesis (leading view)
+
+**The expansion engine has bifurcated.** Something about the way the company drove mid-cycle expansion has stopped working as cohort size doubled, while the renewal-cycle event appears intact for the one cohort we can observe. Some of the apparent cohort decay is real (mid-cycle is genuinely collapsing); some is structural (newer cohorts have not yet reached their renewal moment). The headline 127.9% NRR averages both, hiding both.
+
+The mechanism behind the mid-cycle drop is not visible in this data alone. **The symptom is real and concentrated; the cause is not.**
 
 | | Reading |
 |---|---|
-| **Mid-cycle** | Genuinely deteriorating. Real, not a measurement artifact. |
-| **Late-cycle** | Renewal-driven. Visible in only one cohort (Q1 2024). |
+| **Mid-cycle (M3 → M6)** | Genuinely deteriorating. Real, not a measurement artifact. |
+| **Late-cycle (M9 → M18)** | Renewal-driven. Visible in only one cohort (Q1 2024). |
 | **Headline (127.9%)** | Overstates current health if mid-cycle keeps falling. Understates lifetime value if the renewal event repeats. |
 
 ### Step 7: Candidate causes for the mid-cycle drop
 
-The data confirms the symptom is real and concentrated. It does not name the cause. Hypotheses worth ruling in or out:
+Four hypotheses worth ruling in or out, in order of how I would test each:
 
-- Customer Success coverage failing to scale with cohort size.
-- A product packaging or pricing change that left less room for early upsell.
-- Weaker activation pushing customers below the threshold where mid-cycle upsell makes sense.
-- A deliberate commercial decision to consolidate expansion at renewal rather than mid-cycle.
+- **CS coverage failing to scale.** Cohort sizes doubled. CS team may not have. Easy to test: CS headcount vs active accounts over time.
+- **Product packaging or pricing change.** A move that left less room for early upsell (e.g., starter plans already include what used to be add-ons).
+- **Weaker activation.** Customers landing below the usage threshold where mid-cycle upsell makes sense. Test against activation cohort metrics.
+- **Deliberate commercial decision** to consolidate expansion at renewal rather than mid-cycle. Confirm with Sales leadership before assuming a leak.
 
 ### Step 8: What to verify first
 
