@@ -92,8 +92,8 @@ My bias is to put a single number on the workflow before changing it: time spent
 
 This is the same logic the build memo applies to the contract workflow. The structured payload is the measurement, not a side effect.
 
-### 3. Take work off Martina's plate, do not compete for hers
+### 3. Take operational load before opinions
 
-The Head of F&O at a 30x-growth company is the highest-leverage seat on the org chart. The fastest way I become useful is to own the half-built workflows she has been carrying personally, not to compete for the strategic calls she is paid to make.
+For the first 90 days, I would rather absorb operational work than form opinions on strategy. Picking up the end-of-month, end-of-quarter, and end-of-deal cycles keeps Martina's time on the calls only she can make. It also gives me first-hand context for any view I do eventually bring.
 
-For the first 90 days, my default would be the unglamorous end-of-month, end-of-quarter, end-of-deal work — the things that drain her week but do not move the company forward when she is the one doing them.
+None of that work is glamorous. It is the cheapest to take over, the easiest to measure, and the place I am most likely to be useful before I have earned the right to bigger opinions.
