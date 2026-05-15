@@ -79,7 +79,7 @@ While rebuilding the flow, there is a strategic opportunity available to Light t
 - **NDAs are the exception.** No commercial value to post. They file for retention only. The audit trail is the system of record (see [decisions.md §14](docs/decisions.md)).
 - **The writeback lands where Light has a receiver.** The prototype emits the structured payload on `envelope-completed`. Production wires it into whichever receivers Light operates or is building. The 90-day roadmap treats this as a parallel workstream, not a precondition.
 
-The PDF is the audit artifact, the data is the product. That is the potential wedge, if Light wants to operationalise it.
+The PDF is the audit artifact, the data is the product. That is the strategic opening, conditional on Light's product direction.
 
 ---
 
@@ -143,10 +143,10 @@ Steps 5 and 6 are where the design earned the right to be more than "build an up
 
 | Layer | Decision | Why |
 |---|---|---|
-| E-signature, identity, audit trail | **Buy / keep DocuSign** | eIDAS-compliant in EU, ESIGN in US, court-tested. Not our edge. |
+| E-signature, identity, audit trail | **Keep DocuSign** | eIDAS-compliant in EU, ESIGN in US, court-tested. Not our edge. |
 | Template authoring | **Keep Word + Drive** | Legal will not adopt a new editor. We read templates from Drive, we do not host editing. |
-| Full CLM (Ironclad, Juro, SpotDraft) | **Defer, not dismiss** | Juro and SpotDraft now target Series A SaaS in Europe with SMB pricing and ~30-day implementations. A pilot would cover ~70% of this workflow. The 30% they do not cover is what's interesting for Light: writeback into Light's systems of record, routing rules owned by Head of F&O, and integration with the source records Light's customers already trust. Revisit at 500+ contracts / month or when post-signature obligation tracking dominates. |
-| Workflow layer (intake → check → route → envelope → writeback) | **Build** | The gap that simpler tools do not fill and the larger CLMs over-build. Sized for Light's volume today, designed so the most useful part of it (the writeback shape) can be lifted into Light's product later. |
+| Full CLM (Ironclad, Juro, SpotDraft) | **Defer, not dismiss** | Juro and SpotDraft now target Series A SaaS in Europe with SMB pricing and ~30-day implementations. A pilot would cover ~70% of this workflow. The 30% they do not cover is the strategic opening for Light: writeback into Light's systems of record, routing rules owned by Head of F&O, and integration with the source records Light's customers already trust. Revisit at 500+ contracts / month or when post-signature obligation tracking dominates. |
+| Workflow layer (intake → check → route → envelope → writeback) | **Build** | The gap that simpler tools do not fill and larger CLMs over-build. Sized for Light's volume today, designed so the writeback shape can be lifted into Light's product later if direction supports it. |
 
 ## The one key decision
 
@@ -202,7 +202,7 @@ Every stubbed piece carries an explicit "Demo:" callout in the UI where it appea
 |---|---|---|
 | Workflow engine | Next.js routing + state machine with explicit valid transitions + immutable updates | None |
 | Clause checker | Deterministic typed rules engine over `ClauseRule[]`. Output shape is what Claude will return in production. | Claude API (one-file swap) |
-| Routing engine | 13 typed rules + `computeRouting()` with channel collision + committee logic | None |
+| Routing engine | 14 typed rules + `computeRouting()` with channel collision + committee logic | None |
 | Approver directory | Group + specialty matching + active PTO delegations | Settings UI for editing groups |
 | DocuSign send | Real envelope JSON shown in the preview modal | DocuSign REST API call (Connect webhooks for receive) |
 | Slack notifications | Audit-trail events with realistic message bodies + recipient routing logic | `chat.postMessage` with interactive buttons |

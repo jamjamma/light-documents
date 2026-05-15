@@ -33,6 +33,20 @@ export default function AboutPage() {
       />
       <div className="mx-auto max-w-4xl space-y-5 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
 
+        {/* ─────────────────────────  TOP: TOUR CTA  ───────────────────────── */}
+        <div className="rounded-lg border border-accent-300 bg-accent-50/60 px-4 py-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-[13px] text-ink-700">
+              <strong className="text-ink-900">Short on time?</strong> The Take the Tour button in the sidebar walks the
+              whole build in ~9 minutes with popovers explaining each surface. Six chapters; start any one of them on its
+              own.
+            </div>
+            <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-ink-700 ring-1 ring-inset ring-ink-200">
+              ~9 min, faster than reading this page
+            </span>
+          </div>
+        </div>
+
         {/* ─────────────────────────  TOP: PROMINENT LINKS  ───────────────────────── */}
         <Card>
           <div className="flex flex-col gap-2.5">
@@ -44,7 +58,7 @@ export default function AboutPage() {
               This page is Part 1 (the build memo). The full submission has three parts plus the source.
             </p>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-              <PrimaryLinkTile href={README_URL} title="README" detail="Long-form of this page, on GitHub." icon={<FileText className="h-3.5 w-3.5" />} />
+              <PrimaryLinkTile href={README_URL} title="README.md" detail="Long-form of this page, on GitHub." icon={<FileText className="h-3.5 w-3.5" />} />
               <PrimaryLinkTile href={PART_2_URL} title="Case Part 2" detail="Cohort analysis." />
               <PrimaryLinkTile href={PART_3_URL} title="Case Part 3" detail="Day-one plan." />
               <PrimaryLinkTile href={REPO_URL} title="Repo" detail="Source + decision log." icon={<Github className="h-3.5 w-3.5" />} />
@@ -82,7 +96,7 @@ export default function AboutPage() {
               </li>
             </ul>
             <p className="mt-2.5 text-ink-600">
-              The PDF is the audit artifact, the data is the product. That is the wedge.
+              The PDF is the audit artifact, the data is the product. That is the strategic opening, conditional on Light&apos;s product direction.
             </p>
           </div>
         </Section>
@@ -97,7 +111,7 @@ export default function AboutPage() {
           <ul className="ml-1 mt-1 space-y-1 text-[13px]">
             <li className="flex gap-2"><span className="text-ink-400">•</span><span>No new editor for the legal team who owns the master templates. They keep working in Word.</span></li>
             <li className="flex gap-2"><span className="text-ink-400">•</span><span>No new signing primitive. DocuSign stays the system of record for signatures.</span></li>
-            <li className="flex gap-2"><span className="text-ink-400">•</span><span>The work happens in the gap, which is exactly the gap Light&apos;s ERP wedge can fill.</span></li>
+            <li className="flex gap-2"><span className="text-ink-400">•</span><span>The work happens in the gap; that is the strategic opening for Light, conditional on its product direction.</span></li>
           </ul>
         </Section>
 
@@ -126,48 +140,50 @@ export default function AboutPage() {
                 <BvBRow
                   layer="Full CLM (Ironclad, Juro, SpotDraft)"
                   decision="Defer, not dismiss"
-                  why="Covers ~70% of this workflow. The 30% gap is the strategic wedge: writeback into Light's ledger, Finance-owned routing, source-system integration. Revisit at 500+ contracts / month."
+                  why="Covers ~70% of this workflow. The 30% they do not cover is where Light could differentiate. Revisit at 500+ contracts / month."
                 />
                 <BvBRow
                   layer="Workflow layer (intake → routing → envelope → writeback)"
                   decision="Build"
-                  why="The gap Light's ERP wedge is uniquely positioned to fill."
+                  why="The gap simpler tools miss and bigger CLMs over-build. Sized for Light's volume today; the writeback shape is reusable if direction supports it."
                 />
               </tbody>
             </table>
           </div>
         </Section>
 
-        {/* ─────────────────────────  4. FIVE KEY DECISIONS  ───────────────────────── */}
-        <Section title="Five key decisions" icon={<ListChecks className="h-4 w-4" />}>
+        {/* ─────────────────────────  4. TWO TECHNICAL PATTERNS  ───────────────────────── */}
+        <Section title="Two technical patterns inside the Build" icon={<ListChecks className="h-4 w-4" />}>
           <p className="text-[13px] text-ink-500">
-            Full paper trail in{" "}
+            Both feed into the &quot;Build&quot; decision above. Full paper trail in{" "}
             <a href={DECISIONS_URL} target="_blank" rel="noreferrer" className="text-ink-900 underline">
               docs/decisions.md
             </a>
-            . The short prose version:
+            .
           </p>
-          <ol className="ml-5 list-decimal space-y-2 text-[13px]">
+          <ol className="ml-5 list-decimal space-y-3 text-[13px]">
             <li>
-              <strong>Keep DocuSign.</strong> Identity verification, audit trail, eIDAS, ESIGN are commodity. Rebuilding
-              them is the wrong battle for a Series A finance company.
+              <strong>Deterministic clause rules now, Claude later.</strong>
+              <ul className="mt-1 space-y-0.5 text-ink-600">
+                <li>• The typed rules engine handles 80% of cases reliably and cheaply.</li>
+                <li>• The LLM swap is a one-file change. UI binds to the result shape, not the engine.</li>
+                <li>• Demo runs without API keys; every flag is traceable to a typed rule, not an opaque call.</li>
+              </ul>
             </li>
             <li>
-              <strong>Keep Word + Drive for authoring.</strong> Forcing legal counsel into a new editor is the single
-              largest failure mode for CLM rollouts.
-            </li>
-            <li>
-              <strong>Defer full CLM.</strong> Juro and SpotDraft cover ~70%. The 30% they don&apos;t cover is the wedge.
-              Revisit at 500+ contracts / month.
-            </li>
-            <li>
-              <strong>Deterministic clause rules now, Claude later.</strong> The typed rules engine handles 80% reliably
-              and cheaply. The LLM swap is a one-file change; the contract with the UI is the result shape, not the engine.
-            </li>
-            <li>
-              <strong>Anchor tags over per-contract dragging.</strong> Counsel types{" "}
-              <code className="rounded bg-ink-100 px-1 py-0.5 font-mono text-[11.5px]">{`\\sig:counterparty\\`}</code>{" "}
-              once into the master. DocuSign&apos;s API finds it via searchString. Zero per-contract field placement.
+              <strong>Anchor tags over per-contract field dragging.</strong>
+              <ul className="mt-1 space-y-0.5 text-ink-600">
+                <li>
+                  • Counsel types{" "}
+                  <code className="rounded bg-ink-100 px-1 py-0.5 font-mono text-[11.5px]">{`\\sig:counterparty\\`}</code>{" "}
+                  once into the master template (as white-on-white text, invisible to signers).
+                </li>
+                <li>
+                  • DocuSign&apos;s API finds the anchor via{" "}
+                  <code className="rounded bg-ink-100 px-1 py-0.5 font-mono text-[11.5px]">searchString</code> on every send.
+                </li>
+                <li>• Zero per-contract field placement, forever.</li>
+              </ul>
             </li>
           </ol>
         </Section>
@@ -277,7 +293,7 @@ export default function AboutPage() {
               <tbody className="divide-y divide-ink-100">
                 <StubRow what="Workflow engine" real="Next.js routing + state machine + immutable updates" stubbed="None" />
                 <StubRow what="Clause checker" real="Deterministic typed rules over ClauseRule[]" stubbed="Claude API (one-file swap)" />
-                <StubRow what="Routing engine" real="13 typed rules + computeRouting() with channel collision logic" stubbed="None" />
+                <StubRow what="Routing engine" real="14 typed rules + computeRouting() with channel collision logic" stubbed="None" />
                 <StubRow what="DocuSign send" real="Real envelope JSON shown in preview modal" stubbed="DocuSign REST API call" />
                 <StubRow what="Slack notifications" real="Audit-trail events with realistic message body" stubbed="chat.postMessage with interactive buttons" />
                 <StubRow what="Writeback" real="Structured payload generated per document type" stubbed="HTTP POST to ledger / HRIS / cap-table receivers" />
@@ -300,7 +316,7 @@ export default function AboutPage() {
               </thead>
               <tbody className="divide-y divide-ink-100">
                 <NextRow n="1" what="Slack (interactive approvals via DM)" why="Everyone is in Slack. The adoption gate." />
-                <NextRow n="2" what="Light writeback (ledger / HRIS / cap table)" why="The strategic moat. Built parallel with Slack so the first signed contract lands somewhere structured." />
+                <NextRow n="2" what="Light writeback (ledger / HRIS / cap table)" why="The strategic extension; conditional on which receivers Light has exposed. Built parallel with Slack so the first signed contract lands somewhere structured if the receiver is ready." />
                 <NextRow n="3" what="Salesforce + HubSpot deal read" why="30 to 50 contracts / month originate from Sales." />
                 <NextRow n="4" what="DocuSign API (real envelopes + Connect webhooks)" why="Replaces simulated send. Well-documented. Low risk." />
                 <NextRow n="5" what="HRIS read (Personio, Ashby, Workday)" why="10 to 20 contracts / month from People Ops." />

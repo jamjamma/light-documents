@@ -130,5 +130,5 @@ This is what gets built after the MVP wraps DocuSign, in order of ROI:
 | 4 | HRIS read (Personio, Ashby, Workday) | 10-20 contracts / month from People Ops. |
 | 5 | Drive / SharePoint template sync | Replaces ad-hoc folder. Required for version control + compliance. |
 | 6 | Email magic links | Handles board, external counsel, non-Slack users. |
-| 7 | Light ledger writeback (internal API) | The strategic moat. Light's wedge made operational. |
+| 7 | Light ledger writeback (internal API) | The strategic extension. Conditional on which receivers Light has exposed. |
 | 8 | Calendar alerts for renewals | Closes the loop on obligations. |

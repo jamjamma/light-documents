@@ -204,7 +204,7 @@ export const TOUR_STEPS: TourStep[] = [
       <ul>
         <li><strong>Awaiting me.</strong> Your queue.</li>
         <li><strong>Blocked.</strong> No approver response.</li>
-        <li><strong>In review.</strong> Clause check or legal.</li>
+        <li><strong>In review.</strong> Clause check or Counsel.</li>
       </ul>
       <p class="muted">Click any tile to filter the table.</p>
     `,
@@ -339,7 +339,7 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Routing rules",
     description: `
-      <p>Bolt triggers 3 of 13 rules:</p>
+      <p>Bolt triggers 3 of 14 rules:</p>
       <ul>
         <li><strong>Legal.</strong> Clause deviations.</li>
         <li><strong>Head of F&amp;O.</strong> ARR &gt; EUR 50k.</li>
@@ -1489,7 +1489,7 @@ export const TOUR_ALL_PROGRESS_KEY = "tour-all-progress";
 /**
  * The active tour state.
  *
- * - `mode: "all"` walks all 33 steps end-to-end (one big tour).
+ * - `mode: "all"` walks every step in `TOUR_STEPS` end-to-end (one big tour).
  * - `mode: "chapter"` walks only the steps in `chapter`. The controller stops
  *   cleanly when the next step would belong to a different chapter.
  *
@@ -1727,7 +1727,7 @@ export const CHAPTERS: ChapterMeta[] = [
     id: "templates",
     title: "Templates",
     blurb: "8 master Word docs (Drive or SharePoint), rogue-template governance walked action by action, Counsel's editing workflow.",
-    estSeconds: 90,
+    estSeconds: 360,
   },
   {
     id: "intake",
@@ -1768,9 +1768,9 @@ export function stepIndexWithinChapter(
 
 /**
  * Section-by-section progress label for the popover. Renders as e.g.
- * "Workflow · 5 of 12" instead of "12 of 60", so the operator sees how far
- * into the current chapter they are rather than facing the full 60-step
- * total. Used by TourController.progressText.
+ * "Workflow · 5 of 12" instead of "12 of N", so the operator sees how far
+ * into the current chapter they are rather than facing the full
+ * end-to-end count. Used by TourController.progressText.
  */
 export function chapterProgressLabel(globalStepIndex: number): string {
   const step = TOUR_STEPS[globalStepIndex];

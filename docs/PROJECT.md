@@ -147,7 +147,7 @@ Output: `ClauseCheckResult[]` with status `standard` or `deviation`. The UI bind
 
 Two-stage:
 
-1. **Rule layer** (`routing-rules.ts`): 13 typed `RoutingRule` objects with `appliesTo`, `trigger`, `approver` (a role), `channel`, `autoApproveIfStandard`, `reason`. `computeRouting()` deduplicates by role, picks the most-restrictive channel on collision, and emits the chain. Committee roles (`all_required` strategy) emit one `Approval` per member so `allApproved()` actually requires every vote.
+1. **Rule layer** (`routing-rules.ts`): 14 typed `RoutingRule` objects with `appliesTo`, `trigger`, `approver` (a role), `channel`, `autoApproveIfStandard`, `reason`. `computeRouting()` deduplicates by role, picks the most-restrictive channel on collision, and emits the chain. Committee roles (`all_required` strategy) emit one `Approval` per member so `allApproved()` actually requires every vote.
 
 2. **Directory layer** (`approver-directory.ts`): for each role, an `ApproverGroup` holds 1..N members with specialty tags (`type:Warrant`, `jurisdiction:UK`, `entity:Light Ltd …`) and a `strategy` (`specialty_match` / `named_default` / `all_required` / `any_round_robin`). `selectApprover()` scores members by weighted specialty match (type=10, entity=2, jurisdiction=1) so a UK MSA picks the UK in-house counsel over the Danish one, and a Warrant picks outside counsel over either in-house counsel. Active PTO `Delegation` entries automatically reroute to the named backup with `delegateOfName` set for the UI.
 
@@ -168,7 +168,7 @@ Two-stage:
 | `clause-checker.ts` | Pure rules engine. Runs every clause rule attached to a template against contract fields. | `runChecks`, `countDeviations`, `hasBlockingDeviation`, `allStandard`, `summarizeChecks` |
 | `approver-directory.ts` | 6 approver groups (Legal, Head of F&O, CFO, People Ops, CEO, Board) with 13 members total. PTO delegation (Anna Lind 2026-05-10 → 2026-05-20). Specialty matching with weighted classes. | `selectApprover`, `selectAllMembers`, `listMembers`, `findMember`, `getApproverGroup`, `listActiveDelegations` |
 | `signer-routing.ts` | Light-side signer policy per template + entity. Counterparty, light signer, witness. | `resolveSigners`, `resolveLightSigners`, `resolveCounterpartySigner`, `resolveWitnessSigner`, `primaryLightSignerActor`, `lightSignerRationale` |
-| `routing-rules.ts` | 13 routing rules + `computeRouting()`. Channel collision resolution. Committee emission for `all_required` groups. | `ROUTING_RULES`, `computeRouting`, `allApproved` |
+| `routing-rules.ts` | 14 routing rules + `computeRouting()`. Channel collision resolution. Committee emission for `all_required` groups. | `ROUTING_RULES`, `computeRouting`, `allApproved` |
 | `contract-store.ts` | The operating core. State machine, immutable updates, localStorage persistence, journey commands, workflow actions. | `getContract`, `listContracts`, `createContract`, `runClauseChecks`, `approve`, `reassignApproval`, `rejectApproval`, `repingApproval`, `saveDraftAndExit`, `send`, `simulateSigned`, `resetDemo`, `computeKpis` |
 | `mock-data.ts` | 8 templates with full clause rules + DocuSign config + version history + conditional sections. 14 source records across Salesforce / HubSpot / Attio / Personio / Ashby / Manual. 14 seed contracts (10 in-flight + 4 signed) pre-hydrated through `runChecks` + `computeRouting`. 4 rogue templates. | `TEMPLATES`, `SOURCE_RECORDS`, `SEED_CONTRACTS`, `ROGUE_TEMPLATES`, `getTemplate`, `getSourceRecord`, `LIGHT_ENTITIES` |
 | `format.ts` | EUR + date + initials helpers. | `formatEur`, `formatEurCompact`, `formatDate`, `formatDateTime`, `relativeDays`, `initials` |
@@ -443,7 +443,7 @@ light-documents/
 │   ├── approver-directory.ts         Groups, members, delegations, selectApprover
 │   ├── signer-routing.ts             Light-side signers by entity + template
 │   ├── clause-checker.ts             Pure rules engine
-│   ├── routing-rules.ts              13 rules + computeRouting()
+│   ├── routing-rules.ts              14 rules + computeRouting()
 │   ├── contract-store.ts             State machine + journey commands + localStorage
 │   ├── mock-data.ts                  Templates + sources + seed contracts
 │   └── format.ts                     EUR / date / initials helpers
@@ -489,7 +489,7 @@ Heaviest file is `mock-data.ts` (templates + seed data + version history). Every
 | 14 | Resize browser to mobile width | Sidebar disappears; a sticky top bar appears with hamburger + brand. Tap hamburger → drawer slides in. Tap any nav item → drawer auto-closes. KPIs stack 2x2, clause review becomes stacked cards, every action bar wraps cleanly. |
 | 15 | Back on desktop, click the sidebar **collapse arrow** | Sidebar shrinks to icons-only. Hover any nav item → tooltip with the label. State persists across refresh. |
 | 16 | Approve Martina's row, change mind, click **Undo my approval** | Row reverts to pending. Audit trail captures "Withdrew approval". If she was the last pending approver, contract walks back from ready_to_send to awaiting_approval. |
-| 17 | Open **Templates**, expand "Rogue templates detected in Drive" | 4 rogue files listed with similarity + recommended action. Click **Notify owner** on the SecureBank row → inline Slack DM preview shows Sara Lindberg as the recipient + the exact message body + production-mode notes. Click **Send DM** → green "sent" pill replaces the buttons. Click **Archive** on John's draft row → row dims, "rogue" badge becomes "archived", Undo pill appears. |
+| 17 | Open **Templates**, expand "Rogue templates detected in Drive" | 4 rogue files listed with similarity + recommended action. Click **Notify owner** on the first row (John's draft) → inline Slack preview routes to the `#sales-ops` channel because John left the company (data-driven fallback). The exact message body + production-mode notes are shown. Click **Send** → green "sent" pill replaces the buttons. Click **Archive** on another row → row dims, "rogue" badge becomes "archived", Undo pill appears. |
 | 18 | Click **Reset demo data** in the sidebar | All in-session state (rogue actions, manually-added records, approvals, etc.) clears and re-seeds from the mock data. |
 
 ---
