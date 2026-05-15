@@ -150,9 +150,14 @@ export function ContractsTable({ contracts, filter, onFilterChange, awaitingRole
               fidelity. */}
           <ul className="divide-y divide-ink-100 sm:hidden">
             {sorted.map((c) => (
+              // Note: NO tour-anchor-hero-row here. The tour is gated to
+              // viewports >= 768px (TourController), so the hero anchor only
+              // belongs on the desktop table row below. Marking both would
+              // make driver.js querySelector pick this (hidden) li first and
+              // mis-anchor the popover to a zero-size element.
               <li
                 key={c.id}
-                className={clsx("row-hover", c.id === "c_bolt_msa" && "tour-anchor-hero-row")}
+                className="row-hover"
               >
                 <Link href={contractHref(c)} className="block px-4 py-3.5">
                   <div className="flex items-start gap-2.5">
