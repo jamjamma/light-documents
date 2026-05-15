@@ -1747,37 +1747,37 @@ export const CHAPTERS: ChapterMeta[] = [
   {
     id: "dashboard",
     title: "Dashboard",
-    blurb: "Operator KPIs, stage filters, sidebar.",
+    blurb: "Operator KPIs and filters.",
     estSeconds: 45,
   },
   {
     id: "workflow",
     title: "Workflow walk",
-    blurb: "Bolt MSA from in-review to sent. Clause check, routing, approvals with Undo and ... menu, envelope preview, send.",
+    blurb: "Bolt MSA from review to send.",
     estSeconds: 150,
   },
   {
     id: "signed",
     title: "Signed record",
-    blurb: "Signed banner, PDF retention, audit trail walked event by event, structured writeback.",
+    blurb: "Audit trail and writeback.",
     estSeconds: 120,
   },
   {
     id: "archive",
     title: "Signed archive",
-    blurb: "All filed contracts, by category.",
+    blurb: "Every filed contract, by type.",
     estSeconds: 30,
   },
   {
     id: "templates",
     title: "Templates",
-    blurb: "8 master Word docs (Drive or SharePoint), rogue-template governance walked action by action, Counsel's editing workflow.",
+    blurb: "Catalog and rogue-template governance.",
     estSeconds: 360,
   },
   {
     id: "intake",
     title: "New contract",
-    blurb: "End-to-end: pick template, pick record, confirm fields, run checks, land on the new contract.",
+    blurb: "Three-step intake into clause check.",
     estSeconds: 75,
   },
 ];

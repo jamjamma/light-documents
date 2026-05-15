@@ -38,16 +38,14 @@ export default function AboutPage() {
         <div className="rounded-lg border border-accent-300 bg-accent-50/60 p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex-1 space-y-1.5">
-              {/* Hook + action */}
-              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                <span className="text-[14px] font-bold text-ink-900">Short on time?</span>
-                <span className="text-[13.5px] text-ink-800">
-                  Take the tour from the sidebar.
-                </span>
+              {/* Lead — direct, logical, cause→effect */}
+              <div className="text-[14.5px] font-bold text-ink-900">
+                Built to save you reading time.
               </div>
-              {/* Italic line — signals the tour exists to give time back */}
-              <p className="text-[12.5px] italic text-ink-700">
-                It was built to save you the time of reading this memo. Six chapters; start any one on its own.
+              {/* Action subline */}
+              <p className="text-[13px] text-ink-700">
+                Take the guided tour from the sidebar instead of reading this memo. Popovers explain every surface as you walk.
+                Six chapters; start any one on its own.
               </p>
             </div>
             {/* Time chip */}
