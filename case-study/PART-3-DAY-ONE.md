@@ -86,14 +86,12 @@ My bias: find the handoff where manual work today will break at next quarter's v
 
 ### 2. Instrument before you fix
 
-A workflow change that saves five hours next month and zero hours every month after is a one-off, not a fix. The trap is improving something nobody can prove improved.
+Before I change a workflow, I want a number on it. Otherwise the fix is hard to prove and easy to forget.
 
-My bias is to put a single number on the workflow before changing it: time spent, exceptions per week, where it stalls. That makes the before / after auditable to Martina and to anyone who follows me.
+Three things I would measure first:
 
-This is the same logic the build memo applies to the contract workflow. The structured payload is the measurement, not a side effect.
+- **Time spent.** Per cycle, per person.
+- **Exceptions.** How often the workflow hits manual rework or escalation.
+- **Where it stalls.** Which handoff, which step.
 
-### 3. Take operational load before opinions
-
-For the first 90 days, I would rather absorb operational work than form opinions on strategy. Picking up the end-of-month, end-of-quarter, and end-of-deal cycles keeps Martina's time on the calls only she can make. It also gives me first-hand context for any view I do eventually bring.
-
-None of that work is glamorous. It is the cheapest to take over, the easiest to measure, and the place I am most likely to be useful before I have earned the right to bigger opinions.
+The before and after then becomes auditable to Martina and to anyone who follows. The build memo applies the same logic to the contract workflow: the structured payload that flows out of signing is the measurement, not a side effect of it.
