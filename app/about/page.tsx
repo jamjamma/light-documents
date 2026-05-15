@@ -35,18 +35,36 @@ export default function AboutPage() {
       <div className="mx-auto max-w-4xl space-y-5 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
 
         {/* ─────────────────────────  TOP: TOUR CTA  ───────────────────────── */}
-        <div className="rounded-lg border border-accent-300 bg-accent-50/60 px-4 py-3.5">
-          <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <div className="text-[14px] font-semibold text-ink-900">
-                Short on time? Take the tour instead.
+        <div className="rounded-lg border border-accent-300 bg-accent-50/60 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex-1 space-y-1.5">
+              {/* Hook + action */}
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                <span className="text-[14px] font-bold text-ink-900">Short on time?</span>
+                <span className="text-[13.5px] text-ink-800">
+                  Take the tour from the sidebar.
+                </span>
               </div>
-              <div className="mt-1 text-[12.5px] text-ink-600">
-                Walks the whole build with popovers explaining each surface. Six chapters; start any one on its own.
+              {/* Why */}
+              <p className="text-[12.5px] text-ink-600">
+                Built to save you the time of reading this memo. Popovers explain every surface as you walk.
+              </p>
+              {/* Facts as inline pills */}
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px] text-ink-600">
+                <span className="rounded-full bg-white px-2 py-0.5 ring-1 ring-inset ring-ink-200">
+                  6 chapters
+                </span>
+                <span className="rounded-full bg-white px-2 py-0.5 ring-1 ring-inset ring-ink-200">
+                  Start any chapter alone
+                </span>
+                <span className="rounded-full bg-white px-2 py-0.5 ring-1 ring-inset ring-ink-200">
+                  Skip what you have seen
+                </span>
               </div>
             </div>
-            <span className="shrink-0 rounded-full bg-white px-3 py-1 text-[11.5px] font-medium text-ink-900 ring-1 ring-inset ring-ink-200">
-              ~9 min · faster than reading
+            {/* Time chip */}
+            <span className="shrink-0 self-start rounded-full bg-ink-900 px-3 py-1.5 text-[12px] font-semibold text-white">
+              ~9 min
             </span>
           </div>
         </div>
@@ -84,10 +102,6 @@ export default function AboutPage() {
 
             {/* Build-side reading: visually separated from the case-study parts */}
             <div className="mt-3 border-t border-ink-100 pt-3">
-              <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink-500">
-                <Github className="h-3 w-3" />
-                For the engineer reviewing the build
-              </div>
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <PrimaryLinkTile
                   href={README_URL}
@@ -97,7 +111,7 @@ export default function AboutPage() {
                 />
                 <PrimaryLinkTile
                   href={PROJECT_DOC_URL}
-                  title="docs/PROJECT.md →"
+                  title="PROJECT.md →"
                   detail="Technical deep-dive: state machine, engines, every workflow branch."
                   icon={<FileText className="h-3.5 w-3.5" />}
                 />
