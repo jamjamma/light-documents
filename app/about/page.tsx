@@ -45,22 +45,10 @@ export default function AboutPage() {
                   Take the tour from the sidebar.
                 </span>
               </div>
-              {/* Why */}
-              <p className="text-[12.5px] text-ink-600">
-                Built to save you the time of reading this memo. Popovers explain every surface as you walk.
+              {/* Italic line — signals the tour exists to give time back */}
+              <p className="text-[12.5px] italic text-ink-700">
+                It was built to save you the time of reading this memo. Six chapters; start any one on its own.
               </p>
-              {/* Facts as inline pills */}
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px] text-ink-600">
-                <span className="rounded-full bg-white px-2 py-0.5 ring-1 ring-inset ring-ink-200">
-                  6 chapters
-                </span>
-                <span className="rounded-full bg-white px-2 py-0.5 ring-1 ring-inset ring-ink-200">
-                  Start any chapter alone
-                </span>
-                <span className="rounded-full bg-white px-2 py-0.5 ring-1 ring-inset ring-ink-200">
-                  Skip what you have seen
-                </span>
-              </div>
             </div>
             {/* Time chip */}
             <span className="shrink-0 self-start rounded-full bg-ink-900 px-3 py-1.5 text-[12px] font-semibold text-white">
@@ -78,7 +66,7 @@ export default function AboutPage() {
             </div>
             <p className="text-[12.5px] text-ink-600">
               You are on <strong className="text-ink-900">Part 1</strong> right now (this page is the build memo).
-              Each part tests a different muscle. Open them in any order.
+              Parts 2 and 3 are linked below.
             </p>
 
             {/* The three case-study parts */}
@@ -102,6 +90,9 @@ export default function AboutPage() {
 
             {/* Build-side reading: visually separated from the case-study parts */}
             <div className="mt-3 border-t border-ink-100 pt-3">
+              <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-ink-500">
+                Source and reference docs
+              </div>
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <PrimaryLinkTile
                   href={README_URL}
