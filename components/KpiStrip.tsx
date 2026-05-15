@@ -20,11 +20,13 @@ interface Props {
 }
 
 export function KpiStrip({ kpis, trailing }: Props) {
+  // Pick a mobile grid that doesn't leave an orphan tile on the last row.
+  // 3 KPIs → 3-up row (dashboard). 4 KPIs → 2x2 (archive). 2 → 2-up. Else 3.
+  const mobileGrid =
+    kpis.length === 4 ? "grid-cols-2" : kpis.length === 2 ? "grid-cols-2" : "grid-cols-3";
   return (
     <div className="panel overflow-hidden">
-      {/* Mobile: 3-up grid (one per KPI), so 3 KPIs never leave an empty cell
-          and 4+ wrap into a 3-then-N layout. Desktop: flex strip. */}
-      <div className="grid grid-cols-3 divide-x divide-ink-100 sm:flex sm:items-stretch">
+      <div className={`grid ${mobileGrid} divide-x divide-y divide-ink-100 sm:flex sm:items-stretch sm:divide-y-0`}>
         {kpis.map((k, i) => {
           const interactive = !!k.onClick;
           const inner = (
@@ -66,7 +68,7 @@ export function KpiStrip({ kpis, trailing }: Props) {
             </div>
           );
         })}
-        {trailing && <div className="col-span-3 flex items-center border-t border-ink-100 px-4 py-3 sm:col-auto sm:border-t-0 sm:px-5">{trailing}</div>}
+        {trailing && <div className="col-span-full flex items-center border-t border-ink-100 px-4 py-3 sm:col-auto sm:border-t-0 sm:px-5">{trailing}</div>}
       </div>
     </div>
   );
