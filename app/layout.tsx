@@ -6,6 +6,7 @@ import { MobileNavProvider } from "@/components/MobileNavContext";
 import { MobileTopBar } from "@/components/MobileTopBar";
 import { TourController } from "@/components/TourController";
 import { TourMenu } from "@/components/TourMenu";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Light Documents",
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <TourController />
           <TourMenu />
         </MobileNavProvider>
+        <Analytics />
       </body>
     </html>
   );
