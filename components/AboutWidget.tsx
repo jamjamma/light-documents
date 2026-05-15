@@ -1,16 +1,15 @@
-"use client";
-
-import Link from "next/link";
-import { ArrowRight, Play, FileText, Workflow } from "lucide-react";
+import { Workflow } from "lucide-react";
 
 /**
- * Dashboard preamble. Orients first-time reviewers to what this build is and
- * gives them two ways forward: read the memo, or take the guided tour.
+ * Dashboard preamble. Intentionally quiet: orients first-time reviewers to
+ * what this build is, without a primary CTA pulling attention from the
+ * dashboard itself.
  *
- * Structured layout (instead of one long paragraph): icon-led tag at top,
- * one-line answer, three bullet rows (problem / answer / wedge), two CTAs.
- * Matches the visual hierarchy used on the /about page so the dashboard
- * and the memo read as one product.
+ * The widget points back to the sidebar for both deeper reads:
+ *   - "About this build" in the sidebar = the full memo
+ *   - "Take the Tour" in the sidebar    = the 9-minute guided walk-through
+ *
+ * The tour is framed as the time-saver, not as competition with the docs.
  */
 export function AboutWidget() {
   return (
@@ -46,33 +45,12 @@ export function AboutWidget() {
             />
           </div>
 
-          {/* Two CTAs */}
-          <div className="mt-3.5 flex flex-wrap items-center gap-2">
-            <Link
-              href="/about"
-              className="inline-flex items-center gap-1.5 rounded-md bg-ink-900 px-3 py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-ink-800"
-            >
-              <FileText className="h-3.5 w-3.5" />
-              Read the submission memo
-              <ArrowRight className="h-3 w-3" />
-            </Link>
-            <button
-              type="button"
-              onClick={() => {
-                if (typeof window !== "undefined") {
-                  window.dispatchEvent(new CustomEvent("tour:menu-open"));
-                }
-              }}
-              className="inline-flex items-center gap-1.5 rounded-md border border-accent-300 bg-accent-50 px-3 py-1.5 text-[12px] font-medium text-accent-700 transition-colors hover:bg-accent-100"
-            >
-              <Play className="h-3.5 w-3.5" />
-              Take the tour
-              <span className="text-[10.5px] font-normal text-accent-700/80">~9 min</span>
-            </button>
-            <span className="text-[11px] text-ink-400">
-              The tour is faster than reading.
-            </span>
-          </div>
+          {/* Quiet pointer to sidebar — no big CTAs */}
+          <p className="mt-3 text-[11.5px] text-ink-500">
+            Open <strong className="text-ink-700">About this build</strong> in the sidebar for the full memo.
+            The <strong className="text-ink-700">guided tour</strong> in the sidebar walks the build in ~9 minutes,
+            built to save you the time of reading.
+          </p>
         </div>
       </div>
     </section>

@@ -54,7 +54,7 @@ This is a stand-in for a real LLM clause comparator. The UI binds to `ClauseChec
 
 ### 2. Routing rules (`lib/routing-rules.ts`)
 
-12 typed `RoutingRule` objects with:
+14 typed `RoutingRule` objects with:
 - `appliesTo(template) → boolean` (which templates does this rule pertain to?)
 - `trigger(fields, clauseResults) → boolean` (does this rule fire?)
 - `approver` (which role is needed)

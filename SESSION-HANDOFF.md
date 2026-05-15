@@ -12,7 +12,8 @@ overflow at iPhone 14 Pro width.
 - 8 templates (NDA, MSA, MSA Pilot, Order Form, Employment DK, Employment UK, Warrant, Advisor Warrant).
 - 10 in-flight + 4 signed seed contracts spanning every dashboard filter.
 - 8 routes, all 200, typecheck clean, production build clean.
-- `STATE_VERSION = 9`. localStorage shape: `{version, contracts, manualSourceRecords?, rogueActions?, seededAt}`.
+- `STATE_VERSION = 10`. localStorage shape: `{version, contracts, manualSourceRecords?, rogueActions?, seededAt}`.
+- Guided tour: 76 steps across 6 chapters (Dashboard / Workflow / Signed record / Signed archive / Templates / New contract). Earlier "17 steps / 5 acts" entries in the polish-pass log below are historical snapshots, not current state.
 
 **Case-study parts:**
 - Part 1 (this build): complete and deployed.
@@ -145,7 +146,7 @@ light-documents/
 │   ├── template-meta.ts, template-meta-icons.tsx, template-bullets.tsx
 │   ├── approver-directory.ts, signer-routing.ts
 │   ├── clause-checker.ts, routing-rules.ts
-│   ├── contract-store.ts             # STATE_VERSION = 9; rogue actions + undo approval + structured ledger writeback
+│   ├── contract-store.ts             # STATE_VERSION = 10; rogue actions + undo approval + structured ledger writeback
 │   ├── mock-data.ts
 │   └── format.ts
 ├── docs/

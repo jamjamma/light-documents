@@ -93,7 +93,7 @@ The four exits (Slack / DocuSign / Email / writeback) are the four real-world su
         │  signer-routing    entity-aware Light-side signers + witness    │
         │                                                                 │
         │  clause-checker    pure runChecks(template, fields) → results   │
-        │  routing-rules     12 typed rules + computeRouting() with       │
+        │  routing-rules     14 typed rules + computeRouting() with       │
         │                    channel-collision + committee handling       │
         │                                                                 │
         │  contract-store    state machine + journey commands +           │
@@ -129,7 +129,7 @@ Defined in `lib/contract-store.ts:VALID_TRANSITIONS`. Every command:
 - returns a new immutable `Contract`,
 - appends an `AuditEvent` atomically.
 
-`localStorage` key `light-documents-state` holds `{version, contracts, manualSourceRecords?, rogueActions?, seededAt}`. Bumping `STATE_VERSION` invalidates old state and re-seeds. Current version: **9** (bumped to invalidate stale flat-shape `ledger` data and force re-seed with the new structured `journalEntry` / `hrisRecord` / `capTableDelta` blocks).
+`localStorage` key `light-documents-state` holds `{version, contracts, manualSourceRecords?, rogueActions?, seededAt}`. Bumping `STATE_VERSION` invalidates old state and re-seeds. Current version: **10**.
 
 ---
 
@@ -381,7 +381,7 @@ Every stubbed surface is labelled with a `Demo:` callout in the UI.
 | `README.md` | The submission entry point. Problem reframe, build vs buy, run instructions, demo flow, repo map, stated assumptions, tech stack. |
 | `SESSION-HANDOFF.md` | Session-state notes for continuing work across coding sessions. |
 | `docs/architecture.md` | Data flow + state model + per-engine deep dive. |
-| `docs/decisions.md` | Every key product/architectural decision with alternatives considered. 13 decisions including the late-stage closures from the audit (group-based approvers, signer routing, policy as data, template pinning, channel collision). |
+| `docs/decisions.md` | Every key product/architectural decision with alternatives considered. 14 ADRs plus an explicit cut list (§15), including the late-stage closures from the audit (group-based approvers, signer routing, policy as data, template pinning, channel collision, NDA writeback carve-out). |
 | `docs/features.md` | Per-doc-type "manual editing kill matrix", for each template, what was edited by hand and how the system eliminates it. |
 | `docs/cross-functional.md` | Persona × action matrix, RBAC, integration plan, failure modes. |
 | `docs/demo-script.md` | The 5-minute Loom narration script. |
@@ -569,4 +569,4 @@ Production stack would add: Postgres, S3, Redis (BullMQ), Vercel/AWS, Google SSO
 
 ---
 
-**End of project map.** Updated 2026-05-13.
+**End of project map.** Updated 2026-05-15.

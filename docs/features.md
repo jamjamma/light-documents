@@ -157,14 +157,14 @@ For every document type, the same mechanism:
 
 | Persona | Triggers | Reviews | Approves | Signs | Where they work |
 |---|---|---|---|---|---|
-| AE / Sales rep | Generate contract from Salesforce / HubSpot | own drafts |, |, | Salesforce + Slack |
-| Recruiter | Generate offer from Personio / Ashby | own drafts |, |, | ATS + Slack |
-| Head of People |, | All employment | Above-band exceptions |, | Slack + Light Documents |
-| Head of Finance & Ops | Owns routing rules | All contracts | Threshold approvals, daily digest |, | Light Documents (primary user) |
-| Legal |, | Clause deviations, master templates | Clause deviations |, | Slack + Word |
-| CFO |, | Above-threshold contracts | High-value, warrants |, | Slack |
-| CEO |, | Strategic |, | Most contracts | DocuSign emails |
-| Board |, |, | Warrants, equity | Equity docs | Email magic links |
+| AE / Sales rep | Generate contract from Salesforce / HubSpot | own drafts | | | Salesforce + Slack |
+| Recruiter | Generate offer from Personio / Ashby | own drafts | | | ATS + Slack |
+| Head of People | | All employment | Above-band exceptions | | Slack + Light Documents |
+| Head of Finance & Ops | Owns routing rules | All contracts | Threshold approvals, daily digest | | Light Documents (primary user) |
+| Legal | | Clause deviations, master templates | Clause deviations | | Slack + Word |
+| CFO | | Above-threshold contracts | High-value, warrants | | Slack |
+| CEO | | Strategic | | Most contracts | DocuSign emails |
+| Board | | | Warrants, equity | Equity docs | Email magic links |
 
 ## What is real in the prototype vs stubbed
 

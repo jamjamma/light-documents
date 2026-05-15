@@ -37,12 +37,12 @@ export default function AboutPage() {
         <div className="rounded-lg border border-accent-300 bg-accent-50/60 px-4 py-3">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-[13px] text-ink-700">
-              <strong className="text-ink-900">Short on time?</strong> The Take the Tour button in the sidebar walks the
-              whole build in ~9 minutes with popovers explaining each surface. Six chapters; start any one of them on its
-              own.
+              <strong className="text-ink-900">Short on time?</strong> The Take the Tour button in the sidebar walks
+              the whole build in ~9 minutes with popovers explaining each surface. It was built to save you the time
+              of reading this memo. Six chapters; start any one on its own.
             </div>
             <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-ink-700 ring-1 ring-inset ring-ink-200">
-              ~9 min, faster than reading this page
+              ~9 min guided walk
             </span>
           </div>
         </div>
@@ -188,42 +188,13 @@ export default function AboutPage() {
               </tbody>
             </table>
           </div>
-        </Section>
-
-        {/* ─────────────────────────  4. TWO TECHNICAL PATTERNS  ───────────────────────── */}
-        <Section title="Two technical patterns inside the Build" icon={<ListChecks className="h-4 w-4" />}>
-          <p className="text-[13px] text-ink-500">
-            Both feed into the &quot;Build&quot; decision above. Full paper trail in{" "}
+          <p className="text-[12px] text-ink-500">
+            Full paper trail (alternatives considered, what was deliberately cut) in{" "}
             <a href={DECISIONS_URL} target="_blank" rel="noreferrer" className="text-ink-900 underline">
               docs/decisions.md
             </a>
             .
           </p>
-          <ol className="ml-5 list-decimal space-y-3 text-[13px]">
-            <li>
-              <strong>Deterministic clause rules now, Claude later.</strong>
-              <ul className="mt-1 space-y-0.5 text-ink-600">
-                <li>• The typed rules engine handles 80% of cases reliably and cheaply.</li>
-                <li>• The LLM swap is a one-file change. UI binds to the result shape, not the engine.</li>
-                <li>• Demo runs without API keys; every flag is traceable to a typed rule, not an opaque call.</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Anchor tags over per-contract field dragging.</strong>
-              <ul className="mt-1 space-y-0.5 text-ink-600">
-                <li>
-                  • Counsel types{" "}
-                  <code className="rounded bg-ink-100 px-1 py-0.5 font-mono text-[11.5px]">{`\\sig:counterparty\\`}</code>{" "}
-                  once into the master template (as white-on-white text, invisible to signers).
-                </li>
-                <li>
-                  • DocuSign&apos;s API finds the anchor via{" "}
-                  <code className="rounded bg-ink-100 px-1 py-0.5 font-mono text-[11.5px]">searchString</code> on every send.
-                </li>
-                <li>• Zero per-contract field placement, forever.</li>
-              </ul>
-            </li>
-          </ol>
         </Section>
 
         {/* ─────────────────────────  5. HOW THE LEGAL TEAM KEEPS WORD  ───────────────────────── */}

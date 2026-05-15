@@ -35,19 +35,19 @@ How Light Documents lives in the real organisation: who uses what, how handoffs 
 
 | Persona | Triggers | Reviews | Approves | Signs | Lives in |
 |---|---|---|---|---|---|
-| AE / Sales rep | Generate contract from Salesforce / HubSpot deal | own drafts |, |, | Salesforce + Slack |
-| Sales Ops / RevOps |, | sales contracts pre-send | discount approvals if delegated |, | Salesforce + Light |
-| Recruiter | Generate offer from Personio / Ashby | own drafts |, |, | ATS + Slack |
-| Hiring manager |, | Offer details |, |, | Slack |
-| Head of People |, | All employment contracts | Above-band salary approvals |, | Slack + Light Documents |
-| Head of Finance & Ops (the case study role) | Owns routing rules + thresholds | All contracts | Threshold approvals, daily digest reviewer |, | Light Documents (primary user) |
-| Finance / accounting |, | Reads signed contracts for revrec |, |, | Light ledger |
-| In-house counsel / Legal |, | Clause deviations, master templates | Clause deviations |, | Slack + Light + Word |
-| Outside counsel |, | Bespoke (warrants, M&A) |, |, | Email + Word |
-| CFO |, | Above-threshold contracts | High-value deals, warrants, vendor |, | Slack |
-| CEO |, |, | Strategic deals | Most contracts on Light side | DocuSign emails |
-| Board |, |, | Warrants, equity grants | Equity docs | Email magic links |
-| Counterparty |, | Final document via DocuSign |, | their own signature | DocuSign emails |
+| AE / Sales rep | Generate contract from Salesforce / HubSpot deal | own drafts | | | Salesforce + Slack |
+| Sales Ops / RevOps | | sales contracts pre-send | discount approvals if delegated | | Salesforce + Light |
+| Recruiter | Generate offer from Personio / Ashby | own drafts | | | ATS + Slack |
+| Hiring manager | | Offer details | | | Slack |
+| Head of People | | All employment contracts | Above-band salary approvals | | Slack + Light Documents |
+| Head of Finance & Ops (the case study role) | Owns routing rules + thresholds | All contracts | Threshold approvals, daily digest reviewer | | Light Documents (primary user) |
+| Finance / accounting | | Reads signed contracts for revrec | | | Light ledger |
+| In-house counsel / Legal | | Clause deviations, master templates | Clause deviations | | Slack + Light + Word |
+| Outside counsel | | Bespoke (warrants, M&A) | | | Email + Word |
+| CFO | | Above-threshold contracts | High-value deals, warrants, vendor | | Slack |
+| CEO | | | Strategic deals | Most contracts on Light side | DocuSign emails |
+| Board | | | Warrants, equity grants | Equity docs | Email magic links |
+| Counterparty | | Final document via DocuSign | | their own signature | DocuSign emails |
 
 ## End-to-end walkthrough with names: Acme MSA
 
@@ -92,16 +92,16 @@ Three surfaces, used for different audiences.
 
 | Role | See | Edit drafts | Edit templates | Edit routing rules | Approve | Override approvals |
 |---|---|---|---|---|---|---|
-| AE | own deals | own |, |, |, |, |
-| Sales Ops | all sales |, | sales templates |, | discounts if delegated |, |
-| Recruiter | own roles | own |, |, |, |, |
-| Head of People | all employment |, | employment templates | salary bands | above-band exceptions |, |
-| Head of Finance & Ops | all |, |, | all routing rules | threshold approvals | yes |
-| Legal | all |, | master templates + clause rules | clause-related | clause deviations |, |
-| CFO | all |, |, | financial thresholds | high-value, warrants | yes |
-| CEO | all |, |, |, | strategic + signs | yes |
-| Board | warrants + equity only |, |, |, | equity approvals |, |
-| External counterparty | only what they're signing |, |, |, |, |, |
+| AE | own deals | own | | | | |
+| Sales Ops | all sales | | sales templates | | discounts if delegated | |
+| Recruiter | own roles | own | | | | |
+| Head of People | all employment | | employment templates | salary bands | above-band exceptions | |
+| Head of Finance & Ops | all | | | all routing rules | threshold approvals | yes |
+| Legal | all | | master templates + clause rules | clause-related | clause deviations | |
+| CFO | all | | | financial thresholds | high-value, warrants | yes |
+| CEO | all | | | | strategic + signs | yes |
+| Board | warrants + equity only | | | | equity approvals | |
+| External counterparty | only what they're signing | | | | | |
 
 The Head of Finance & Ops role (the case study role) is the operating owner. Owns the rules engine. Sees everything. Can override anything.
 
@@ -120,15 +120,15 @@ The Head of Finance & Ops role (the case study role) is the operating owner. Own
 
 ## Integration priority order (Phase 2)
 
-This is what gets built after the MVP wraps DocuSign, in order of ROI:
+This is what gets built after the MVP wraps DocuSign, in order of ROI. Slack-first is for adoption; writeback at #2 is the strategic extension, built in parallel so the first signed contract has somewhere structured to land.
 
 | Order | Integration | Why first |
 |---|---|---|
-| 1 | Slack (interactive approvals via DM) | Everyone is in Slack. Zero new tool to learn. |
-| 2 | Salesforce + HubSpot read | 30-50 contracts / month originate from Sales. |
-| 3 | DocuSign API (real envelopes + Connect webhooks) | Replaces simulated send. Well-documented. Low risk. |
-| 4 | HRIS read (Personio, Ashby, Workday) | 10-20 contracts / month from People Ops. |
-| 5 | Drive / SharePoint template sync | Replaces ad-hoc folder. Required for version control + compliance. |
-| 6 | Email magic links | Handles board, external counsel, non-Slack users. |
-| 7 | Light ledger writeback (internal API) | The strategic extension. Conditional on which receivers Light has exposed. |
+| 1 | Slack (interactive approvals via DM) | Everyone is in Slack. Zero new tool to learn. The adoption gate. |
+| 2 | **Light writeback (ledger / HRIS / cap table)** | The strategic extension. Built in parallel with Slack so the first signed contract has somewhere structured to land, not just Drive. Operational reach depends on which Light endpoints are ready. |
+| 3 | Salesforce + HubSpot read | 30-50 contracts / month originate from Sales. |
+| 4 | DocuSign API (real envelopes + Connect webhooks) | Replaces simulated send. Well-documented. Low risk. |
+| 5 | HRIS read (Personio, Ashby, Workday) | 10-20 contracts / month from People Ops. |
+| 6 | Drive / SharePoint template sync | Replaces ad-hoc folder. Required for version control + compliance. |
+| 7 | Email magic links | Handles board, external counsel, non-Slack users. |
 | 8 | Calendar alerts for renewals | Closes the loop on obligations. |

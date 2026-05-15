@@ -295,7 +295,7 @@ If you want to look under the hood, `docs/PROJECT.md` is the single-page map of 
 | File | What's in it |
 |---|---|
 | [`docs/PROJECT.md`](docs/PROJECT.md) | Full project map: state machine, three logic engines, every module, every workflow branch, the cut list |
-| [`docs/decisions.md`](docs/decisions.md) | 15 architectural decision records with alternatives considered |
+| [`docs/decisions.md`](docs/decisions.md) | 14 architectural decision records with alternatives considered, plus an explicit cut list |
 | [`docs/architecture.md`](docs/architecture.md) | Data flow, state model, per-engine deep dive, production architecture |
 | [`docs/features.md`](docs/features.md) | Per-doc-type "manual editing kill matrix" (NDA, MSA, Employment, Warrant, Order Form, Pilot) |
 | [`docs/cross-functional.md`](docs/cross-functional.md) | Persona × action matrix, end-to-end walkthrough by name, RBAC, failure modes |
