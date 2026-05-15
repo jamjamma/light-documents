@@ -6,6 +6,9 @@
 
 ## Question 1. Calculate NRR for each cohort with 12 months of data. What is the blended NRR?
 
+> **Answer.** Blended 12-month NRR is **127.9%** (revenue-weighted across Q1 + Q2 2024).
+> Q1 2024 = 123.6%. Q2 2024 = 131.3%. Two-cohort sample, so directional rather than load-bearing.
+
 **Definition**
 - `NRR = Period MRR / Starting MRR`, holding the cohort fixed and excluding new logos. Captures expansion, contraction, and churn.
 
@@ -27,6 +30,13 @@ Revenue-weighted blending is used so larger cohorts carry proportionally more we
 ---
 
 ## Question 2. Diagnose the retention pattern. What could explain it? What would you investigate?
+
+> **Answer.** The headline NRR averages two diverging expansion phases:
+>
+> - **Mid-cycle (M3 → M6) is breaking.** Expansion in this window fell from +9pp to +2pp across four cohorts.
+> - **The renewal moment looks intact.** Q1 2024 jumped from 123.6% at M12 to 147.3% at M18. One data point with a clean shape.
+>
+> The symptom is concrete. The cause is not visible in this data. **First check: pull contract structure for Q1 and Q2 2024** — cheap to verify, would rebase everything else.
 
 ### Step 1: Retention triangle
 
@@ -131,6 +141,12 @@ Two hypotheses worth ruling in or out, in order of how I would test each:
 
 ## Question 3. If M6 retention improved by 10 percentage points across all future cohorts, what does that do to ARR at month 18?
 
+> **Answer.** A 10pp M6 uplift adds **$268k to $344k of incremental M18 ARR** on the two cohorts not yet at M6 (Q1 + Q2 2025), depending on whether the uplift persists or compounds with later expansion.
+>
+> Broader sensitivity (all cohorts not yet at M18, Q2 2024 → Q2 2025): **$552k to $710k**.
+>
+> The upper bound treats Q1 2024's M6 → M18 ratio (1.286x) as the trajectory. That cohort's M18 jump includes what looks like a renewal-cycle upsell, so treat the upper bound as a ceiling, not a base expectation.
+
 ### Forecasting is required
 
 - Only Q1 2024 has observed M18 data. All other M18 outcomes must be projected.
@@ -177,7 +193,3 @@ A 10 percentage point uplift means the retention rate itself rises by 10 points 
 
 - Persistence: `$46.0k × 12 = $552k incremental ARR at M18`
 - Trajectory: `$46.0k × 1.286 × 12 = $710k incremental ARR at M18`
-
-### Summary
-
-Under Scope A, a 10 percentage point M6 retention improvement adds **$268k to $344k of incremental M18 ARR**, depending on whether the uplift simply persists or compounds with later expansion. Under Scope B, the range scales to **$552k to $710k**. The trajectory case is an upper bound: the Q1 2024 M6 → M18 ratio is inflated by what looks like a renewal-cycle event not yet seen to repeat.
