@@ -31,7 +31,7 @@ export type Stage =
 
 export type ApproverRole =
   | "Head of Finance & Ops"
-  | "Legal"
+  | "Counsel"
   | "CFO"
   | "People Ops"
   | "CEO"

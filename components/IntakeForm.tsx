@@ -145,10 +145,10 @@ function MsaForm({ fields, update, isPilot }: { fields: ContractFields; update: 
         <Field label={isPilot ? "Pilot value (EUR)" : "Contract value (ARR €)"} hint={isPilot ? undefined : arr >= 100_000 ? "Will require CFO approval (≥ €100k)." : arr >= 50_000 ? "Will require Head of Finance approval (≥ €50k)." : undefined}>
           <NumberInput value={arr} onChange={(e) => update({ contractValueEur: Number(e.target.value) || 0 })} />
         </Field>
-        <Field label="Payment terms (days)" warning={(fields.paymentTermsDays ?? 30) > 30 ? `Non-standard: master is Net 30. Will route to Legal.` : undefined}>
+        <Field label="Payment terms (days)" warning={(fields.paymentTermsDays ?? 30) > 30 ? `Non-standard: master is Net 30. Will route to Counsel.` : undefined}>
           <NumberInput value={fields.paymentTermsDays ?? 30} onChange={(e) => update({ paymentTermsDays: Number(e.target.value) || 0 })} />
         </Field>
-        <Field label="Liability cap" warning={fields.liabilityCapUnlimited ? "Unlimited liability requires Legal approval." : (fields.liabilityCapEur ?? standardCap) < standardCap ? `Cap below €${standardCap.toLocaleString()} is non-standard for this template.` : undefined}>
+        <Field label="Liability cap" warning={fields.liabilityCapUnlimited ? "Unlimited liability requires Counsel approval." : (fields.liabilityCapEur ?? standardCap) < standardCap ? `Cap below €${standardCap.toLocaleString()} is non-standard for this template.` : undefined}>
           <div className="flex items-center gap-3">
             <NumberInput
               value={fields.liabilityCapEur ?? standardCap}
@@ -172,7 +172,7 @@ function MsaForm({ fields, update, isPilot }: { fields: ContractFields; update: 
       </GridSection>
 
       <GridSection title="Legal">
-        <Field label="Governing law" warning={!isAcceptedLaw(fields.governingLaw) ? "Non-EU and non-UK governing law requires Legal review." : undefined}>
+        <Field label="Governing law" warning={!isAcceptedLaw(fields.governingLaw) ? "Non-EU and non-UK governing law requires Counsel review." : undefined}>
           <TextInput value={fields.governingLaw ?? "Denmark"} onChange={(e) => update({ governingLaw: e.target.value })} />
         </Field>
       </GridSection>
@@ -215,7 +215,7 @@ function NdaForm({ fields, update }: { fields: ContractFields; update: (p: Parti
         <Field label="Term (months)">
           <NumberInput value={fields.termMonths ?? 24} onChange={(e) => update({ termMonths: Number(e.target.value) || 0 })} />
         </Field>
-        <Field label="Governing law" warning={!isAcceptedLaw(fields.governingLaw) ? "Non-EU and non-UK governing law requires Legal review." : undefined}>
+        <Field label="Governing law" warning={!isAcceptedLaw(fields.governingLaw) ? "Non-EU and non-UK governing law requires Counsel review." : undefined}>
           <TextInput value={fields.governingLaw ?? "Denmark"} onChange={(e) => update({ governingLaw: e.target.value })} />
         </Field>
       </GridSection>

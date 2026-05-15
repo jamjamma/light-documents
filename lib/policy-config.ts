@@ -4,7 +4,7 @@
  * Why this file exists: the same governing-law allow-list and the same salary
  * bands were duplicated in 3 places (routing-rules.ts, IntakeForm.tsx, and the
  * mock-data EU country list). That drift is a real bug: a UI warning could
- * disagree with what actually triggers Legal review. This module is the single
+ * disagree with what actually triggers Counsel review. This module is the single
  * source of truth.
  *
  * In production this lives in a settings table editable by the Head of Finance
@@ -37,8 +37,8 @@ export const UK_VARIANTS: readonly string[] = [
 ];
 
 /**
- * Governing laws that do not require Legal review. EU member states + UK.
- * Anything else routes to Legal regardless of doc type.
+ * Governing laws that do not require Counsel review. EU member states + UK.
+ * Anything else routes to Counsel regardless of doc type.
  */
 export const ACCEPTED_GOVERNING_LAWS: readonly string[] = [
   ...EU_COUNTRIES,

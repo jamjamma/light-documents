@@ -1,7 +1,7 @@
 /**
  * Approver directory.
  *
- * Routing rules name a ROLE ("Legal", "CFO"). This module turns that role into
+ * Routing rules name a ROLE ("Counsel", "CFO"). This module turns that role into
  * a specific INDIVIDUAL by applying a selection strategy over a group of members,
  * with optional specialty matching and PTO-aware delegation.
  *
@@ -30,7 +30,7 @@ import { jurisdictionForEntity } from "./policy-config";
 
 const APPROVER_GROUPS: ApproverGroup[] = [
   {
-    role: "Legal",
+    role: "Counsel",
     strategy: "specialty_match",
     members: [
       {

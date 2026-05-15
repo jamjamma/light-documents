@@ -62,10 +62,10 @@ export const ROUTING_RULES: RoutingRule[] = [
   },
   {
     id: "msa_clause_deviation",
-    reason: "One or more clauses deviate from master template: Legal review required",
+    reason: "One or more clauses deviate from master template: Counsel review required",
     appliesTo: (t) => t.type === "MSA",
     trigger: (_f, results) => countDeviations(results) > 0,
-    approver: "Legal",
+    approver: "Counsel",
     channel: "Slack DM",
     autoApproveIfStandard: false,
   },
@@ -73,10 +73,10 @@ export const ROUTING_RULES: RoutingRule[] = [
   // ── NDA ─────────────────────────────────────────────────────────────────────
   {
     id: "nda_non_eu_jurisdiction",
-    reason: "Non-EU or non-UK governing law: Legal review required",
+    reason: "Non-EU or non-UK governing law: Counsel review required",
     appliesTo: (t) => t.type === "NDA",
     trigger: (f) => !isAcceptedLaw(f.governingLaw),
-    approver: "Legal",
+    approver: "Counsel",
     channel: "Slack DM",
     autoApproveIfStandard: false,
   },
@@ -102,10 +102,10 @@ export const ROUTING_RULES: RoutingRule[] = [
   },
   {
     id: "orderform_missing_msa_ref",
-    reason: "Order Form must reference an executed MSA: Legal block",
+    reason: "Order Form must reference an executed MSA: Counsel block",
     appliesTo: (t) => t.type === "Order Form",
     trigger: (f) => !f.referenceMsaId || f.referenceMsaId.length === 0,
-    approver: "Legal",
+    approver: "Counsel",
     channel: "Slack DM",
     autoApproveIfStandard: false,
   },
@@ -142,10 +142,10 @@ export const ROUTING_RULES: RoutingRule[] = [
   // ── Warrant ─────────────────────────────────────────────────────────────────
   {
     id: "warrant_legal_always",
-    reason: "Warrant: Legal review required",
+    reason: "Warrant: Counsel review required",
     appliesTo: (t) => t.type === "Warrant",
     trigger: () => true,
-    approver: "Legal",
+    approver: "Counsel",
     channel: "Email magic link",
     autoApproveIfStandard: false,
   },

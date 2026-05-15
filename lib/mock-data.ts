@@ -28,7 +28,7 @@ export const TEMPLATES: Template[] = [
         predicate: (f) => isAcceptedLaw(f.governingLaw),
         observed: (f) => f.governingLaw ?? "Denmark",
         severity: "warn",
-        reason: "Non-EU and non-UK governing law requires Legal review for enforceability.",
+        reason: "Non-EU and non-UK governing law requires Counsel review for enforceability.",
       },
       {
         key: "term_months",
@@ -55,7 +55,7 @@ export const TEMPLATES: Template[] = [
         predicate: () => true,
         observed: () => "Not included",
         severity: "info",
-        reason: "Residuals clauses are non-standard at Light. Any inbound NDA with residuals routes to Legal.",
+        reason: "Residuals clauses are non-standard at Light. Any inbound NDA with residuals routes to Counsel.",
       },
     ],
     docusignFeatures: {
@@ -93,7 +93,7 @@ export const TEMPLATES: Template[] = [
     ownerTeam: "Sales",
     jurisdictions: ["Denmark", "United Kingdom", "United States"],
     description:
-      "Standard customer agreement for all commercial deals. Approved by Legal February 2026. Any deviation routes to Legal automatically.",
+      "Standard customer agreement for all commercial deals. Approved by Counsel February 2026. Any deviation routes to Counsel automatically.",
     clauseRules: [
       {
         key: "payment_terms",
@@ -111,7 +111,7 @@ export const TEMPLATES: Template[] = [
         predicate: (f) => !f.liabilityCapUnlimited && (f.liabilityCapEur ?? 500_000) >= 500_000,
         observed: (f) => (f.liabilityCapUnlimited ? "Unlimited" : `€${(f.liabilityCapEur ?? 500_000).toLocaleString()}`),
         severity: "block",
-        reason: "Liability cap below €500k or unlimited liability is non-standard and requires Legal approval.",
+        reason: "Liability cap below €500k or unlimited liability is non-standard and requires Counsel approval.",
       },
       {
         key: "governing_law",
@@ -120,7 +120,7 @@ export const TEMPLATES: Template[] = [
         predicate: (f) => isAcceptedLaw(f.governingLaw),
         observed: (f) => f.governingLaw ?? "Denmark",
         severity: "warn",
-        reason: "Non-EU and non-UK governing law requires Legal review for enforceability.",
+        reason: "Non-EU and non-UK governing law requires Counsel review for enforceability.",
       },
       {
         key: "term_months",
@@ -406,7 +406,7 @@ export const TEMPLATES: Template[] = [
     ownerTeam: "CFO",
     jurisdictions: ["Denmark"],
     description:
-      "Equity warrant grant for advisors and board members. Always requires Legal, CFO, and Board approval. eIDAS QES required for a valid grant.",
+      "Equity warrant grant for advisors and board members. Always requires Counsel, CFO, and Board approval. eIDAS QES required for a valid grant.",
     clauseRules: [
       {
         key: "vesting",
@@ -654,7 +654,7 @@ export const TEMPLATES: Template[] = [
         predicate: (f) => /(denmark|germany|france|ireland|netherlands|sweden|finland|norway|spain|italy|united kingdom|england|uk|delaware|new york)/i.test(f.governingLaw ?? ""),
         observed: (f) => f.governingLaw ?? "Denmark",
         severity: "warn",
-        reason: "Non-EU/UK/US governing law requires Legal review even for pilots.",
+        reason: "Non-EU/UK/US governing law requires Counsel review even for pilots.",
       },
     ],
     docusignFeatures: {
@@ -1191,8 +1191,8 @@ const RAW_SEEDS: Contract[] = [
     audit: [
       { at: "2026-05-11T15:30:00Z", actor: "Sara Lindberg (Sales)", event: "Contract created from HubSpot Deal 4421" },
       { at: "2026-05-11T15:30:30Z", actor: "system", event: "Clause check complete: 3 deviations flagged", meta: "Net 60, unlimited liability, customer-only indemnity" },
-      { at: "2026-05-11T15:31:00Z", actor: "system", event: "Routed for approval: Legal, Head of Finance & Ops, CFO" },
-      { at: "2026-05-11T15:31:10Z", actor: "system", event: "Slack DM sent to Sara Friis (Legal)" },
+      { at: "2026-05-11T15:31:00Z", actor: "system", event: "Routed for approval: Counsel, Head of Finance & Ops, CFO" },
+      { at: "2026-05-11T15:31:10Z", actor: "system", event: "Slack DM sent to Sara Friis (Counsel)" },
       { at: "2026-05-11T15:31:11Z", actor: "system", event: "Slack DM sent to Martina Holst (Head of Finance & Ops)" },
       { at: "2026-05-11T15:31:12Z", actor: "system", event: "Slack DM sent to Magnus Karlsson (CFO)" },
       { at: "2026-05-12T09:20:00Z", actor: "system", event: "Awaiting all three approvers" },
@@ -1320,7 +1320,7 @@ const RAW_SEEDS: Contract[] = [
     fields: { ...SOURCE_RECORDS[6].data, boardResolutionRef: "BR-2026-Q2-007 (pending)" },
     audit: [
       { at: "2026-05-09T11:00:00Z", actor: "Magnus Karlsson (CFO)", event: "Warrant draft created from stakeholder record" },
-      { at: "2026-05-09T11:05:00Z", actor: "system", event: "Routing: Legal + CFO + Board (always for warrants)" },
+      { at: "2026-05-09T11:05:00Z", actor: "system", event: "Routing: Counsel + CFO + Board (always for warrants)" },
       { at: "2026-05-09T11:06:00Z", actor: "Magnus Karlsson (CFO)", event: "Approved (self, as CFO initiated)" },
       { at: "2026-05-09T15:30:00Z", actor: "Sara Friis (external counsel)", event: "Approved via email magic link" },
       { at: "2026-05-12T08:00:00Z", actor: "system", event: "Awaiting Board resolution at next quarterly meeting" },
@@ -1388,10 +1388,10 @@ const RAW_SEEDS: Contract[] = [
     audit: [
       { at: "2026-05-13T08:45:00Z", actor: "Sara Lindberg (Sales)", event: "Contract created from Salesforce Opp 00855" },
       { at: "2026-05-13T08:45:08Z", actor: "system", event: "Clause check complete: 1 deviation flagged (Net 45 vs Net 30)" },
-      { at: "2026-05-13T08:45:09Z", actor: "system", event: "Routing: Head of Finance & Ops + Legal" },
+      { at: "2026-05-13T08:45:09Z", actor: "system", event: "Routing: Head of Finance & Ops + Counsel" },
       { at: "2026-05-13T08:45:10Z", actor: "system", event: "Slack DM sent to Martina Holst (Head of Finance & Ops)" },
-      { at: "2026-05-13T08:45:11Z", actor: "system", event: "Slack DM sent to Sara Friis (Legal)" },
-      { at: "2026-05-13T08:48:00Z", actor: "system", event: "Awaiting Head of Finance & Ops + Legal approval" },
+      { at: "2026-05-13T08:45:11Z", actor: "system", event: "Slack DM sent to Sara Friis (Counsel)" },
+      { at: "2026-05-13T08:48:00Z", actor: "system", event: "Awaiting Head of Finance & Ops + Counsel approval" },
     ],
   },
   {
