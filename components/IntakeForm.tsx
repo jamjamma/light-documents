@@ -149,7 +149,9 @@ function MsaForm({ fields, update, isPilot }: { fields: ContractFields; update: 
           <NumberInput value={fields.paymentTermsDays ?? 30} onChange={(e) => update({ paymentTermsDays: Number(e.target.value) || 0 })} />
         </Field>
         <Field label="Liability cap" warning={fields.liabilityCapUnlimited ? "Unlimited liability requires Counsel approval." : (fields.liabilityCapEur ?? standardCap) < standardCap ? `Cap below €${standardCap.toLocaleString()} is non-standard for this template.` : undefined}>
-          <div className="flex items-center gap-3">
+          {/* Mobile: stack the NumberInput above the Unlimited toggle so the
+              input has full width to type into. Desktop keeps them inline. */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
             <NumberInput
               value={fields.liabilityCapEur ?? standardCap}
               onChange={(e) => update({ liabilityCapEur: Number(e.target.value) || 0 })}

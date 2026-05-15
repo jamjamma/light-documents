@@ -131,27 +131,30 @@ export default function SignedRecordPage({ params }: { params: Promise<{ id: str
             )}
 
             <Card title="Linked records">
-              <ul className="space-y-2 text-[13px]">
-                <li className="flex items-center justify-between gap-2">
-                  <span className="text-ink-500">Source record</span>
+              {/* Mobile: stack label above value so long IDs (envelope, template
+                  id with version) don't overflow horizontally. Desktop keeps
+                  label/value on one line. */}
+              <ul className="space-y-2.5 text-[13px] sm:space-y-2">
+                <li className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+                  <span className="text-[11px] uppercase tracking-wider text-ink-500 sm:text-[13px] sm:normal-case sm:tracking-normal">Source record</span>
                   <Badge tone="slate">{contract.sourceRecordId}</Badge>
                 </li>
-                <li className="flex items-center justify-between gap-2">
-                  <span className="text-ink-500">Template version</span>
-                  <span className="font-mono text-[11px]">{template.id} ({template.version})</span>
+                <li className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+                  <span className="text-[11px] uppercase tracking-wider text-ink-500 sm:text-[13px] sm:normal-case sm:tracking-normal">Template version</span>
+                  <span className="break-all font-mono text-[11px]">{template.id} ({template.version})</span>
                 </li>
                 {contract.envelopeId && (
-                  <li className="flex items-center justify-between gap-2">
-                    <span className="text-ink-500">DocuSign envelope</span>
-                    <span className="font-mono text-[11px]">{contract.envelopeId}</span>
+                  <li className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+                    <span className="text-[11px] uppercase tracking-wider text-ink-500 sm:text-[13px] sm:normal-case sm:tracking-normal">DocuSign envelope</span>
+                    <span className="break-all font-mono text-[11px]">{contract.envelopeId}</span>
                   </li>
                 )}
-                <li className="flex items-center justify-between gap-2">
-                  <span className="text-ink-500">Counterparty</span>
+                <li className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+                  <span className="text-[11px] uppercase tracking-wider text-ink-500 sm:text-[13px] sm:normal-case sm:tracking-normal">Counterparty</span>
                   <span className="font-medium">{contract.counterparty}</span>
                 </li>
-                <li className="flex items-center justify-between gap-2">
-                  <span className="text-ink-500">Owner</span>
+                <li className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+                  <span className="text-[11px] uppercase tracking-wider text-ink-500 sm:text-[13px] sm:normal-case sm:tracking-normal">Owner</span>
                   <span>{contract.owner} ({contract.ownerTeam})</span>
                 </li>
               </ul>
