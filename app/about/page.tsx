@@ -22,6 +22,7 @@ const REPO_URL = "https://github.com/jamjamma/light-documents";
 const README_URL = `${REPO_URL}/blob/main/README.md`;
 const PART_2_URL = `${REPO_URL}/blob/main/case-study/PART-2-COHORT-ANALYSIS.md`;
 const PART_3_URL = `${REPO_URL}/blob/main/case-study/PART-3-DAY-ONE.md`;
+const PROJECT_DOC_URL = `${REPO_URL}/blob/main/docs/PROJECT.md`;
 const DECISIONS_URL = `${REPO_URL}/blob/main/docs/decisions.md`;
 
 export default function AboutPage() {
@@ -56,13 +57,48 @@ export default function AboutPage() {
             </div>
             <p className="text-[12.5px] text-ink-600">
               You are on <strong className="text-ink-900">Part 1</strong> right now (this page is the build memo).
-              Parts 2 and 3 are linked below, alongside the long-form README and the source.
+              Each part tests a different muscle. Open them in any order.
             </p>
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-              <PrimaryLinkTile href={PART_2_URL} title="Part 2 →" detail="SaaS cohort analysis." />
-              <PrimaryLinkTile href={PART_3_URL} title="Part 3 →" detail="Day-one mindset + the 1-1 plan." />
-              <PrimaryLinkTile href={README_URL} title="README.md →" detail="Long-form of this page (Part 1)." icon={<FileText className="h-3.5 w-3.5" />} />
-              <PrimaryLinkTile href={REPO_URL} title="Repo →" detail="Source code + decision log." icon={<Github className="h-3.5 w-3.5" />} />
+
+            {/* The three case-study parts */}
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              <PrimaryLinkTile
+                href="/about"
+                title="Part 1: This memo"
+                detail="Scope, build, deliver: what to build vs buy and why."
+              />
+              <PrimaryLinkTile
+                href={PART_2_URL}
+                title="Part 2: Read the business →"
+                detail="SaaS finance + cohort modelling (NRR diagnosis, ARR projection)."
+              />
+              <PrimaryLinkTile
+                href={PART_3_URL}
+                title="Part 3: Day-one mindset →"
+                detail="Judgment + curiosity: the week before the 1-1 with Martina."
+              />
+            </div>
+
+            {/* Build-side reading */}
+            <div className="mt-1 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              <PrimaryLinkTile
+                href={README_URL}
+                title="README.md →"
+                detail="Long-form of this build memo, on GitHub."
+                icon={<FileText className="h-3.5 w-3.5" />}
+              />
+              <PrimaryLinkTile
+                href={PROJECT_DOC_URL}
+                title="docs/PROJECT.md →"
+                detail="Technical deep-dive: state machine, engines, every workflow branch."
+                icon={<FileText className="h-3.5 w-3.5" />}
+              />
+              <PrimaryLinkTile
+                href={REPO_URL}
+                title="Repo →"
+                detail="Source code + the 15 architectural decision records."
+                icon={<Github className="h-3.5 w-3.5" />}
+              />
             </div>
           </div>
         </Card>
@@ -139,17 +175,43 @@ export default function AboutPage() {
           </div>
         </Section>
 
-        {/* ─────────────────────────  2. THE ANSWER (one paragraph)  ───────────────────────── */}
+        {/* ─────────────────────────  2. THE ANSWER  ───────────────────────── */}
         <Section title="The answer in one paragraph" icon={<Shield className="h-4 w-4" />}>
-          <p>
-            <strong>Wrap DocuSign as infrastructure. Keep Word + Drive for authoring. Build the workflow layer in between</strong>{" "}
-            (intake → clause check → routing → anchor-tag envelope → ledger writeback), so every contract moves from
-            approved business terms to a signed agreement whose data flows back into Light&apos;s systems of record.
+
+          {/* Three-part formula */}
+          <p className="text-[15px] font-semibold text-ink-900">
+            Wrap DocuSign. Keep Word + Drive. Build the workflow layer in between.
           </p>
-          <ul className="ml-1 mt-1 space-y-1 text-[13px]">
-            <li className="flex gap-2"><span className="text-ink-400">•</span><span>No new editor for the legal team who owns the master templates. They keep working in Word.</span></li>
-            <li className="flex gap-2"><span className="text-ink-400">•</span><span>No new signing primitive. DocuSign stays the system of record for signatures.</span></li>
-            <li className="flex gap-2"><span className="text-ink-400">•</span><span>The work happens in the gap; that is the strategic opening for Light, conditional on its product direction.</span></li>
+
+          {/* Visual workflow chain */}
+          <div className="rounded-md border border-ink-100 bg-ink-50/50 px-3 py-2 font-mono text-[12.5px] text-ink-700">
+            intake → clause check → routing → anchor-tag envelope → ledger writeback
+          </div>
+
+          {/* Why each part */}
+          <p className="text-[13px] text-ink-600">
+            Every contract moves from approved business terms to a signed agreement whose data flows back into Light&apos;s
+            systems of record. The three reasons it lands cleanly:
+          </p>
+          <ul className="ml-1 space-y-1.5 text-[13px]">
+            <li className="flex gap-2">
+              <span className="mt-0.5 text-ink-400">•</span>
+              <span>
+                <strong>No new editor.</strong> The legal team keeps working in Word, where the master templates already live.
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-0.5 text-ink-400">•</span>
+              <span>
+                <strong>No new signing primitive.</strong> DocuSign stays the system of record for signatures.
+              </span>
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-0.5 text-ink-400">•</span>
+              <span>
+                <strong>The work happens in the gap.</strong> That gap is the strategic opening for Light, conditional on its product direction.
+              </span>
+            </li>
           </ul>
         </Section>
 
@@ -168,22 +230,26 @@ export default function AboutPage() {
                 <BvBRow
                   layer="E-signature, identity, audit trail"
                   decision="Keep DocuSign"
-                  why="eIDAS QES in EU, ESIGN in US, court-tested. Not our edge."
+                  whyLead="Not our edge."
+                  whyDetail="eIDAS QES in EU, ESIGN in US, court-tested."
                 />
                 <BvBRow
                   layer="Template authoring"
                   decision="Keep Word + Drive"
-                  why="Legal will not adopt a new editor. We read templates from Drive; we do not host editing."
+                  whyLead="No new editor."
+                  whyDetail="Legal will not adopt one. We read templates from Drive; we do not host editing."
                 />
                 <BvBRow
                   layer="Full CLM (Ironclad, Juro, SpotDraft)"
                   decision="Defer, not dismiss"
-                  why="Covers ~70% of this workflow. The 30% they do not cover is where Light could differentiate. Revisit at 500+ contracts / month."
+                  whyLead="Covers ~70%. Light owns the 30%."
+                  whyDetail="Juro and SpotDraft cover the bulk. The gap is where Light could differentiate. Revisit at 500+ contracts / month."
                 />
                 <BvBRow
                   layer="Workflow layer (intake → routing → envelope → writeback)"
                   decision="Build"
-                  why="The gap simpler tools miss and bigger CLMs over-build. Sized for Light's volume today; the writeback shape is reusable if direction supports it."
+                  whyLead="The gap."
+                  whyDetail="Simpler tools miss it, bigger CLMs over-build it. Sized for Light's volume today; the writeback shape is reusable if direction supports it."
                 />
               </tbody>
             </table>
@@ -315,6 +381,12 @@ export default function AboutPage() {
 
         {/* ─────────────────────────  9. NEXT 90 DAYS  ───────────────────────── */}
         <Section title="What I would build next (90 days)" icon={<Workflow className="h-4 w-4" />}>
+          <p className="text-[13px] text-ink-600">
+            Order matters. <strong className="text-ink-900">#1 is the adoption gate</strong> (Slack);{" "}
+            <strong className="text-ink-900">#2 is the strategic extension</strong> (writeback), built parallel not sequential;{" "}
+            <strong className="text-ink-900">#3 to #6 replace the demo stubs</strong> with real integrations;{" "}
+            <strong className="text-ink-900">#7 to #8 close the loop</strong> on external signers and renewals.
+          </p>
           <div className="overflow-x-auto -mx-1">
             <table className="min-w-full text-[13px]">
               <thead>
@@ -325,39 +397,24 @@ export default function AboutPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-ink-100">
-                <NextRow n="1" what="Slack (interactive approvals via DM)" why="Everyone is in Slack. The adoption gate." />
-                <NextRow n="2" what="Light writeback (ledger / HRIS / cap table)" why="The strategic extension; conditional on which receivers Light has exposed. Built parallel with Slack so the first signed contract lands somewhere structured if the receiver is ready." />
-                <NextRow n="3" what="Salesforce + HubSpot deal read" why="30 to 50 contracts / month originate from Sales." />
-                <NextRow n="4" what="DocuSign API (real envelopes + Connect webhooks)" why="Replaces simulated send. Well-documented. Low risk." />
-                <NextRow n="5" what="HRIS read (Personio, Ashby, Workday)" why="10 to 20 contracts / month from People Ops." />
-                <NextRow n="6" what="Drive / SharePoint template sync" why="Replaces ad-hoc folder. Version control + compliance." />
-                <NextRow n="7" what="Email magic links" why="Board, external counsel, non-Slack users." />
-                <NextRow n="8" what="Calendar alerts for renewals" why="Closes the loop on obligations." />
+                {/* Adoption gate */}
+                <NextRow n="1" group="Adoption" what="Slack (interactive approvals via DM)" why="Everyone is in Slack. Zero new tool to learn." />
+                {/* Strategic extension */}
+                <NextRow n="2" group="Strategic" what="Light writeback (ledger / HRIS / cap table)" why="Built parallel with Slack so the first signed contract lands somewhere structured if the receiver is ready. Conditional on which receivers Light has exposed." />
+                {/* Replace stubs with real integrations */}
+                <NextRow n="3" group="Integrate" what="Salesforce + HubSpot deal read" why="Most contracts originate from Sales." />
+                <NextRow n="4" group="Integrate" what="DocuSign API (real envelopes + Connect webhooks)" why="Replaces simulated send. Well-documented. Low risk." />
+                <NextRow n="5" group="Integrate" what="HRIS read (Personio, Ashby, Workday)" why="Offer letters originate from People Ops." />
+                <NextRow n="6" group="Integrate" what="Drive / SharePoint template sync" why="Replaces ad-hoc folder. Version control + compliance." />
+                {/* Close the loop */}
+                <NextRow n="7" group="Loop close" what="Email magic links" why="Board, external counsel, non-Slack users." />
+                <NextRow n="8" group="Loop close" what="Calendar alerts for renewals" why="Closes the loop on obligations." />
               </tbody>
             </table>
           </div>
         </Section>
 
-        {/* ─────────────────────────  10. WHERE V2 GOES  ───────────────────────── */}
-        <Section title="Where v2 goes" icon={<ArrowRight className="h-4 w-4" />}>
-          <ol className="ml-5 list-decimal space-y-2 text-[13px]">
-            <li>
-              <strong>Light Documents as a customer module.</strong> Same workflow turned on for Light&apos;s customers.
-              Series A finance teams sign the same MSAs, offers, warrants, vendor agreements; they need the same writeback.
-            </li>
-            <li>
-              <strong>Inbound contracts (counterparty papers).</strong> v1 handles Light-paper-out. v2 handles
-              counterparty-paper-in: parse, compare against our master library, flag deviations, route to Legal. Where
-              Claude earns its keep.
-            </li>
-            <li>
-              <strong>Renewal and obligation tracking.</strong> Every signed contract carries dates and obligations.
-              Calendar alerts at T-90 and T-30 close the loop on revenue retention and vendor cost.
-            </li>
-          </ol>
-        </Section>
-
-        {/* ─────────────────────────  11. ASSUMPTIONS  ───────────────────────── */}
+        {/* ─────────────────────────  10. ASSUMPTIONS  ───────────────────────── */}
         <Section title="Stated assumptions" icon={<AlertTriangle className="h-4 w-4" />}>
           <ol className="ml-5 list-decimal space-y-1.5 text-[13px]">
             <li>Light has master Word templates in Drive (or SharePoint) owned by Legal and People, not yet connected to source systems.</li>
@@ -403,21 +460,50 @@ function Section({ title, icon, children }: { title: string; icon: React.ReactNo
   );
 }
 
-function BvBRow({ layer, decision, why }: { layer: string; decision: string; why: string }) {
+function BvBRow({
+  layer,
+  decision,
+  whyLead,
+  whyDetail,
+}: {
+  layer: string;
+  decision: string;
+  whyLead: string;
+  whyDetail: string;
+}) {
   return (
     <tr>
       <td className="py-2.5 pr-3 align-top font-medium text-ink-900">{layer}</td>
       <td className="py-2.5 pr-3 align-top font-semibold text-ink-900">{decision}</td>
-      <td className="py-2.5 align-top text-ink-600">{why}</td>
+      <td className="py-2.5 align-top text-ink-600">
+        <strong className="text-ink-900">{whyLead}</strong> {whyDetail}
+      </td>
     </tr>
   );
 }
 
-function NextRow({ n, what, why }: { n: string; what: string; why: string }) {
+function NextRow({
+  n,
+  group,
+  what,
+  why,
+}: {
+  n: string;
+  group?: string;
+  what: string;
+  why: string;
+}) {
   return (
     <tr>
       <td className="py-2.5 pr-3 align-top font-mono text-[12px] text-ink-500">{n}</td>
-      <td className="py-2.5 pr-3 align-top font-medium text-ink-900">{what}</td>
+      <td className="py-2.5 pr-3 align-top">
+        {group ? (
+          <div className="mb-0.5 text-[10.5px] font-semibold uppercase tracking-wider text-ink-400">
+            {group}
+          </div>
+        ) : null}
+        <div className="font-medium text-ink-900">{what}</div>
+      </td>
       <td className="py-2.5 align-top text-ink-600">{why}</td>
     </tr>
   );

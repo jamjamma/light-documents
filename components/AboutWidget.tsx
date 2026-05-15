@@ -1,15 +1,13 @@
-import { Workflow } from "lucide-react";
+"use client";
+
+import Link from "next/link";
+import { Workflow, Info, Play, ArrowRight } from "lucide-react";
 
 /**
- * Dashboard preamble. Intentionally quiet: orients first-time reviewers to
- * what this build is, without a primary CTA pulling attention from the
- * dashboard itself.
- *
- * The widget points back to the sidebar for both deeper reads:
- *   - "About this build" in the sidebar = the full memo
- *   - "Take the Tour" in the sidebar    = the 9-minute guided walk-through
- *
- * The tour is framed as the time-saver, not as competition with the docs.
+ * Dashboard preamble. Three columns of structured bullets under a tight
+ * one-line answer, then two CTAs that mirror the sidebar entries:
+ * "About this build" (ink-900 like the sidebar nav active state) and
+ * "Take the tour" (accent-tinted like the sidebar tour button).
  */
 export function AboutWidget() {
   return (
@@ -23,34 +21,51 @@ export function AboutWidget() {
             About this build
           </div>
 
-          {/* One-line answer */}
-          <p className="mt-2 max-w-3xl text-[14px] leading-relaxed text-ink-900">
-            <strong>Wrap DocuSign. Keep Word + Drive. Build the workflow layer in between</strong>{" "}
-            so commercial contracts emit structured data on signing.
+          {/* One-line answer, tight + balanced */}
+          <p className="mt-2 max-w-3xl text-[13.5px] font-semibold leading-snug text-ink-900">
+            Wrap DocuSign. Keep Word + Drive. Build the workflow layer between them.
           </p>
 
-          {/* Structured bullet grid */}
+          {/* 3-tile structured grid: short, parallel, scannable */}
           <div className="mt-3 grid gap-2 sm:grid-cols-3">
             <BulletTile
               label="Problem"
-              text="Manual Word edits and hand-placed DocuSign fields. This build kills both directly."
+              text="Manual Word edits and hand-placed DocuSign fields, every contract."
             />
             <BulletTile
               label="Answer"
-              text="Master templates stay in Word; anchor tags route signature fields automatically; routing engine fires Slack approvals."
+              text="Templates stay in Word. Anchor tags place fields. Rules engine routes approvals."
             />
             <BulletTile
               label="Wedge"
-              text="Every signed contract emits a structured payload (revenue, headcount, cap table) into Light's systems of record. NDAs file for retention only."
+              text="Signed contracts emit structured data into Light's systems of record."
             />
           </div>
 
-          {/* Quiet pointer to sidebar — no big CTAs */}
-          <p className="mt-3 text-[11.5px] text-ink-500">
-            Open <strong className="text-ink-700">About this build</strong> in the sidebar for the full memo.
-            The <strong className="text-ink-700">guided tour</strong> in the sidebar walks the build in ~9 minutes,
-            built to save you the time of reading.
-          </p>
+          {/* Two CTAs styled like the sidebar entries */}
+          <div className="mt-3.5 flex flex-wrap items-center gap-2">
+            <Link
+              href="/about"
+              className="inline-flex items-center gap-2.5 rounded-lg bg-ink-900 px-3 py-2 text-sm text-white transition-colors hover:bg-ink-800"
+            >
+              <Info className="h-4 w-4 shrink-0" />
+              About this build
+              <ArrowRight className="h-3 w-3 shrink-0 opacity-70" />
+            </Link>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new CustomEvent("tour:menu-open"));
+                }
+              }}
+              className="inline-flex items-center gap-2.5 rounded-lg border border-accent-200 bg-accent-50 px-3 py-2 text-[13px] font-medium text-accent-700 transition-colors hover:bg-accent-100"
+            >
+              <Play className="h-4 w-4 shrink-0" />
+              Take the tour
+              <span className="text-[10.5px] font-normal text-accent-700/80">~9 min</span>
+            </button>
+          </div>
         </div>
       </div>
     </section>
