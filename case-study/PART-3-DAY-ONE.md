@@ -13,44 +13,52 @@ Everything below maps to one of those.
 
 ## What I would read
 
-Three lenses on the same company, read in parallel and weighted by what I find. The analytical value is not in any single lens, it is in the gaps between them.
+Three lenses on the same company, read in parallel and weighted by what I find. The analytical value sits in the gaps between them, not in any single lens.
 
 ### Lens 1. What is actually happening on the ground
 
-The unvarnished reality. Highest signal, fastest decay. Starts here, because everything else is interpretation.
+Read this first. Highest signal, fastest decay.
 
-- Last 30 days of `#customer-feedback`, `#deployment`, `#wins`, and `#losses` in Slack. Five hours of reading, two months of context.
-- Three to five recorded customer calls in Gong or Fireflies: one new-logo kickoff, one mid-deployment, one expansion. 1.5x speed.
-- Recent support tickets, escalations, and any deal-desk exceptions from the last quarter.
-- The customer roster with ARR, segment, geography, and go-live date. The real book, not the website logos. Where heavy ACVs sit. Where churn or expansion has happened.
+| Source | What I am looking for |
+|---|---|
+| Internal team comms, last 30 days (Slack, Linear, or wherever the team coordinates day to day) | Customer feedback, deployment friction, wins, losses, deal-desk exceptions |
+| 2 to 3 recorded customer calls if Gong or Fireflies is in use | One new-logo kickoff, one mid-deployment, one expansion. 1.5x speed. |
+| Support tickets and escalations from the last quarter | The same issue surfacing more than once |
+| The real customer roster | ARR, segment, geography, go-live date. Not the website logos. Where heavy ACVs sit. Where churn or expansion has happened. |
 
 ### Lens 2. What leadership says should be happening
 
-The intended direction. Only useful after Lens 1, because then the delta becomes visible.
+Useful after Lens 1, because then the delta between stated and lived becomes visible.
 
-- Company Notion: strategy docs, OKRs, current quarter priorities. Anything labelled "v1" or "WIP", because half-written documents tell you more than finished ones.
-- Recent all-hands recordings and Loom updates. Where Jonathan directs attention is the de facto priority list.
-- Pricing and packaging deck, plus the discount approval policy if one exists. That is where the model meets reality.
-- Martina's last team update or all-hands segment, so I am not asking her to repeat what she has already said publicly.
-- My job description, re-read against everything above. What does the role mean given what the company is actually trying to do?
+| Source | What I am looking for |
+|---|---|
+| Strategy docs, OKRs, current-quarter priorities (in whatever workspace the company uses for written planning) | What leadership says the company is doing. Half-written and "v1" docs often tell you more than the polished ones. |
+| Recent all-hands recordings and internal video updates | Where the CEO directs attention is the de facto priority list. |
+| Pricing, packaging, and discount-approval policy (if one is written down) | Where the commercial model meets reality. |
+| Martina's last team update or all-hands segment | So I am not asking her to repeat what she has already said publicly. |
+| My own job description, re-read | What does the role actually mean given what the company is trying to do. |
 
 ### Lens 3. How the outside sees Light
 
-The external mirror. Lowest cost to consume, and useful in parallel to the other two.
+Lowest cost to consume, useful in parallel.
 
-- Atomico's Series A memo and Balderton's framing piece. Investor logic is closer to ground truth than founder narrative.
-- Jonathan's Slush talk, the TechCrunch stealth piece, recent podcasts. Pleo to Juni to Light is one through-line, and his NetSuite frustration is documented down to page-load speed.
-- NetSuite vs. Rillet and NetSuite vs. Campfire teardowns. How Light is being framed inside the AI-native ERP wave.
-- Pennylane in France, Brex and Ramp at the spend layer. Adjacent battles Light is not fighting yet but might inherit.
-- Two practitioner threads on what breaks during NetSuite-to-AI-native migrations (Reddit `r/Accounting`, LinkedIn FinOps). Where the real friction lives.
-
-### The job is in the gaps
-
-| Pattern | What it signals |
+| Source | What I am looking for |
 |---|---|
-| Leadership talks about cost-to-deploy in all-hands, but the deployment Slack channel has nothing about it | Gap between stated and lived priority |
-| Investors expect multi-entity to be the wedge, but the team is not shipping for it | Gap between thesis and execution |
-| The CEO calls out one customer publicly, but the support thread tells a different story | Gap between narrative and reality |
+| Publicly available investor framing (Balderton's piece; Atomico's blog where published) | Investor logic is closer to ground truth than founder narrative. |
+| Jonathan's public talks and recent press (Slush, TechCrunch coverage, podcasts) | The through-line: Pleo → Juni → Light. The NetSuite frustration is documented down to page-load speed. |
+| NetSuite vs. AI-native ERP coverage (Rillet, Campfire teardowns) | How Light is framed inside the wave. |
+| Adjacent battles Light is not fighting yet (Pennylane in France; Brex / Ramp at the spend layer) | What Light might inherit at the next stage. |
+| Practitioner threads on NetSuite-to-AI-native migrations (Reddit `r/Accounting`, LinkedIn FinOps) | Where the real customer friction lives. |
+
+### Read for the gaps, not the headlines
+
+The job is in the gaps between lenses.
+
+| Pattern | What it tells me |
+|---|---|
+| Leadership talks about cost-to-deploy in all-hands, but the deployment team channel has nothing on it | Gap between stated and lived priority |
+| Investors frame multi-entity as the wedge, but the team is not shipping toward it | Gap between thesis and execution |
+| The CEO calls out one customer publicly, the support thread tells a different story | Gap between narrative and reality |
 
 Triangulating across the three lenses is closer to the real work than reading any one of them well.
 

@@ -5,11 +5,15 @@
 
 ---
 
-## 1. The reframe (one sentence)
+## 1. The reframe
 
-**The stated problem (Word edits and hand-placed DocuSign fields) is real, and the workflow below eliminates both. The strategic opportunity uniquely available to Light: every signed contract is structured data that belongs in the systems of record.** Other CLMs ship integrations into N ERPs. Light *is* the ERP.
+**The stated problem (Word edits and hand-placed DocuSign fields) is real, and the workflow below eliminates both.** The strategic opportunity available to Light that other CLM vendors cannot match:
 
-The PDF is the audit artifact; the data is the product. Routing per document type: MSAs / Order Forms → revenue and billing, Employment → headcount and compensation, Warrants → cap table, Vendor → AP, NDAs → retention metadata only (see ADR 14).
+- **Commercial contracts carry structured data.** MSAs and Order Forms → revenue and billing. Employment → headcount and compensation. Warrants → cap table. Vendor → AP and obligation tracking.
+- **NDAs are the exception.** No commercial value to post. They file for retention only (ADR 14).
+- **The writeback lands where Light has a receiver.** The prototype emits the payload on `envelope-completed`. Production wires it into whichever receivers Light operates.
+
+The PDF is the audit artifact, the data is the product.
 
 ---
 

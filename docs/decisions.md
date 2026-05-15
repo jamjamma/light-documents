@@ -20,23 +20,28 @@ The key architectural and product decisions, with alternatives considered and wh
 
 ## 2. Contracts are first-class structured data, written to the relevant system of record
 
-**Decision:** Every signed contract emits structured data into the relevant system of record. The PDF is the audit artifact, not the product. Routing per document type:
+**Decision:** Signed contracts that carry commercial data emit a structured payload into the relevant system of record. The PDF is the audit artifact, not the product. Routing per document type:
 
 - **MSAs and Order Forms** → revenue and billing (MRR, ARR, renewal date)
 - **Employment contracts** → headcount and compensation
 - **Warrant agreements** → cap table
 - **Vendor agreements** → AP and obligation tracking
-- **NDAs** → retention metadata only (no commercial impact; see ADR 14)
+- **NDAs** → retention metadata only, no writeback (see ADR 14)
+
+**Boundaries this decision draws explicitly:**
+
+- **NDAs are the exception** (ADR 14). No commercial value to post. They file for retention only.
+- **The writeback runs where Light has a receiver.** The prototype emits the payload on `envelope-completed`. Production wires it into whichever receivers Light operates. The 90-day roadmap treats this as a parallel workstream, not a precondition.
 
 **Alternatives considered:**
 
 - Store signed PDFs in Drive and let RevOps manually update each system (status quo). **Rejected.** This is the entire problem.
 - Store contract metadata in a separate "contracts DB" disconnected from the systems of record. **Rejected.** Creates a second source of truth that has to reconcile.
-- **Chosen:** Type-conditional writeback into the system of record that matters for that document type.
+- **Chosen:** Type-conditional writeback into the system of record that matters for that document type, with graceful fallback to Drive filing + audit trail when the receiver is not yet exposed.
 
-**Why:**
-1. Matches Light's product thesis: Light is the ERP. Other CLMs ship integrations into N ERPs; Light is inside one.
-2. Eliminates manual re-keying.
+**Why this matches Light specifically:**
+1. Light's product thesis positions it close to the systems of record (ledger, HRIS-adjacent, cap-table-adjacent). Where that closeness exists, contract data lands natively rather than as an integration into another vendor's ERP.
+2. Eliminates manual re-keying for the contract types that carry commercial data.
 3. Closes the loop on obligations (renewal alerts, payment schedules, vesting tracking).
 4. Sets up Light Documents to ship as a customer-facing module after internal use proves it.
 

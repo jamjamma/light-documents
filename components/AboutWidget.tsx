@@ -19,9 +19,9 @@ export function AboutWidget() {
             About this build
           </div>
           <p className="mt-2 max-w-3xl text-[13px] leading-relaxed text-ink-700">
-            The stated pain (manual Word edits and hand-placed DocuSign fields) is real, and this build kills both
-            directly. While we&apos;re in there, every signed contract becomes structured data that flows back into
-            the system of record. The PDF is the audit artifact; the data is the product.
+            The stated pain (manual Word edits and hand-placed DocuSign fields) is real. This build kills both
+            directly. Commercial contracts (MSA, Order Form, Employment, Warrant) emit a structured payload into Light&apos;s
+            systems of record on signing; NDAs file for retention only. The PDF is the audit artifact, the data is the product.
           </p>
 
           <Link

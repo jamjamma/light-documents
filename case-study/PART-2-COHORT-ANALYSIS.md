@@ -22,7 +22,7 @@
 
 Revenue-weighted blending is used so larger cohorts carry proportionally more weight than a simple average would allow.
 
-**Interpretation.** The mature base expands every $1.00 of starting MRR into approximately $1.28 over twelve months. Strong on a small sample of two cohorts.
+**Interpretation.** The two mature cohorts expand every $1.00 of starting MRR into approximately $1.28 over twelve months. Two-cohort sample, so treat the headline as directional rather than load-bearing.
 
 ---
 
@@ -78,38 +78,55 @@ Conclusions are bounded by what is missing:
 - Contract structure: length, ramp terms, multi-year vs annual.
 - Segment cuts by sales channel, customer size, geography, industry.
 
-### Step 5: Hypothesis
+### Step 5: Two expansion phases, behaving differently
 
-The data shows two expansion phases that behave very differently. Reading them together is what the headline NRR misses.
+The headline NRR averages over two phases that are diverging. Reading them separately is what the headline misses.
 
-**Phase 1: Mid-cycle expansion (M3 to M6) is collapsing.**
+**Phase 1: Mid-cycle expansion (M3 → M6) is collapsing.**
 
-| Cohort | M3 | M6 | M3 → M6 expansion |
-|--------|----|----|-------------------|
+| Cohort | M3 | M6 | M3 → M6 |
+|--------|----|----|---------|
 | Q1 2024 | 105.5% | 114.5% | +9.0pp |
 | Q2 2024 | 104.5% | 113.4% | +8.9pp |
 | Q3 2024 | 102.6% | 109.0% | +6.4pp |
 | Q4 2024 | 103.3% | 105.4% | +2.1pp |
 
-Across four cohorts, expansion in this window has fallen from ~9 points to ~2 points. M3 itself is stable, so customers are landing and onboarding similarly. The deterioration is in the expansion phase, not the activation phase.
+Expansion in this window has fallen from ~9pp to ~2pp across four cohorts. M3 itself is stable, so activation is similar. The deterioration is in the expansion phase.
 
 **Phase 2: A late-cycle expansion event around the annual renewal.**
 
-Q1 2024 is flat from M9 (123.6%) to M12 (123.6%) and then jumps to 147.3% by M18, a +23.7pp move. That shape is not smooth organic growth. It looks like a renewal-cycle event: customers re-contracting with bigger commitments, multi-year upgrades, or seat true-ups timed to the anniversary.
+Q1 2024 is flat M9 → M12 (123.6% → 123.6%) then jumps to 147.3% by M18 (+23.7pp). The shape is not smooth organic growth. It looks like customers re-contracting with bigger commitments, multi-year upgrades, or seat true-ups at the anniversary.
 
-**Reading the two phases together.**
-- Mid-cycle expansion is genuinely deteriorating.
-- Late-cycle expansion may be the more important value driver, and we have visibility into it for only one cohort.
-- Some of the apparent cohort decay is real (mid-cycle expansion is collapsing) and some is structural (newer cohorts have not yet reached their renewal moment).
-- The headline 127.9% blended NRR at M12 understates lifetime value if the renewal-cycle event repeats. It overstates current health if mid-cycle expansion keeps deteriorating.
+### Step 6: What this likely means
 
-**Leading view.** The expansion engine has bifurcated. Something about the way the company drove mid-cycle expansion has stopped working as cohort size doubled, while the renewal-cycle event appears to be intact for the one cohort we can observe. The mechanism behind the mid-cycle drop is not visible in this data: it could be customer success coverage failing to scale, a change in product packaging that left less room for early upsell, weaker activation that pushes customers below the upsell threshold, or a deliberate sales decision to consolidate expansion at renewal. The data tells us the symptom is real and concentrated; it does not tell us the cause.
+| | Reading |
+|---|---|
+| **Mid-cycle** | Genuinely deteriorating. Real, not a measurement artifact. |
+| **Late-cycle** | Renewal-driven. Visible in only one cohort (Q1 2024). |
+| **Headline (127.9%)** | Overstates current health if mid-cycle keeps falling. Understates lifetime value if the renewal event repeats. |
 
-**One alternative to rule out first.** If earlier cohorts signed contracts with stronger ramp or renewal terms than newer cohorts, part of both the mid-cycle expansion and the Q1 2024 M18 jump is a contract-design artifact rather than a behavioural change. Worth testing first because it is cheap to verify and would rebase the diagnosis.
+### Step 7: Candidate causes for the mid-cycle drop
 
-**Commercial implication.** If mid-cycle expansion is genuinely broken, the fix is operational and high-leverage but cannot be specified without knowing the mechanism. If the renewal-cycle event holds for newer cohorts, long-term cohort economics are stronger than the M6 trend implies and the ARR opportunity is concentrated at renewal moments. The risk is that management, anchored to M6 retention, either underinvests in renewal motion (because M12 looks weaker than it is) or invests in M3 to M6 fixes without first identifying what actually broke.
+The data confirms the symptom is real and concentrated. It does not name the cause. Hypotheses worth ruling in or out:
 
-**Validation priority.** Pull contract structure for Q1 and Q2 2024 to test the ramp-artifact view. Then decompose mid-cycle expansion into seat adds, module attach, usage growth, and CS-driven upsell to identify which mechanism has weakened. Track Q2 2024 through M18 closely: it is the next cohort to cross the renewal threshold and will tell us whether the late-cycle event repeats.
+- Customer Success coverage failing to scale with cohort size.
+- A product packaging or pricing change that left less room for early upsell.
+- Weaker activation pushing customers below the threshold where mid-cycle upsell makes sense.
+- A deliberate commercial decision to consolidate expansion at renewal rather than mid-cycle.
+
+### Step 8: What to verify first
+
+| Order | Check | Why first |
+|---|---|---|
+| 1 | Pull contract structure for Q1 and Q2 2024 | If early cohorts had stronger ramp or renewal terms, part of both the mid-cycle expansion and the Q1 2024 M18 jump is a contract-design artifact, not a behaviour change. Cheap to verify, would rebase everything else. |
+| 2 | Decompose mid-cycle expansion (seat adds, module attach, usage growth, CS-led upsell) | Names which mechanism weakened. |
+| 3 | Track Q2 2024 through M18 | Next cohort to cross the renewal threshold. Tells us whether the late-cycle event repeats. |
+
+### Commercial implication
+
+- **If mid-cycle is broken**: the fix is operational and high-leverage, but cannot be specified without knowing the mechanism. Step 2 above is the unlock.
+- **If late-cycle holds for newer cohorts**: long-term cohort economics are stronger than M6 implies; ARR opportunity is concentrated at renewal moments rather than mid-cycle.
+- **Risk to manage**: leadership anchored to M6 retention may either underinvest in renewal motion (because M12 looks weaker than it is) or invest in M3 → M6 fixes without first identifying what actually broke.
 
 ---
 
@@ -164,16 +181,4 @@ A 10 percentage point uplift means the retention rate itself rises by 10 points 
 
 ### Recommended answer
 
-Under Scope A, a 10 percentage point M6 retention improvement adds **$268k to $344k of incremental M18 ARR**, depending on whether the uplift simply persists or compounds with later expansion. Under Scope B, the range scales to **$552k to $710k**. The trajectory case should be read as an upper bound because the Q1 2024 M6 to M18 ratio is inflated by what looks like a renewal-cycle expansion event we have not yet seen repeat.
-
----
-
-## Executive Summary
-
-- **Headline.** Mature cohorts show 127.9% blended 12-month NRR. Strong land-and-expand profile on a small sample.
-- **The real story is two expansion phases behaving differently.** Mid-cycle expansion (M3 to M6) has collapsed from +9pp to +2pp across four cohorts. Late-cycle expansion looks renewal-driven: Q1 2024 is flat from M9 to M12 then jumps to 147.3% at M18.
-- **Implication.** Some of the apparent cohort decay is a real expansion-engine problem; some is simply that newer cohorts have not yet reached their renewal moment. The headline retention curve obscures both.
-- **Caveat.** Net retention above 100% does not prove the base is healthy. Logo retention, churn, GRR, and contract structure are not visible in this dataset.
-- **Working hypothesis.** Mid-cycle expansion has broken at scale, mechanism unknown. Renewal-cycle expansion may still be intact but is observed in only one cohort.
-- **Modelled upside.** A 10 percentage point M6 improvement on the two pre-M6 cohorts adds $268k to $344k of M18 ARR; broader sensitivity (all pre-M18 cohorts) is $552k to $710k. Trajectory case should be read as an upper bound given the renewal-event distortion in Q1 2024.
-- **Next steps.** Pull contract structure for Q1 and Q2 2024 to test the ramp-artifact view. Track Q2 2024 through M18 to see whether the renewal-cycle expansion repeats.
+Under Scope A, a 10 percentage point M6 retention improvement adds **$268k to $344k of incremental M18 ARR**, depending on whether the uplift simply persists or compounds with later expansion. Under Scope B, the range scales to **$552k to $710k**. The trajectory case is an upper bound: the Q1 2024 M6 → M18 ratio is inflated by what looks like a renewal-cycle event not yet seen to repeat.

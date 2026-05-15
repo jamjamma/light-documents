@@ -6,62 +6,112 @@
 | | |
 |---|---|
 | **Live demo** | https://light-documents-sigma.vercel.app/ |
+| **In-app memo** (the fastest read) | [/about](https://light-documents-sigma.vercel.app/about) |
 | **Repo** | https://github.com/jamjamma/light-documents |
-| **In-app memo** | [/about](https://light-documents-sigma.vercel.app/about) (same content as this README, on the website) |
 | **Case Part 2** | [case-study/PART-2-COHORT-ANALYSIS.md](case-study/PART-2-COHORT-ANALYSIS.md) |
 | **Case Part 3** | [case-study/PART-3-DAY-ONE.md](case-study/PART-3-DAY-ONE.md) |
 
-**Suggested review path:** README top to bottom → live demo MSA happy path → [`docs/decisions.md`](docs/decisions.md) for the ADRs.
+---
 
-## The answer in one paragraph
+## How to read this submission
 
-**Wrap DocuSign as infrastructure. Keep Word + Drive for authoring. Build the workflow layer in between (intake, clause check, routing, anchor-tag envelope, ledger writeback) so every contract goes from approved business terms to a signed agreement whose data flows back into Light's systems of record.** No new editor for Counsel. No new signing primitive. The work happens in the gap, which is precisely the gap Light's ERP wedge can fill.
+There are three reading depths. Pick the one that matches your time.
+
+| If you have | Open | What you get |
+|---|---|---|
+| 5 minutes | the [live demo](https://light-documents-sigma.vercel.app/), let the guided tour run | The workflow in motion. The tour points at each piece and says why it exists. |
+| 15 minutes | the [in-app About memo](https://light-documents-sigma.vercel.app/about), or this README top to bottom | Problem, reframe, how I approached it, value chain + friction map, build vs buy, the key decision, scope, 90-day roadmap, plus inline summaries of Parts 2 and 3 |
+| 45 minutes (build-side) | [`docs/PROJECT.md`](docs/PROJECT.md) | Single-page map of the build. State machine, three logic engines, every module's purpose, every workflow branch (committee, PTO, undo, NDA exception), the cut list with reasoning |
+
+The demo, the About page, and this README contain the same answer at different levels of compression. PROJECT.md and the rest of `docs/` are for the reader who wants to see the engineering behind that answer.
+
+---
 
 ## The problem
 
-The stated pain (Word edits and hand-placed DocuSign fields) is real, and the workflow below kills both directly.
+The brief names two visible frictions:
 
-While we're rebuilding the flow, there is a strategic opportunity uniquely available to Light: every signed contract is structured data (revenue, headcount, equity, vendor obligations) that belongs in the systems of record. The PDF is the audit artifact; the data is the product. Other CLMs ship integrations into N ERPs. Light *is* the ERP.
+- **Manual Word edits per contract.** ~15-20 fields hand-typed per MSA. ~20+ per employment offer. ~30+ for a warrant.
+- **Hand-placed DocuSign fields.** ~5-10 minutes dragging signature, date, and initial blocks per envelope, per signer.
+
+At Light's stated volume (50 to 100 contracts / month), that is a steady operational tax. Both frictions can be eliminated with the right workflow layer in between.
+
+## The reframe
+
+While rebuilding the flow, there is a strategic opportunity available to Light that other CLM vendors cannot match.
+
+- **Commercial contracts carry structured data.** MSAs and Order Forms → revenue and billing. Employment → headcount and compensation. Warrants → cap table. Vendor → AP and obligation tracking.
+- **NDAs are the exception.** No commercial value to post. They file for retention only. The audit trail is the system of record (see [decisions.md §14](docs/decisions.md)).
+- **The writeback lands where Light has a receiver.** The prototype emits the structured payload on `envelope-completed`. Production wires it into whichever receivers Light operates or is building. The 90-day roadmap treats this as a parallel workstream, not a precondition.
+
+The PDF is the audit artifact, the data is the product. That is the wedge.
+
+---
+
+## How I approached this
+
+Six steps, in order, with the artifacts each one produced.
+
+| # | Step | What I produced |
+|---|---|---|
+| 1 | Read the brief and named the two visible frictions plainly | Two-line problem statement, above |
+| 2 | Mapped the contract workflow end to end as a value chain (source → intake → check → route → approve → sign → file → writeback) | Diagram below + the friction map |
+| 3 | Located where pain lives at each handoff, not just inside any single team | Friction map (next section) |
+| 4 | Asked layer by layer: build, buy, or defer | [Build vs buy table](#build-vs-buy) |
+| 5 | Walked the one key decision (wrap DocuSign, build the gap) with three reasons | [The one key decision](#the-one-key-decision) |
+| 6 | Stress-tested the design against the awkward cases (committee approvals, PTO delegation, channel collision, entity-aware signers, NDA exception, undo before send) | The [edge cases this build handles](#why-each-piece-exists) |
+
+Steps 5 and 6 are where the design earned the right to be more than "build an uploader". Most of the surface in the prototype exists because one of those edge cases would have broken a simpler tool.
+
+---
+
+## The value chain and the friction map
 
 ```
-Source records (Salesforce / HubSpot / Attio / Personio / Ashby / Manual entry)
-       and master templates (Word docs in Drive)
-                        ↓
-               LIGHT DOCUMENTS (this build)
-        intake → clause check → routing → envelope
-                        ↓
-                     DocuSign
-                        ↓
-            Webhook → writeback to systems of record
-            (Light ledger for MSAs / Order Forms, HRIS for offers,
-             cap table for warrants, retention metadata for NDAs)
+Source records                Master templates             Approver directory
+(SF / HubSpot / Attio /       (Word docs in Drive,         (Legal, F&O, CFO, People,
+ Personio / Ashby /            owned by Legal)              CEO, Board) with PTO
+ Manual entry)                                              delegations
+        │                              │                              │
+        │ read                         │ read + version-pin           │ read
+        ▼                              ▼                              ▼
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │                       LIGHT DOCUMENTS                                │
+    │                                                                      │
+    │   intake  →  clause check  →  routing  →  approve  →  sign  →  file  │
+    └────────┬──────────────┬───────────────┬──────────────┬───────────────┘
+             │              │               │              │
+             ▼              ▼               ▼              ▼
+          Slack          DocuSign         Email          Writeback to
+        (DM + ch)       (envelope)       magic          systems of record
+                                         links          (where Light exposes
+                                                         them; NDAs file for
+                                                         retention only)
 ```
+
+### Where friction actually lives
+
+Friction is not in any single team. It lives at the **handoffs**. The build is shaped around fixing the worst ones first.
+
+| Handoff | Who suffers today | What we eliminate |
+|---|---|---|
+| Sales → Legal (clause review) | AE waits days for a review; Legal re-reads the same MSA every week | Clause check runs at intake; only deviations route to Legal, with reasons attached |
+| Legal → Finance (approval thresholds) | Approver chain assembled by Slack DM, sometimes the wrong person | Rule-based routing engine, owned by Head of F&O, deduplicates approvers by role and resolves channel collisions |
+| Drafting → DocuSign (field placement) | 5-10 minutes per envelope dragging fields | Anchor tags placed once in the master, DocuSign places fields on every send |
+| DocuSign → ledger / HRIS / cap table | RevOps re-keys MRR, People re-keys headcount, Finance re-keys vesting | Structured writeback on `envelope-completed`. Conditional on Light exposing the receiver. |
+| Master template update mid-flow | In-flight contracts silently change shape | Version pinned at create time, stale banner when master updates |
+| Board / external counsel signing | Outside-Slack approvers get lost | Email magic links with audit-grade access |
+
+---
 
 ## Build vs buy
 
 | Layer | Decision | Why |
 |---|---|---|
 | E-signature, identity, audit trail | **Buy / keep DocuSign** | eIDAS-compliant in EU, ESIGN in US, court-tested. Not our edge. |
-| Template authoring | **Keep Word + Drive** | Counsel will not stop using Word. We read templates, we do not host editing. |
-| Full CLM (Ironclad, Juro, SpotDraft) | **Defer, not dismiss** | Juro and SpotDraft now target Series A SaaS in Europe with SMB pricing and ~30-day implementations. A pilot would cover ~70% of this workflow. The 30% they don't cover is the strategic wedge: writeback into Light's ledger, routing rules owned by Head of F&O, and integration with the source records Light's customers already trust. Revisit at 500+ / month or when post-signature obligation tracking dominates. |
-| Workflow layer (intake → check → route → envelope → writeback) | **Build** | The gap, and the gap Light's ERP wedge is uniquely positioned to fill. |
-
-## Friction killed: before vs after
-
-| Friction today | With Light Documents |
-|---|---|
-| 15-20 fields hand-edited in Word per MSA | 0-3 exceptions; rest prefilled from systems of record |
-| 5-10 minutes dragging DocuSign fields per envelope | 0 minutes; anchor tags placed once in the master template |
-| Approval chasing over Slack DMs and email | Rule-triggered routing with reasons attached to every approval |
-| Wrong template version risk | Version pinned at create time; stale-banner when the master updates |
-| Manual ledger entry by RevOps after signing | Structured writeback on `envelope-completed` |
-| Lost contracts in inboxes | Single state machine + audit trail |
-
-## Why Counsel will not block adoption
-
-Counsel does not author contracts inside Light Documents. Master templates stay as Word docs in Drive, edited where Counsel already edits. Light reads what Counsel writes; it does not host the editing. Counsel may still log in to approve a clause deviation or sit on an approval chain. What stays out of the tool is authoring, not review.
-
-Forcing Counsel into a new editor is the single largest reason CLM rollouts fail. That is the failure mode this build is designed to avoid.
+| Template authoring | **Keep Word + Drive** | Legal will not adopt a new editor. We read templates from Drive, we do not host editing. |
+| Full CLM (Ironclad, Juro, SpotDraft) | **Defer, not dismiss** | Juro and SpotDraft now target Series A SaaS in Europe with SMB pricing and ~30-day implementations. A pilot would cover ~70% of this workflow. The 30% they do not cover is the strategic wedge: writeback into Light's systems of record, routing rules owned by Head of F&O, and integration with the source records Light's customers already trust. Revisit at 500+ contracts / month or when post-signature obligation tracking dominates. |
+| Workflow layer (intake → check → route → envelope → writeback) | **Build** | The gap that simpler tools do not fill and the larger CLMs over-build. Sized for Light's volume today, designed so the most useful part of it (the writeback shape) can be lifted into Light's product later. |
 
 ## The one key decision
 
@@ -71,107 +121,120 @@ Three reasons:
 
 1. **Legal.** Rebuilding the signing layer means inheriting eIDAS, ESIGN, UETA, authority-to-bind verification, witnessing rules, and a decade of case-law compliance. Wrong battle for a Series A finance company.
 2. **Adoption.** Counsel writes contracts in Word. Forcing them into a new editor kills the rollout. We read what they write; we do not replace where they write.
-3. **Strategic fit for Light.** Contracts are streams of structured data (revenue, headcount, equity, vendor obligations) that belong in the systems of record Light already operates. The PDF is the audit artifact. This is the contract approach that matches Light's product thesis.
+3. **Strategic fit.** For the contract types that carry commercial data, the structured payload belongs in the systems of record. The PDF is the audit artifact. NDAs file for retention only (ADR 14). This is the approach that matches Light's product thesis without overclaiming.
 
-Smallest technical embodiment: DocuSign anchor tags embedded in templates as white-on-white text, paired with typed variables. Collapses "manually drag signature fields" from ~5 minutes per doc to zero, deterministically, without writing any signing code ourselves.
+Smallest technical embodiment: DocuSign anchor tags embedded in templates as white-on-white text, paired with typed variables. Collapses "manually drag signature fields" from ~5 minutes per envelope to zero, deterministically, without writing any signing code ourselves.
 
-## Demo flow
+---
 
-The headline demo is an **MSA end-to-end**. The other 7 of the 8 templates use the same machinery and are shown in `/templates`. The MSA was chosen because it captures the most cross-functional pain (Sales originates, Legal reviews, Finance approves, Ledger receives).
+## Friction killed: before vs after
 
-### Hero path: MSA happy path
+| Friction today | With Light Documents |
+|---|---|
+| 15-20 fields hand-edited in Word per MSA | 0-3 exceptions, rest prefilled from source records |
+| 5-10 minutes dragging DocuSign fields per envelope | 0 minutes, anchor tags placed once in the master |
+| Approval chasing over Slack DMs and email | Rule-triggered routing, with reasons attached to every approval |
+| Wrong template version risk | Version pinned at create time, stale banner when master updates |
+| Manual ledger entry by RevOps after signing | Structured writeback on `envelope-completed` (conditional on Light exposing the receiver) |
+| Lost contracts in inboxes | Single state machine, audit trail, dashboard with "Awaiting me" / "Blocked" |
 
-| Step | Click | What happens |
-|---|---|---|
-| 1 | Land on Dashboard | Operator KPI strip (Awaiting me / Blocked / In review). Contracts table with stage tabs + type chips. AboutWidget summarises the reframe. |
-| 2 | Open "Bolt MSA" (high-risk, in review) | Detail page renders with 3 clause deviations flagged (Net 60, unlimited liability, customer-only indemnity) and 3 approval chips pending (Legal, Head of Finance, CFO). |
-| 3 | "Simulate: Legal approves" | Legal chip flips green. Status updates. Audit trail appends event. |
-| 4 | "Preview envelope" | Populated MSA, variables and anchor tags highlighted, DocuSign features listed (sequential signing, 30-day expiry, day 3 / 7 / 14 reminders), conditional sections listed (Service Level Exhibit, DPA, eIDAS QES applied as Light signing policy for high-value EU deals, see "Note on QES" below). |
-| 5 | Approve remaining chips, "Send via DocuSign" | Demo: 3-day signing cycle collapsed to 1.5s. Routes to Signed Record page with audit trail and writeback (MRR, ARR, renewal alert). |
+---
 
-### Extensibility paths (shown to prove the machinery generalises)
+<a id="why-each-piece-exists"></a>
 
-| Step | Click | What happens |
-|---|---|---|
-| 6 | "+ New contract" | Three-step intake: pick template (8 options), pick source record (filtered by template type, with system badge, or switch to **Manual entry** for records not in any CRM), confirm details (prefilled form with live validation). |
-| 7 | "Templates" in sidebar | All 8 templates with clause rules visible, sync metadata from Drive shown. The "Rogue templates" panel is a Phase-2 governance demo. Archive and Notify-owner are wired end-to-end with realistic Slack DM previews. |
-| 8 | Change mind on an approval you just made | Each row you approved shows an **Undo my approval** pill. Click and the row reverts to pending. If yours was the last vote, the contract walks back from `ready_to_send` to `awaiting_approval`. |
-| 9 | Resize to mobile width | Sidebar hides. Sticky top bar holds the hamburger + brand. KPIs stack 2×2. Clause review becomes stacked cards. |
-| 10 | "About this build" in sidebar | Full submission memo in-app, with the same content as this README plus the cast-list note. |
+## Why each piece exists (edge cases this build handles)
 
-10 in-flight + 4 signed contracts pre-seeded (14 total).
-
-### Note on QES
-
-eIDAS QES is enforced in this workflow as **Light's signing policy** for high-value EU contracts (≥ €100k ARR) and all warrants, not because every commercial contract legally requires it. Standard B2B SaaS MSAs do not require QES under eIDAS, but applying AES/QES to high-value deals materially strengthens evidential weight in an EU court.
-
-## What works vs what is stubbed (honest)
-
-| Layer | Working | Stubbed |
-|---|---|---|
-| Routing, navigation | Real Next.js App Router | None |
-| State, persistence | Real localStorage state machine, survives refresh | No real DB |
-| Template + record selection | Real typed data | Data itself is mock |
-| Manual record entry | Real type-aware form (deal / candidate / stakeholder / vendor) with prefilled defaults + live validation that names the missing fields | Record persists locally only |
-| Form validation | Real, threshold-based, live | None |
-| Clause check | Real deterministic rules engine over typed `ClauseRule[]`. **Production swaps in Claude** (see below) | Demo: deterministic stand-in |
-| Approval routing | Real rules engine with dedup, channels, reasons | None |
-| Approval transitions | Real, immutable, via Simulate buttons. **Undo my approval** walks the contract back to `awaiting_approval` if the chain is no longer complete | Real product fires Slack DMs with interactive buttons |
-| Reassign / Pass-on / Re-ping / Reject | Real per-row workflow actions with audit-trail fan-out | Simulated DMs |
-| Rogue template Archive / Notify owner | Real local state + real Slack DM preview with smart recipient routing | No real Slack post |
-| DocuSign envelope preview | Real populated template with anchor-tag callouts + real envelope JSON shown | No real DocuSign API call |
-| Send → Signed | Real state transition with realistic delay | Demo: 3-day cycle collapsed to 1.5s |
-| Audit trail | Real, generated from journey events | Timestamps relative to demo session |
-| Writeback (ledger / HRIS / cap table) | Real structured payload generated per document type (journal entry shape for MSAs / Order Forms, HRIS record for Employment, cap-table grant for Warrants) | Demo: both sides of the integration are stubbed. The prototype emits the shape on the DocuSign `envelope-completed` webhook; production needs Light to expose the receiving endpoint. |
-| Mobile UX | Real responsive layout: sticky top bar with hamburger, 2×2 KPI grid, stacked-card tables, wrap-friendly action bars | None |
-
-Every stubbed piece carries an explicit "Demo:" callout on the screen where it appears.
-
-### Where Claude lives in production
-
-In production, Claude (Sonnet) reads the negotiated draft, compares clause-by-clause against the pinned master, and returns a structured `ClauseCheckResult[]` with rationale per deviation. The UI binds to that shape, so swapping the engine is a one-file change.
-
-**Routing stays rule-based even with Claude in the loop.** Claude proposes deviations; deterministic rules decide who approves. That separation is what keeps the system auditable to Finance.
-
-The prototype ships a deterministic rules engine in the same shape for two reasons: the demo runs with no API key and no per-run cost, and reviewers can trace every flag to a typed `ClauseRule` rather than an opaque LLM call.
-
-## Surface area: why each piece exists
-
-This prototype has more surface than a "build an uploader" answer needs. Each piece is there because the underlying workflow has a real edge case that simpler tools tend to miss:
+The prototype has more surface than a "build an uploader" answer would. Each of these is here because a simpler tool tends to break at exactly that edge.
 
 | Surface | Edge case it handles |
 |---|---|
-| Committee emission + PTO delegation | Board flows have multiple members; one is usually away. Simpler tools either block the whole chain or silently drop a vote. |
+| Committee emission + PTO delegation | Board flows have multiple members, one is usually away. Simpler tools either block the whole chain or silently drop a vote. |
 | Channel-collision tiebreaking | A single contract can fire four rules disagreeing on notification channel. Without resolution, the same approver gets double-DM'd. |
 | Template version pinning | Counsel updating MSA v4.2 to v4.3 mid-flow must not silently change in-flight contracts. |
 | Entity-aware signer routing | A Light Ltd (UK) contract signed as "Light ApS CEO" would fail UK Companies House scrutiny. |
-| NDA exception to the ledger rule | NDAs have no commercial value to post; the audit trail is the system of record. The general rule: when a strategic claim is type-conditional, the catch-all path in code must be explicit, not a fallthrough. See [decisions.md §14](docs/decisions.md). |
+| NDA exception to the writeback rule | NDAs have no commercial value to post; the audit trail is the system of record. The general rule: when a strategic claim is type-conditional, the catch-all path in code must be explicit, not a fallthrough. See [decisions.md §14](docs/decisions.md). |
+| Undo my approval (before send) | An operator approves, changes their mind, withdraws while the envelope is still in our hands. Refused once DocuSign has it. |
 
-Everything else was deliberately cut. See [`docs/decisions.md §15`](docs/decisions.md) for the full cut list.
+Everything else was deliberately cut. See [`docs/decisions.md §15`](docs/decisions.md) for the full cut list with reasoning.
 
-## What I would build next
+---
 
-| Order | Integration | Why |
+## What is real vs what is stubbed
+
+Every stubbed piece carries an explicit "Demo:" callout in the UI where it appears.
+
+| Layer | Real in this prototype | Stubbed for the demo |
+|---|---|---|
+| Workflow engine | Next.js routing + state machine with explicit valid transitions + immutable updates | None |
+| Clause checker | Deterministic typed rules engine over `ClauseRule[]`. Output shape is what Claude will return in production. | Claude API (one-file swap) |
+| Routing engine | 13 typed rules + `computeRouting()` with channel collision + committee logic | None |
+| Approver directory | Group + specialty matching + active PTO delegations | Settings UI for editing groups |
+| DocuSign send | Real envelope JSON shown in the preview modal | DocuSign REST API call (Connect webhooks for receive) |
+| Slack notifications | Audit-trail events with realistic message bodies + recipient routing logic | `chat.postMessage` with interactive buttons |
+| Writeback | Structured payload generated per document type at envelope completion | HTTP POST to Light's receivers (depends on Light side) |
+| Persistence | localStorage with versioned schema, immutable updates, Reset-demo button | Postgres + S3 + Redis |
+
+### Where Claude lives in production
+
+Claude (Sonnet) reads the negotiated draft, compares clause-by-clause against the pinned master, and returns a structured `ClauseCheckResult[]` with rationale per deviation. The UI binds to that shape, so swapping the engine is a one-file change.
+
+**Routing stays rule-based even with Claude in the loop.** Claude proposes deviations; deterministic rules decide who approves. That separation is what keeps the system auditable to Finance.
+
+The prototype ships the deterministic engine for two reasons: the demo runs without an API key or per-run cost, and reviewers can trace every flag to a typed `ClauseRule` rather than an opaque LLM call.
+
+---
+
+## What I would build next (90 days)
+
+| Order | Integration | Why first |
 |---|---|---|
 | 1 | Slack (interactive approvals via DM) | Everyone is in Slack. Zero new tool to learn. The adoption gate. |
-| 2 | **Light writeback (ledger / HRIS / cap table)** | The strategic extension. Built in parallel with Slack so the first signed contract has somewhere structured to land, not just Drive. Whether the wedge is operationally live depends on Light exposing the receiving endpoints; the prototype emits the shape. |
-| 3 | Salesforce + HubSpot read | 30-50 contracts / month originate from Sales. |
-| 4 | DocuSign API (real envelopes + Connect webhooks) | Replaces simulated send. Well-documented. Low risk. |
-| 5 | HRIS read (Personio, Ashby, Workday) | 10-20 contracts / month from People Ops. |
+| 2 | **Light writeback (where endpoints exist)** | The strategic extension. Built in parallel with Slack so the first signed contract has somewhere structured to land, not just Drive. Operational reach depends on which Light endpoints are ready. |
+| 3 | Salesforce + HubSpot deal read | 30 to 50 contracts / month originate from Sales. |
+| 4 | DocuSign API (real envelopes + Connect webhooks) | Replaces simulated send. Well-documented API. Low risk. |
+| 5 | HRIS read (Personio, Ashby, Workday) | 10 to 20 contracts / month from People Ops. |
 | 6 | Drive / SharePoint template sync | Replaces ad-hoc folder. Required for version control + compliance. |
 | 7 | Email magic links | Handles board, external counsel, non-Slack users. |
 | 8 | Calendar alerts for renewals | Closes the loop on obligations. |
 
-Slack-first is for adoption; writeback at #2 is the strategic extension. In an actual rollout I would build the two in parallel, so the first signed contract has somewhere structured to land on day one, not just Drive.
+Slack-first is for adoption. The writeback at #2 is the strategic extension, parallel rather than sequential, so the first signed contract has somewhere structured to land on day one. Anything writeback-dependent gracefully falls back to Drive filing + audit trail until the receiver exists.
+
+---
 
 ## Stated assumptions
 
+These are the assumptions this answer is built on. They are worth flagging because they would be the first questions in a week-one 1-1.
+
 1. Light has master Word templates in Drive (or SharePoint) owned by Legal and People, not yet connected to source systems.
 2. DocuSign is the existing signing tool, with partial template / AutoPlace usage but inconsistent practice.
-3. Source data lives in Salesforce or HubSpot (deals), an HRIS (employees), and Light's own ledger (vendors, cap table).
+3. Source data lives in Salesforce or HubSpot (deals), an HRIS (employees), and Light's own internal systems (vendors, cap table).
 4. Approvers are real humans on Slack. Routing rules are owned by Head of Finance & Ops.
-5. Volume is the stated 50-100 / month. CLM-scale tools are overkill for this throughput today.
-6. Light operates three legal entities (**assumed**: Light ApS (Denmark, primary), Light Ltd (UK, post-Brexit), Light Inc. (US Delaware, for US expansion)). Realistic Series A structure for a Danish-headquartered SaaS company; would verify with Head of F&O in week one.
+5. Volume is the stated 50 to 100 contracts / month. CLM-scale tools are overkill for this throughput today.
+6. Light operates three legal entities (assumed): Light ApS (Denmark, primary), Light Ltd (UK, post-Brexit), Light Inc. (US Delaware, for US expansion). Realistic Series A structure for a Danish-headquartered SaaS company. Would verify with Head of F&O in week one.
+7. The writeback target (Light ledger / HRIS / cap table) exposes a receiver, or is on the near roadmap. If not, this build still removes the upstream friction and the structured payload waits at the gate.
+
+---
+
+## Case study Part 2 (summary)
+
+The full analysis lives at [case-study/PART-2-COHORT-ANALYSIS.md](case-study/PART-2-COHORT-ANALYSIS.md). Headline answers:
+
+- **Blended 12-month NRR (revenue-weighted, Q1 + Q2 2024): 127.9%.** Directional only; the sample is two mature cohorts.
+- **The real story is that two expansion phases behave very differently.** Mid-cycle expansion (M3 → M6) has collapsed from +9pp to +2pp across four cohorts. Late-cycle expansion looks renewal-driven: Q1 2024 is flat from M9 to M12 then jumps to 147.3% by M18.
+- **Implication.** Some of the apparent cohort decay is a real expansion-engine problem; some is structural (newer cohorts have not yet reached their renewal moment). The headline curve obscures both.
+- **What to investigate first.** Pull contract structure for Q1 and Q2 2024 to test whether stronger ramp / renewal terms explain the M18 jump. Track Q2 2024 through M18 to see whether the late-cycle event repeats.
+- **ARR sensitivity.** A 10pp M6 uplift on the two pre-M6 cohorts adds **$268k to $344k of incremental M18 ARR** (persistence to trajectory). Across all pre-M18 cohorts the range is $552k to $710k. The trajectory case is an upper bound because Q1 2024's M6→M18 ratio is inflated by what looks like a renewal-cycle event.
+
+## Case study Part 3 (summary)
+
+The full version lives at [case-study/PART-3-DAY-ONE.md](case-study/PART-3-DAY-ONE.md). Headline answers:
+
+- **The 1-1 with Martina is the deliverable.** The week before it is for arriving with one position worth her time, and for not asking her what I could have found out on my own.
+- **I would read on three lenses in parallel.** Lens 1: what is actually happening on the ground (Slack channels, customer calls, support tickets, the real ARR roster). Lens 2: what leadership says should be happening (OKRs, all-hands, Martina's last update). Lens 3: how the outside sees Light (Atomico / Balderton memos, Jonathan's talks, adjacent battles). The analytical value is in the gaps between them.
+- **I would map people to handoffs, not titles.** The other F&O person, deployment / CS, one AE, one ledger engineer, one legal. Sit in on a deployment standup, one customer kickoff, one month-end close. Not Jonathan; he should not pay the tax of a week-one chat.
+- **The one point of view I would bring.** Find the handoffs, not the loudest pain. The internal practice is product research (Linear runs on Linear, Lovable on Lovable). Earn the right to bigger opinions later. What I want from the 1-1 is for Martina to tell me where this is wrong.
+
+---
 
 ## How to run
 
@@ -184,77 +247,27 @@ npm run dev
 
 Requires Node 20+. No env vars, no auth, no database. State persists in localStorage. Reset demo data anytime via the sidebar button.
 
-## Tech stack
+Tech stack: Next.js 15 App Router, TypeScript strict, Tailwind 3.4, lucide-react, clsx, React 19. localStorage state machine with immutable updates. No backend in this prototype.
 
-Next.js 15 App Router, TypeScript strict, Tailwind 3.4, lucide-react icons, clsx. React 19. localStorage state with a real state machine and immutable updates. No backend in this prototype.
+For production: Postgres for contracts and templates, S3 / GCS for signed PDFs, Redis for queues, Vercel or AWS for hosting, SSO via Google Workspace or Okta, OAuth integrations per source system.
 
-For production: Postgres for contracts and templates, S3 / GCS for signed PDFs, Redis for queues, Vercel or AWS for hosting, SSO via Google Workspace or Okta, OAuth integrations for source systems.
+---
 
-## Repo map
+## Where to read more (the build-side)
 
-```
-app/
-├── globals.css                              Tailwind base + design tokens
-├── layout.tsx                               Shell (DemoBanner + Sidebar + main)
-├── page.tsx                                 Dashboard
-├── templates/page.tsx                       Templates library (all 8 templates with clause rules + rogue panel)
-├── about/page.tsx                           In-app submission memo
-└── contracts/
-    ├── new/page.tsx                         3-step intake (template → record → confirm)
-    └── [id]/
-        ├── page.tsx                         Detail (clause review + routing + approval + send)
-        └── signed/page.tsx                  Signed record (PDF + audit trail + writeback)
+If you want to look under the hood, `docs/PROJECT.md` is the single-page map of the build. The rest of `docs/` is split per concern.
 
-components/
-├── ui/                                      Button, Card, Badge, Modal, EmptyState
-├── Sidebar.tsx, MobileTopBar.tsx, MobileNavContext.tsx
-├── Header.tsx, DemoBanner.tsx, Breadcrumb.tsx, BackButton.tsx
-├── StatusBadge.tsx, RiskBadge.tsx, DocumentTypeIcon.tsx
-├── KpiStrip.tsx, AboutWidget.tsx
-├── ContractsTable.tsx                       Dashboard table with filter tabs
-├── TemplateCard.tsx, TemplatePicker.tsx, TemplateDetailModal.tsx
-├── RecordPicker.tsx, ManualEntryModal.tsx   Source-record picker + type-aware manual entry
-├── IntakeForm.tsx                           Conditional fields per template type
-├── ClauseDiff.tsx                           Clause-by-clause diff (stacked cards on mobile)
-├── RoutingPanel.tsx                         Required approvals with attached reasons
-├── ApprovalChain.tsx, ApprovalActionsMenu.tsx
-├── ReassignModal.tsx, RejectModal.tsx
-├── DocuSignPreviewModal.tsx                 Envelope preview with anchor-tag + DocuSign feature config
-├── RogueTemplatesPanel.tsx                  Daily Drive scan + interactive Archive + Notify owner with Slack DM preview
-├── AuditTrail.tsx                           Timeline with notification events
-└── LedgerImpactPanel.tsx                    Writeback summary (the Light-specific feature)
+| File | What's in it |
+|---|---|
+| [`docs/PROJECT.md`](docs/PROJECT.md) | Full project map: state machine, three logic engines, every module, every workflow branch, the cut list |
+| [`docs/decisions.md`](docs/decisions.md) | 15 architectural decision records with alternatives considered |
+| [`docs/architecture.md`](docs/architecture.md) | Data flow, state model, per-engine deep dive, production architecture |
+| [`docs/features.md`](docs/features.md) | Per-doc-type "manual editing kill matrix" (NDA, MSA, Employment, Warrant, Order Form, Pilot) |
+| [`docs/cross-functional.md`](docs/cross-functional.md) | Persona × action matrix, end-to-end walkthrough by name, RBAC, failure modes |
+| [`docs/demo-script.md`](docs/demo-script.md) | 5-minute Loom narration script |
 
-lib/
-├── types.ts                                 Full TypeScript types
-├── mock-data.ts                             8 templates with clause rules + DocuSign config + conditional sections, 14 source records across CRM/HRIS systems, 14 seed contracts (10 in-flight + 4 signed), 4 rogue templates
-├── clause-checker.ts                        Pure deterministic rules engine (Claude-shaped output)
-├── routing-rules.ts                         13 typed routing rules with reasons + channels
-├── approver-directory.ts                    6 approver groups + specialty matching + PTO delegations
-├── signer-routing.ts                        Light-side signer policy by entity + document type
-├── policy-config.ts                         Governing-law allow-list + salary bands + entity→jurisdiction
-├── template-meta.ts, template-meta-icons.tsx, template-bullets.tsx
-├── contract-store.ts                        State machine, immutable updates, localStorage adapter, journey commands
-└── format.ts                                EUR + date + initials utilities
-
-docs/
-├── architecture.md                          Data flow + state model + file responsibilities
-├── features.md                              Per-doc-type manual editing kill matrix
-├── decisions.md                             Key decision walkthrough + alternatives considered
-├── cross-functional.md                      Persona × action matrix + integration plan + RBAC
-└── demo-script.md                           Loom recording script (5 min)
-```
-
-## Case study parts 2 and 3
-
-Both written for the same submission. Each is self-contained and intended to be read alongside this README.
-
-| Part | What it answers | Read it |
-|---|---|---|
-| Part 2 | SaaS cohort analysis: blended NRR, retention diagnosis with hypothesis, M18 ARR projection under a 10pp M6 uplift | [case-study/PART-2-COHORT-ANALYSIS.md](case-study/PART-2-COHORT-ANALYSIS.md) |
-| Part 3 | Day-one mindset: how I would spend the week before the 1-1 with the Head of F&O, who I would talk to, what one point of view I would walk in with | [case-study/PART-3-DAY-ONE.md](case-study/PART-3-DAY-ONE.md) |
+---
 
 ## License + attribution
 
 Built by James Hwang for a case study submission at Light. Single-author, single-session prototype. No production secrets, no proprietary code, mock data only.
-
-See `docs/` for deeper architectural detail and per-feature reasoning.

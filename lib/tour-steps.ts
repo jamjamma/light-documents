@@ -1243,12 +1243,20 @@ export const TOUR_STEPS: TourStep[] = [
     // unmount of `showSlackPreview` while on this step and dispatches
     // tour:auto-next, so clicking Send DM or Cancel both advance the tour
     // cleanly to the after-notify recap step.
+    //
+    // side="bottom" align="end": pop the popover BELOW the preview panel
+    // and right-aligned, so the popover's top-right arrow lines up with
+    // the bottom-right corner of the preview where Cancel / Send post
+    // live. Centred or start-aligned variants put the popover under the
+    // far left of the preview, miles from the buttons the user is being
+    // asked to click.
     selector: ".tour-anchor-rogue-slack-preview",
     side: "bottom",
+    align: "end",
     title: "What gets sent",
     description: `
       <p>The Slack message above: file name, % match, the diff, the recommended action, and the recipient's rationale.</p>
-      <p>Click <strong>Cancel</strong> to back out, or <strong>Send DM / Send post</strong> to dispatch. The tour shows you the outcome next.</p>
+      <p>Use the <strong>Cancel</strong> or <strong>Send DM / Send post</strong> buttons (top-right of the preview, just above this popover). The tour shows you the outcome next.</p>
       <p class="muted">In production we post via the Slack Web API with interactive Acknowledge / Reroute / Snooze buttons; replies thread back into the audit log.</p>
     `,
     next: "advance",

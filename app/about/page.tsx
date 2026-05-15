@@ -30,10 +30,33 @@ export default function AboutPage() {
             The stated pain (manual Word edits and hand-placed DocuSign fields) is real. The workflow below kills both directly.
           </p>
           <div className="rounded-lg border border-ink-100 bg-ink-50/60 p-3.5 text-[13px] leading-relaxed">
-            <div className="demo-note mb-1.5">The reframe</div>
-            Every signed contract is structured data (revenue, headcount, equity, vendor obligations) that belongs in the
-            systems of record. <strong>The PDF is the audit artifact, the data is the product.</strong> Other CLMs ship
-            integrations into N ERPs. Light <em>is</em> the ERP, so the writeback is a native capability rather than an integration.
+            <div className="demo-note mb-2">The reframe</div>
+            <ul className="space-y-2 text-ink-700">
+              <li className="flex gap-2">
+                <span className="text-ink-400">•</span>
+                <span>
+                  <strong>Commercial contracts carry structured data.</strong> MSAs and Order Forms → revenue and billing.
+                  Employment → headcount. Warrants → cap table. Vendor → AP.
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-ink-400">•</span>
+                <span>
+                  <strong>NDAs are the exception.</strong> No commercial value to post. They file for retention only
+                  (ADR 14 in <code className="rounded bg-ink-100 px-1 py-0.5 font-mono text-[11.5px]">docs/decisions.md</code>).
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-ink-400">•</span>
+                <span>
+                  <strong>The writeback lands where Light has a receiver.</strong> The prototype emits the payload on
+                  envelope completion. Production wires it into whichever receivers Light operates.
+                </span>
+              </li>
+            </ul>
+            <p className="mt-2.5 text-ink-600">
+              The PDF is the audit artifact, the data is the product. That is the wedge.
+            </p>
           </div>
         </Section>
 

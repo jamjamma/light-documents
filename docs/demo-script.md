@@ -4,7 +4,7 @@ Target: 4 to 5 minutes. Narrate the click path, lead with the reframe, end on th
 
 ## 0:00 to 0:30: The reframe
 
-> "The stated problem is manual Word edits and hand-placed DocuSign fields. The workflow you're about to see eliminates both. While we're in there, there's a strategic opportunity uniquely available to Light: every signed contract is structured data that belongs in the systems of record. Other CLMs ship integrations into N ERPs. Light *is* the ERP. So my answer is: wrap DocuSign as infrastructure, keep Word for authoring, and build a workflow layer between them whose output flows into the systems of record."
+> "The stated problem is manual Word edits and hand-placed DocuSign fields. The workflow you're about to see eliminates both. While we're in there, the strategic opening for Light: commercial contracts carry structured data that belongs in the systems of record. MSAs and Order Forms map to revenue, Employment to headcount, Warrants to the cap table. NDAs are the exception, retention only. So my answer is: wrap DocuSign as infrastructure, keep Word for authoring, build the workflow layer in between, and emit the structured payload into Light's receivers."
 
 Open `http://localhost:3000`. Point at the AboutWidget on the Dashboard. Read the one sentence.
 
@@ -50,7 +50,7 @@ Click Send via DocuSign. Wait for the simulated 1.5 seconds.
 
 Point at the LedgerImpactPanel on the Signed Record page.
 
-> "This is the part that makes the answer Light-specific. The signed contract emits a structured writeback like this. The prototype renders the shape. In production it lands wherever Light exposes an endpoint: ledger, billing, CRM. The structural argument is that Light is positioned to receive this because Light is the ERP. Other CLMs ship integrations into N ERPs; Light is one of them. The PDF stays as the audit artifact, the data is the product."
+> "This is the part that makes the answer Light-specific. The signed contract emits a structured payload in this shape. The prototype renders it. Production lands it wherever Light exposes a receiver: ledger, billing, or CRM. The PDF stays as the audit artifact, the data is the product. NDAs file for retention only."
 
 Point at the Audit Trail.
 
