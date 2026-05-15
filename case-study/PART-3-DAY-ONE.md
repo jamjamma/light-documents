@@ -1,111 +1,135 @@
-# Part 3: Day one mindset
+# Case Study, Part 3: Day One Mindset
 
-I have one week before my first 1-1 with the Head of Finance & Operations. Here is what I plan to do, how I think about the seven days, and the one thing I want to bring a point of view on.
+The 1-1 with Martina is the deliverable. The week before it is for arriving with one position worth her time, and for collecting enough context not to ask her things I could have found out on my own.
 
-## How I think about the first week
+I would organise the week around two questions:
 
-The role sits at the centre of how Light actually runs: finance, legal, people, GTM, ops. The instinct that matters is operating instinct, which only comes from understanding the actual texture of the work. So week one is for absorption, not output. I want to be the person who walked in, listened hard, and arrived at the 1-1 with the right questions, not the right answers.
+1. What is the company actually like from the inside?
+2. What handoffs is this role going to live on?
 
-Three things I want to be true by the end of the week:
-1. I understand what the team actually does day to day, not just what the org chart says.
-2. I have a clear picture of the three to five workflows that are most likely to break as Light scales from here to the next 3-5x in revenue.
-3. I have one specific, defensible point of view to test with Martina at the 1-1.
+Everything below maps to one of those.
 
-## What I read
+---
 
-### Light-specific reading
+## What I would read
 
-| Source | Why |
+Three lenses on the same company, read in parallel and weighted by what I find. The analytical value is not in any single lens, it is in the gaps between them.
+
+### Lens 1. What is actually happening on the ground
+
+The unvarnished reality. Highest signal, fastest decay. Starts here, because everything else is interpretation.
+
+- Last 30 days of `#customer-feedback`, `#deployment`, `#wins`, and `#losses` in Slack. Five hours of reading, two months of context.
+- Three to five recorded customer calls in Gong or Fireflies: one new-logo kickoff, one mid-deployment, one expansion. 1.5x speed.
+- Recent support tickets, escalations, and any deal-desk exceptions from the last quarter.
+- The customer roster with ARR, segment, geography, and go-live date. The real book, not the website logos. Where heavy ACVs sit. Where churn or expansion has happened.
+
+### Lens 2. What leadership says should be happening
+
+The intended direction. Only useful after Lens 1, because then the delta becomes visible.
+
+- Company Notion: strategy docs, OKRs, current quarter priorities. Anything labelled "v1" or "WIP", because half-written documents tell you more than finished ones.
+- Recent all-hands recordings and Loom updates. Where Jonathan directs attention is the de facto priority list.
+- Pricing and packaging deck, plus the discount approval policy if one exists. That is where the model meets reality.
+- Martina's last team update or all-hands segment, so I am not asking her to repeat what she has already said publicly.
+- My job description, re-read against everything above. What does the role mean given what the company is actually trying to do?
+
+### Lens 3. How the outside sees Light
+
+The external mirror. Lowest cost to consume, and useful in parallel to the other two.
+
+- Atomico's Series A memo and Balderton's framing piece. Investor logic is closer to ground truth than founder narrative.
+- Jonathan's Slush talk, the TechCrunch stealth piece, recent podcasts. Pleo to Juni to Light is one through-line, and his NetSuite frustration is documented down to page-load speed.
+- NetSuite vs. Rillet and NetSuite vs. Campfire teardowns. How Light is being framed inside the AI-native ERP wave.
+- Pennylane in France, Brex and Ramp at the spend layer. Adjacent battles Light is not fighting yet but might inherit.
+- Two practitioner threads on what breaks during NetSuite-to-AI-native migrations (Reddit `r/Accounting`, LinkedIn FinOps). Where the real friction lives.
+
+### The job is in the gaps
+
+| Pattern | What it signals |
 |---|---|
-| Light's product (sign up for a trial, walk through onboarding myself) | Cannot speak intelligently about ops without understanding what the product actually does |
-| The Series A announcement (Balderton, Atomico blog posts, EU-Startups coverage) | Public narrative + investor priorities |
-| Customer-facing content: pricing page, customer stories, recent product launches | What we sell, who we sell to, what's recently shipped |
-| Investor updates / board decks, last 2 quarters | What the leadership is actually focused on and reporting to investors |
-| Last 3 months of internal monthly reporting | Operating cadence, what metrics matter, what's been trending |
-| The CEO's blog, Twitter, and any podcast interviews | How Jonathan Sanders thinks and talks about the company |
+| Leadership talks about cost-to-deploy in all-hands, but the deployment Slack channel has nothing about it | Gap between stated and lived priority |
+| Investors expect multi-entity to be the wedge, but the team is not shipping for it | Gap between thesis and execution |
+| The CEO calls out one customer publicly, but the support thread tells a different story | Gap between narrative and reality |
 
-### Operational reading
+Triangulating across the three lenses is closer to the real work than reading any one of them well.
 
-| Source | Why |
-|---|---|
-| Current contracts in flight (the very pain point from Part 1) | Volume, variety, where Word edits actually happen |
-| Last 50 signed contracts: customer MSAs, employment, vendor | What "normal" looks like; spot recurring patterns |
-| Approval Slack threads (sales discount requests, legal reviews, hire approvals) | How decisions actually get made today |
-| Salesforce / HubSpot / whatever the CRM is: pipeline, closed-won, closed-lost notes | Where deals stall, what reasons we lose, what reasons we win |
-| CS / Support tickets last 90 days | Real customer voice, churn signals, friction patterns |
-| Existing process docs / SOPs in Drive | What's already documented vs tribal knowledge |
+---
 
-### Team reading
+## Who I would talk to
 
-| Source | Why |
-|---|---|
-| All-hands recordings (last 3) | Cadence of company communication, recent priorities |
-| #sales-wins, #people-ops, #finance, #legal-queue, #exec-updates Slack channels | The pulse of the company |
-| Recent hires' announcement docs | Who is being added and why |
-| Org chart + tenure: who's been here >2 years vs joined this year | Where knowledge concentration sits |
+Martina is the destination. Everyone else is mapped to a specific handoff I want a clearer view of, because handoffs are where this role's leverage lives.
 
-## Who I talk to
-
-| Person | When | What I want from the conversation |
+| Person | Why | What I want from them |
 |---|---|---|
-| **Head of Finance & Ops (Martina)** | Day 1, 30 min + Day 5, 45 min | Day 1: What's most broken? What's working? What do you want me focused on first? Day 5: my point of view, test if it lands |
-| **CEO (Jonathan Sanders)** | Day 2 or 3, 20 min | Strategic vision, what he expects from this role, what would be a "win" in 90 days |
-| **CFO** | Day 2, 30 min | Financial reporting cadence, capital structure, what slows them down |
-| **Head of People** | Day 3, 30 min | Hiring workflow, salary band process, employment contract pain |
-| **Sales lead / CRO** | Day 3, 30 min | Deal flow, where contracts stall, what slows time-to-close |
-| **Customer Success lead** | Day 4, 30 min | Onboarding, churn signals, where ops creates friction |
-| **Legal (in-house counsel if any, else external counsel rep)** | Day 4, 30 min | Template state, clause deviation patterns, redline volume |
-| **Engineering lead** | Day 4, 20 min | Dev cycle, what gets prioritised, internal tooling appetite |
-| **3-5 recent joiners (last 3 months)** | Day 5, 15 min each | Why they joined. What surprised them. What's frustrating. Fresh eyes are more honest than tenured eyes. |
-| **Sit in on 1 sales call + 1 customer success call** | Day 4 or 5 | Hear the actual customer voice. No second-hand summaries. |
+| Whoever is already on F&O (or Martina's closest cross-functional ally, if it is still her and me) | Sits on the internal F&O cadence | The real close timeline. What is automated, what is not. Where she runs hot. What has been tried and parked. |
+| Deployment or Customer Success lead | Sits on the closed-won → live customer handoff (where the case study problem bites) | What breaks during onboarding, week by week. Where their hours go that they wish did not. |
+| One AE or commercial lead | Sits on the customer ask → contract / billing reality handoff | What customers raise late in the cycle that we cannot answer cleanly. Where deal terms do not carry through to ops. |
+| One engineer on the ledger or workflow team | Sits on the product capability → ops automation handoff | What "AI-native" means in the codebase versus the marketing. What is automatable today without anyone shipping new code. |
+| Legal or compliance (in-house or fractional) | Sits on the commercial intent → legally binding artefact handoff (the case study itself) | The issuance process from their seat, before I form a view. |
 
-I would deliberately NOT meet with everyone individually in week one. That signals overconfidence. The shape above is: leadership for context, peers for craft, recent joiners for ground truth.
+### Meetings I would sit in on (rather than ask for coffee)
 
-## What I bring a point of view on
+- Weekly deployment standup.
+- One customer kickoff or QBR.
+- The next month-end close, silently.
 
-> **Light's biggest internal operating risk is that growth creates hidden manual complexity faster than the team can see it.** The places where this hurts most are the workflows that scale linearly with headcount and customer count: contracts, expense reports, hiring, vendor management, revenue ops. My instinct is that we should instrument these workflows now, while we are at a size where we can see all of them, before they fragment into bespoke processes by team. **The first 30 days I would focus on the document workflow,** because it touches every team (sales, people, legal, finance), it is high-volume, and the case study build gave me a head start on the design.
+### Who I would not ask for time
 
-### Why this point of view
+- **Jonathan.** He is running a 30x-growth company through a US expansion. A week-one junior asking for 30 minutes is the tax a fast-moving CEO should not pay. I would absorb his thinking from all-hands, Slack, and Loom. If he wants the 30 minutes later, that is a different conversation.
 
-Three reasons it is the right one to test.
+### Ground rules
 
-1. **It connects to Light's product thesis without being sycophantic.** Light is rebuilding the general ledger from scratch for hypergrowth companies. The thesis is that legacy systems break at scale and you have to build for the throughput problem from day one. The exact same logic applies to Light's own internal ops. We should not wait until manual complexity becomes a fire to instrument it.
+- 30-minute time-box per chat.
+- One-paragraph note after each.
+- If a pattern shows up by Wednesday, I follow it. If not, I keep questions tight rather than chase ambiguity.
 
-2. **It is testable in 90 days.** Pick three high-volume, high-risk workflows. Build or pilot automation for one. Measure before and after. That is a real first-quarter goal, not a vague strategy bullet.
+---
 
-3. **It matches the role description literally.** "Touches almost everything that makes the company run" plus "ability to scope and build a real solution." The point of view is exactly that scope.
+## The one thing I would come with a point of view on
 
-### Why I'm not bringing a more ambitious point of view
+I will not pretend to know what Light's biggest F&O problem is after one week. That would be confident-sounding nonsense, and any operator who has actually run a team will spot it instantly.
 
-I considered going bigger. "Build Light Documents as a customer-facing module." "Replace Salesforce with our own CRM." "Productise our ops automation as a separate revenue line." I rejected all of them for day one because they are pattern-matching to startup playbook clichés. The right move is to earn the right to make those bets by first nailing the operating heartbeat. Ambition without context is just noise.
+What I can bring is a method, not a conclusion. Three commitments, ordered from analytical bias to strategic framing to posture.
 
-### What I want from Martina at the 1-1
+### 1. Find the handoffs, not the loudest pain
 
-Three concrete things:
-1. **A reality check on the point of view.** Does this match where she sees the biggest leverage? If not, where is she actually losing sleep?
-2. **A first project assignment.** I want to walk out with one specific, scoped thing to ship in the next 30 days. Could be the contracts work, could be something else she has been wanting to do but has not had the bandwidth for.
-3. **The constraint map.** What's off-limits, what's politically tricky, what's already been tried and failed. The fastest way to be useful is to know where the landmines are.
+In fast-growing companies, operational friction lives at handoffs more than inside any single team.
 
-## What I would NOT do in week one
+- Sales → legal.
+- Legal → finance.
+- Finance → customer success.
+- Hire → people ops.
+- Compliance → audit evidence.
 
-Recording these because they are real temptations:
+The case study's contract problem is itself a handoff problem dressed as a document problem. Editing the Word file is annoying. The real cost is what does not carry through to billing, onboarding, renewal, and audit, because signing does not capture structured data.
 
-- **Propose org changes.** I have no standing.
-- **Reorganise files in Drive.** Not yet. Watch first.
-- **Suggest new tools.** Especially not "let's add Notion to the stack" or similar.
-- **Critique anyone's work.** Including in private to Martina. I have not earned the read.
-- **Ship code on the document workflow before the 1-1.** Even though the case study build gives me a working prototype, week one is for listening. If Martina says "go build it" at the 1-1, great. If she says "actually, expense reports are killing us right now," I want to be able to pivot without sunk cost.
+My bias is to find the handoffs where manual work today will quietly break at next quarter's volume, and fix one cleanly, rather than chase whichever process is loudest in the standup this week.
 
-## What week two looks like
+### 2. The internal practice is product research
 
-Driven by the 1-1. Probably:
-1. Scope the first project, agree on success metrics with Martina by day 8.
-2. Set up a weekly 30-min standing 1-1 with her and a Friday 15-min async update note.
-3. Start the first project.
-4. Keep meeting people (sales reps, individual contributors, customers) at a slower cadence.
+Light sells an AI-native finance platform to companies still running on spreadsheets, DocuSign, and Word templates. The case study is a Light example of that pattern.
 
-## What I owe Martina
+That is not a contradiction. Every Series A startup runs internally on duct tape. But it is the most legitimate place for an F&O hire to start, because every internal workflow I help clean up is also a candidate spec for what Light could one day sell.
 
-The honest version: I am paid to remove load from her plate, not add to it. Every week I should leave her with one fewer thing to think about. The hardest part of the role is figuring out which one.
+- Linear runs on Linear.
+- Lovable, a Light customer, runs on Lovable.
 
-That is the point of view I want to test at the first 1-1. If she pushes back, I want to know early.
+F&O at Light has an unusual property: the internal work is also product research.
+
+### 3. Earn the right to bigger opinions later
+
+I would rather come to Martina at the end of the quarter with one clean diagnosis of one workflow than five half-formed takes at the end of week one. The failure mode I want to avoid is being the new hire who has opinions before they have data.
+
+### What I would actually want from the 1-1
+
+For Martina to tell me where this is wrong.
+
+- Maybe internal-process work is not the right starting point for this role, and the bigger lever is GTM ops or commercial deal-desk.
+- Maybe the contract workflow is already in flight and I should leave it alone.
+
+Either of those is more useful than me being right.
+
+That is what I would walk into the 1-1 with.
+
+Jeewoo

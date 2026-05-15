@@ -190,113 +190,117 @@ export function TourMenu() {
           The guided tour is desktop-first. Open this page on a wider screen, or browse manually via the sidebar.
         </div>
       ) : (
-        <div className="space-y-3">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+        <div className="space-y-4">
+          <div className="flex items-stretch gap-2">
             <button
               onClick={startWalkEverything}
-              className="flex flex-1 items-start gap-3 rounded-xl border border-ink-900 bg-ink-900 px-4 py-3 text-left text-white transition-colors hover:bg-ink-800"
+              className="flex flex-1 items-center gap-3 rounded-lg border border-ink-900 bg-ink-900 px-4 py-2.5 text-left text-white transition-colors hover:bg-ink-800"
             >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-300/20 text-accent-300">
-                <Sparkles className="h-4 w-4" />
-              </div>
+              <Sparkles className="h-4 w-4 shrink-0 text-accent-300" />
               <div className="min-w-0 flex-1">
-                <div className="text-[14px] font-semibold">
+                <div className="text-[13px] font-semibold">
                   {canResumeAll ? "Restart everything" : "Walk everything in order"}
                 </div>
-                <div className="mt-0.5 text-[12px] text-white/70">
-                  All 6 chapters, end-to-end. About {formatTotalTourDuration()}.
+                <div className="text-[11px] text-white/70">
+                  6 chapters, about {formatTotalTourDuration()}
                 </div>
               </div>
             </button>
             {canResumeAll && (
               <button
                 onClick={resumeWalkEverything}
-                className="flex shrink-0 items-center justify-center gap-2 rounded-xl border border-accent-300 bg-accent-50 px-4 py-3 text-left text-accent-700 transition-colors hover:bg-accent-100 sm:w-44"
+                className="flex shrink-0 items-center gap-2 rounded-lg border border-accent-300 bg-accent-50 px-3 py-2.5 text-accent-700 transition-colors hover:bg-accent-100"
+                title={`Continue walk-everything from step ${savedAllIdx + 1}`}
               >
-                <Clock className="h-4 w-4" />
-                <div className="min-w-0">
-                  <div className="text-[13px] font-semibold">Resume</div>
-                  <div className="text-[11px] text-accent-700/80">
-                    Step {savedAllIdx + 1} of {TOUR_STEPS.length}
+                <Clock className="h-3.5 w-3.5" />
+                <div className="text-left">
+                  <div className="text-[12px] font-semibold leading-none">Resume</div>
+                  <div className="text-[10px] text-accent-700/80">
+                    step {savedAllIdx + 1} / {TOUR_STEPS.length}
                   </div>
                 </div>
               </button>
             )}
           </div>
 
-          <div className="-mb-1 pt-1 text-[10px] font-semibold uppercase tracking-wider text-ink-400">
-            Or pick a chapter
-          </div>
+          <div className="space-y-1">
+            <div className="px-1 text-[10px] font-semibold uppercase tracking-wider text-ink-400">
+              Or pick a chapter
+            </div>
+            <ul className="overflow-hidden rounded-lg border border-ink-100 bg-white">
+              {CHAPTERS.map((ch, i) => {
+                const total = chapterLength(ch.id);
+                const isDone = done.has(ch.id);
+                const savedIdx = progress[ch.id];
+                const inProgress =
+                  !isDone &&
+                  typeof savedIdx === "number" &&
+                  savedIdx > firstStepIndexOf(ch.id);
+                const stepWithin =
+                  typeof savedIdx === "number"
+                    ? stepIndexWithinChapter(ch.id, savedIdx)
+                    : 0;
+                const seconds = Math.round(ch.estSeconds / 5) * 5;
 
-          <ul className="space-y-2">
-            {CHAPTERS.map((ch, i) => {
-              const total = chapterLength(ch.id);
-              const isDone = done.has(ch.id);
-              const savedIdx = progress[ch.id];
-              const inProgress =
-                !isDone &&
-                typeof savedIdx === "number" &&
-                savedIdx > firstStepIndexOf(ch.id);
-              const stepWithin =
-                typeof savedIdx === "number"
-                  ? stepIndexWithinChapter(ch.id, savedIdx)
-                  : 0;
-
-              return (
-                <li key={ch.id}>
-                  <div className="flex items-start gap-3 rounded-xl border border-ink-100 bg-white px-4 py-3">
+                return (
+                  <li
+                    key={ch.id}
+                    className={`flex items-center gap-3 px-3 py-2.5 ${
+                      i > 0 ? "border-t border-ink-100" : ""
+                    }`}
+                  >
                     <div
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[12px] font-semibold ${
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[11px] font-semibold ${
                         isDone
                           ? "bg-sage-500/15 text-sage-600"
                           : "bg-ink-100 text-ink-700"
                       }`}
                     >
-                      {isDone ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
+                      {isDone ? <CheckCircle2 className="h-3.5 w-3.5" /> : i + 1}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-baseline justify-between gap-2">
-                        <div className="text-[13.5px] font-semibold text-ink-900">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-[13px] font-semibold text-ink-900">
                           {ch.title}
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[10.5px] text-ink-500">
-                          <Clock className="h-3 w-3" />
-                          ~{Math.round(ch.estSeconds / 5) * 5}s · {total} step{total === 1 ? "" : "s"}
-                          {isDone && (
-                            <span className="ml-1 rounded bg-sage-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-sage-600">
-                              Done
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="mt-0.5 text-[12px] leading-snug text-ink-600">
-                        {ch.blurb}
-                      </div>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        <button
-                          onClick={() => startChapter(ch.id)}
-                          className="rounded-lg border border-ink-200 bg-white px-2.5 py-1 text-[11.5px] font-medium text-ink-900 transition-colors hover:bg-ink-50"
-                        >
-                          {isDone ? "Restart" : "Start"}
-                        </button>
-                        {inProgress && (
-                          <button
-                            onClick={() => resumeChapter(ch.id)}
-                            className="rounded-lg border border-accent-300 bg-accent-50 px-2.5 py-1 text-[11.5px] font-medium text-accent-700 transition-colors hover:bg-accent-100"
-                          >
-                            Resume (step {stepWithin + 1} of {total})
-                          </button>
+                        </span>
+                        <span className="text-[10.5px] tabular-nums text-ink-400">
+                          ~{seconds}s · {total} step{total === 1 ? "" : "s"}
+                        </span>
+                        {isDone && (
+                          <span className="rounded bg-sage-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-sage-600">
+                            Done
+                          </span>
                         )}
                       </div>
+                      <div className="truncate text-[11.5px] text-ink-500">
+                        {ch.blurb}
+                      </div>
                     </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      {inProgress && (
+                        <button
+                          onClick={() => resumeChapter(ch.id)}
+                          className="rounded-md border border-accent-300 bg-accent-50 px-2.5 py-1 text-[11px] font-medium text-accent-700 transition-colors hover:bg-accent-100"
+                          title={`Resume from step ${stepWithin + 1} of ${total}`}
+                        >
+                          Resume {stepWithin + 1}/{total}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => startChapter(ch.id)}
+                        className="rounded-md border border-ink-200 bg-white px-2.5 py-1 text-[11px] font-medium text-ink-900 transition-colors hover:bg-ink-50"
+                      >
+                        {isDone ? "Restart" : "Start"}
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
 
-          <div className="mt-3 rounded-lg bg-ink-50 px-3 py-2 text-[11px] leading-relaxed text-ink-500">
-            Closing the menu won't reset progress. Re-open it any time from the sidebar.
+          <div className="text-[11px] text-ink-400">
+            Closing the menu keeps your progress. Re-open it any time from the sidebar.
           </div>
         </div>
       )}

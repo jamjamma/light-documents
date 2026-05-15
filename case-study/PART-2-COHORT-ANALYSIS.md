@@ -1,142 +1,179 @@
-# Part 2: SaaS cohort analysis
+# Light Documents Case Study — Part 2
 
-## The data
+## SaaS Cohort Analysis
 
-| Cohort | Customers | M0 | M3 | M6 | M9 | M12 | M18 |
-|---|---|---|---|---|---|---|---|
-| Q1 2024 | 15 | $55k | $58k | $63k | $68k | $68k | $81k |
-| Q2 2024 | 18 | $67k | $70k | $76k | $81k | $88k | — |
-| Q3 2024 | 21 | $78k | $80k | $85k | $89k | — | — |
-| Q4 2024 | 25 | $92k | $95k | $97k | — | — | — |
-| Q1 2025 | 28 | $105k | $109k | — | — | — | — |
-| Q2 2025 | 32 | $118k | — | — | — | — | — |
+---
 
-## Q1. NRR per cohort with 12 months of data, and blended
+## Question 1. Calculate NRR for each cohort with 12 months of data. What is the blended NRR?
 
-Only Q1 2024 and Q2 2024 have full 12-month data.
+**Definition**
+- `NRR = Period MRR / Starting MRR`, holding the cohort fixed and excluding new logos. Captures expansion, contraction, and churn.
 
-**NRR (Net Revenue Retention) = M12 MRR / M0 MRR**
+**Cohorts with 12 months of data**
 
-| Cohort | M0 MRR | M12 MRR | 12-month NRR |
-|---|---|---|---|
+| Cohort | M0 MRR | M12 MRR | 12M NRR |
+|--------|--------|---------|---------|
 | Q1 2024 | $55k | $68k | **123.6%** |
 | Q2 2024 | $67k | $88k | **131.3%** |
 
-**Blended 12-month NRR** (weighted by initial MRR):
+**Blended 12-month NRR (revenue-weighted)**
 
-```
-Blended NRR = sum(M12 MRR) / sum(M0 MRR)
-            = ($68k + $88k) / ($55k + $67k)
-            = $156k / $122k
-            = 127.9%
-```
+`($68k + $88k) / ($55k + $67k) = $156k / $122k = 127.9%`
 
-127.9% NRR is excellent. For context: world-class SaaS sits at 120%+, top-quartile at 110%+, median around 100%. This company is expansion-led, not retention-led.
+Revenue-weighted blending is used so larger cohorts carry proportionally more weight than a simple average would allow.
 
-## Q2. Diagnose the retention pattern. What could explain it? What would you investigate?
+**Interpretation.** The mature base expands every $1.00 of starting MRR into approximately $1.28 over twelve months. Strong on a small sample of two cohorts.
 
-### The pattern at face value
+---
 
-Strong expansion across the board, but with two concerning sub-patterns visible underneath the headline number.
+## Question 2. Diagnose the retention pattern. What could explain it? What would you investigate?
 
-**Sub-pattern 1: M6/M0 expansion is decelerating cohort over cohort.**
+### Step 1: Retention triangle
 
-| Cohort | M6 / M0 |
-|---|---|
-| Q1 2024 | 114.5% |
-| Q2 2024 | 113.4% |
-| Q3 2024 | 109.0% |
-| Q4 2024 | 105.4% |
-| Q1 2025 | (TBD) |
+| Cohort | M3 | M6 | M9 | M12 | M18 |
+|--------|------|------|------|------|------|
+| Q1 2024 | 105.5% | 114.5% | 123.6% | 123.6% | 147.3% |
+| Q2 2024 | 104.5% | 113.4% | 120.9% | 131.3% | |
+| Q3 2024 | 102.6% | 109.0% | 114.1% | | |
+| Q4 2024 | 103.3% | 105.4% | | | |
+| Q1 2025 | 103.8% | | | | |
 
-Each newer cohort expands less in its first 6 months than the cohort before it. If this continues, by Q1 2025 the cohort might land at ~103% at M6.
+### Step 2: Customer count at landing
 
-**Sub-pattern 2: Q1 2024 M9 → M12 plateau, then big jump M12 → M18.**
+| Cohort | Customers | M0 MRR | M0 MRR per customer |
+|--------|-----------|--------|---------------------|
+| Q1 2024 | 15 | $55k | $3.67k |
+| Q2 2024 | 18 | $67k | $3.72k |
+| Q3 2024 | 21 | $78k | $3.71k |
+| Q4 2024 | 25 | $92k | $3.68k |
+| Q1 2025 | 28 | $105k | $3.75k |
+| Q2 2025 | 32 | $118k | $3.69k |
 
-M9 = $68k, M12 = $68k (zero expansion), then M18 = $81k (+19% in 6 months). This shape is characteristic of **annual contract renewals with upsells**: the cohort signed annual deals at M0, hit no expansion during the term, then renewed with seat additions / tier upgrades at month 12-13. The M18 jump is the renewal motion.
+- Customer count up 113% across six quarters. Acquisition is scaling fast.
+- Starting MRR per customer is consistent at ~$3.7k. Initial deal size at landing is stable. Not equivalent to flat ACV without contract structure data.
 
-### What could explain it
+### Step 3: The three signals that matter
 
-Hypotheses, ranked by likelihood:
+**Signal 1: Cohort decay across cohorts**
+- Each successive cohort retains less well at every comparable age.
+- M6: 114.5% → 113.4% → 109.0% → 105.4%.
+- M9: 123.6% → 120.9% → 114.1%.
+- Directional, consistent, and not a single-cohort anomaly.
 
-1. **Land-and-expand motion working.** Customers are buying small, then expanding via seats / tier upgrades / add-ons. This is healthy when it's seat growth driven by product stickiness.
-2. **Annual contract renewal cycle dominates.** Most expansion happens at renewal, not mid-term. Consistent with the M9→M12 flat-then-M18-jump pattern in Q1 2024.
-3. **Newer cohorts have larger initial deals but less expansion runway.** M0 grew from $55k (Q1 2024) to $118k (Q2 2025), a 2.1x increase in average initial deal size. Larger initial deals often mean less headroom for expansion (already starting near plan capacity). This explains the declining M6/M0 ratio.
-4. **Price hikes on the rate card.** Newer cohorts may be hitting a higher price book, inflating M0 and compressing apparent M6/M0 retention.
-5. **Logo churn hidden by expansion.** This is the dangerous one. If 2 of 15 customers churned in Q1 2024 cohort but the remaining 13 expanded enough to push the total to $81k at M18, the headline NRR looks fantastic while gross retention is mediocre. Cannot rule out from this data alone.
-6. **Market shift.** Q3-Q4 2024 cohorts saw less expansion, possibly because of macro headwinds at that period or a change in customer ICP.
+**Signal 2: Growth is volume-led, not value-led**
+- Customer count is scaling fast; starting MRR per customer is flat.
+- The company is winning more deals of similar size, not larger or higher-value deals.
+- Cohort decay is therefore not explained by smaller landing deals.
 
-### What I would investigate
+**Signal 3: Net retention above 100% does not prove the base is healthy**
+- Only net cohort MRR movement is visible.
+- Logo retention, churn, GRR, and expansion vs contraction split are not.
+- A few large expanding accounts could be masking churn elsewhere.
 
-In priority order, ten things I would dig into before drawing conclusions:
+### Step 4: Data gaps
 
-| # | Investigation | Why it matters |
-|---|---|---|
-| 1 | **GRR (Gross Retention Rate) separate from NRR.** GRR = retained MRR / starting MRR, excluding expansion. | If GRR is, say, 80% while NRR is 128%, expansion is masking 20% churn. Different story. |
-| 2 | **Logo retention.** % of customers from M0 still active at each month. | Tells me if expansion is from a shrinking customer base. Concentration risk. |
-| 3 | **Expansion source breakdown.** Seats vs tier upgrades vs price increases vs cross-sell. | Each implies a different durability and product-fit story. |
-| 4 | **Top 5 expanders per cohort.** Who is driving most of the expansion? | Concentration risk. If 80% of expansion is from 2 customers, NRR is fragile. |
-| 5 | **Q3 2024 M6 → M9 deceleration.** $85k → $89k = +4.7% in 3 months, slower than peer cohorts. | What changed for this cohort? Industry mix? Sales motion? |
-| 6 | **Q4 2024 M3 → M6 anemia.** $95k → $97k = +2.1%. | Early warning of slowing motion, or normal small-cohort variance? |
-| 7 | **Cohort customer count over time.** Did all 15 of Q1 2024 stay? | If 2 churned, the remaining 13 must have expanded by 41.4% to hit $81k (a concentration concern). |
-| 8 | **Contraction events.** Even within an "expanding" cohort, did some customers downgrade? | Contraction is the canary in the coal mine. |
-| 9 | **Renewal terms.** Are these multi-year or annual? What discounts on renewal? | Heavy renewal discounts inflate NRR but compress LTV. |
-| 10 | **ICP drift.** Are newer cohorts in different segments (enterprise vs SMB)? Different motion drives different expansion patterns. |
+Conclusions are bounded by what is missing:
+- Customer count at M3 to M18 (yields logo retention and churn rate).
+- NRR decomposition into GRR, expansion, contraction, churn.
+- Contract structure: length, ramp terms, multi-year vs annual.
+- Segment cuts by sales channel, customer size, geography, industry.
 
-### What I would say to the board
+### Step 5: Hypothesis
 
-> Headline NRR of 128% is genuinely excellent. But three things bother me. First, M6 expansion is declining cohort over cohort. Second, the Q1 2024 cohort's flat M9-M12 then big M18 jump tells me most expansion is happening at the annual renewal moment, not continuously. Third, we have not separated gross retention from net, so I do not yet know how much logo churn is being masked by expansion. Before I extrapolate this NRR into the model, I want to see GRR by cohort, logo retention curves, and a breakdown of where the expansion dollars are actually coming from. If the answer is "seats are growing because customers love us," we are in great shape. If the answer is "two whales are dragging the average up," we have concentration risk to address.
+The data shows two expansion phases that behave very differently. Reading them together is what the headline NRR misses.
 
-## Q3. If M6 retention improved by 10 percentage points across all future cohorts, what does that do to ARR at month 18?
+**Phase 1: Mid-cycle expansion (M3 to M6) is collapsing.**
+
+| Cohort | M3 | M6 | M3 → M6 expansion |
+|--------|----|----|-------------------|
+| Q1 2024 | 105.5% | 114.5% | +9.0pp |
+| Q2 2024 | 104.5% | 113.4% | +8.9pp |
+| Q3 2024 | 102.6% | 109.0% | +6.4pp |
+| Q4 2024 | 103.3% | 105.4% | +2.1pp |
+
+Across four cohorts, expansion in this window has fallen from ~9 points to ~2 points. M3 itself is stable, so customers are landing and onboarding similarly. The deterioration is in the expansion phase, not the activation phase.
+
+**Phase 2: A late-cycle expansion event around the annual renewal.**
+
+Q1 2024 is flat from M9 (123.6%) to M12 (123.6%) and then jumps to 147.3% by M18, a +23.7pp move. That shape is not smooth organic growth. It looks like a renewal-cycle event: customers re-contracting with bigger commitments, multi-year upgrades, or seat true-ups timed to the anniversary.
+
+**Reading the two phases together.**
+- Mid-cycle expansion is genuinely deteriorating.
+- Late-cycle expansion may be the more important value driver, and we have visibility into it for only one cohort.
+- Some of the apparent cohort decay is real (mid-cycle expansion is collapsing) and some is structural (newer cohorts have not yet reached their renewal moment).
+- The headline 127.9% blended NRR at M12 understates lifetime value if the renewal-cycle event repeats. It overstates current health if mid-cycle expansion keeps deteriorating.
+
+**Leading view.** The expansion engine has bifurcated. Something about the way the company drove mid-cycle expansion has stopped working as cohort size doubled, while the renewal-cycle event appears to be intact for the one cohort we can observe. The mechanism behind the mid-cycle drop is not visible in this data: it could be customer success coverage failing to scale, a change in product packaging that left less room for early upsell, weaker activation that pushes customers below the upsell threshold, or a deliberate sales decision to consolidate expansion at renewal. The data tells us the symptom is real and concentrated; it does not tell us the cause.
+
+**One alternative to rule out first.** If earlier cohorts signed contracts with stronger ramp or renewal terms than newer cohorts, part of both the mid-cycle expansion and the Q1 2024 M18 jump is a contract-design artifact rather than a behavioural change. Worth testing first because it is cheap to verify and would rebase the diagnosis.
+
+**Commercial implication.** If mid-cycle expansion is genuinely broken, the fix is operational and high-leverage but cannot be specified without knowing the mechanism. If the renewal-cycle event holds for newer cohorts, long-term cohort economics are stronger than the M6 trend implies and the ARR opportunity is concentrated at renewal moments. The risk is that management, anchored to M6 retention, either underinvests in renewal motion (because M12 looks weaker than it is) or invests in M3 to M6 fixes without first identifying what actually broke.
+
+**Validation priority.** Pull contract structure for Q1 and Q2 2024 to test the ramp-artifact view. Then decompose mid-cycle expansion into seat adds, module attach, usage growth, and CS-driven upsell to identify which mechanism has weakened. Track Q2 2024 through M18 closely: it is the next cohort to cross the renewal threshold and will tell us whether the late-cycle event repeats.
+
+---
+
+## Question 3. If M6 retention improved by 10 percentage points across all future cohorts, what does that do to ARR at month 18?
+
+### Forecasting is required
+
+- Only Q1 2024 has observed M18 data. All other M18 outcomes must be projected.
+- `M18 ARR = M18 MRR × 12`. A higher M6 raises the base flowing through to M18.
 
 ### Stated assumptions
 
-1. **"M6 retention" = M6 MRR / M0 MRR ratio.** A +10pp improvement means this ratio goes up by 10 absolute points (e.g., 109% → 119%).
-2. **"All future cohorts" = cohorts that have not yet hit M6.** As of the snapshot, that is Q1 2025 (currently at M3) and Q2 2025 (currently at M0). Cohorts that already have M6 in the data (Q1-Q4 2024) are locked.
-3. **M6 → M18 progression assumed at 1.286x** based on the one fully-observed cohort (Q1 2024: $63k at M6, $81k at M18 = 1.286x). This is the best estimate available but it is fragile because n=1.
-4. **Without intervention**, baseline M6/M0 for future cohorts follows the declining trend: Q1 2025 estimated at ~103%, Q2 2025 estimated at ~101%.
+**A. Which cohorts count as "future cohorts"?**
+- **Scope A: cohorts pre-M6** (Q1 2025, Q2 2025). The two cohorts that have not yet reached the M6 mark. Cleanest reading of "future" and the recommended baseline.
+- **Scope B: cohorts pre-M18** (Q2 2024 through Q2 2025). All cohorts whose M18 outcome is still unobserved. Counterfactual reading; treated as sensitivity.
 
-### The math
+**B. How does the M6 uplift carry through to M18?**
+- **Persistence case:** the incremental MRR at M6 carries flat to M18. Conservative.
+- **Trajectory case:** the incremental MRR follows Q1 2024's observed M6 to M18 expansion = `147.3% / 114.5% = 1.286x`. Upside.
+- Caveat: the trajectory case is anchored to a single cohort whose M18 jump appears to include a renewal-event upsell. Treat it as an upper bound, not a base expectation.
 
-For each affected cohort:
+### Math
 
-```
-Baseline M6 MRR        = baseline_M6_ratio × M0
-Improved M6 MRR        = (baseline_M6_ratio + 0.10) × M0
-                       = baseline M6 + (0.10 × M0)
+A 10 percentage point uplift means the retention rate itself rises by 10 points (e.g., 105% to 115%), not that M6 MRR rises by 10% from current level.
 
-Baseline M18 MRR       = baseline_M6 × 1.286
-Improved M18 MRR       = improved_M6 × 1.286
+`Incremental MRR at M6 = Starting MRR × 10%`
 
-Lift to M18 MRR        = (0.10 × M0) × 1.286
-                       = 0.1286 × M0
-```
+**Scope A: cohorts pre-M6 (Q1 2025 + Q2 2025)**
 
-### Cohort-by-cohort impact
+| Cohort | M0 MRR | +10pp at M6 |
+|--------|--------|-------------|
+| Q1 2025 | $105k | $10.5k |
+| Q2 2025 | $118k | $11.8k |
+| **Total** | **$223k** | **$22.3k MRR** |
 
-| Cohort | M0 MRR | Lift to M18 MRR | Lift to M18 ARR (× 12) |
-|---|---|---|---|
-| Q1 2025 | $105k | +$13.5k | **+$162k** |
-| Q2 2025 | $118k | +$15.2k | **+$182k** |
-| **Total** | | **+$28.7k MRR** | **+$344k ARR** |
+- Persistence: `$22.3k × 12 = $268k incremental ARR at M18`
+- Trajectory: `$22.3k × 1.286 × 12 = $344k incremental ARR at M18`
 
-### Three scenarios for context
+**Scope B: cohorts pre-M18 (Q2 2024 through Q2 2025)**
 
-The answer depends heavily on what "future cohorts" includes.
+| Cohort | M0 MRR | +10pp at M6 |
+|--------|--------|-------------|
+| Q2 2024 | $67k | $6.7k |
+| Q3 2024 | $78k | $7.8k |
+| Q4 2024 | $92k | $9.2k |
+| Q1 2025 | $105k | $10.5k |
+| Q2 2025 | $118k | $11.8k |
+| **Total** | **$460k** | **$46.0k MRR** |
 
-| Scope | M18 ARR lift |
-|---|---|
-| Only cohorts not yet at M6 (Q1 + Q2 2025) | **+$344k ARR** |
-| All cohorts not yet at M18 (Q3 2024 + Q4 2024 + Q1 + Q2 2025) | **+$606k ARR** |
-| Forward-looking, assuming 4 future cohorts of similar size (~$120k M0 each) | Roughly **+$170k ARR per cohort × 4 = +$680k ARR per year, compounding** |
+- Persistence: `$46.0k × 12 = $552k incremental ARR at M18`
+- Trajectory: `$46.0k × 1.286 × 12 = $710k incremental ARR at M18`
 
-### Caveats I would flag
+### Recommended answer
 
-1. **n=1 for M6→M18 multiplier.** Q1 2024 is the only cohort with M18 data. If Q2 2024 lands differently when its M18 arrives, the multiplier shifts.
-2. **Linear extrapolation may be too kind.** The deceleration in M6/M0 suggests the company is hitting a plateau. The +10pp improvement might be harder to achieve in Q2 2025 than in Q1 2024.
-3. **The cost of the intervention matters.** If improving M6 retention by 10pp requires a CSM dedicated to every customer (variable cost), the net ARR impact is lower. If it's a product investment that scales (fixed cost), the math is much better.
-4. **What drives M6 retention.** Onboarding quality, first-value milestone, in-app activation. Find the leading indicator of M6 expansion and instrument it. The retention math follows from operating well, not from setting a target.
+Under Scope A, a 10 percentage point M6 retention improvement adds **$268k to $344k of incremental M18 ARR**, depending on whether the uplift simply persists or compounds with later expansion. Under Scope B, the range scales to **$552k to $710k**. The trajectory case should be read as an upper bound because the Q1 2024 M6 to M18 ratio is inflated by what looks like a renewal-cycle expansion event we have not yet seen repeat.
 
-### What I would actually recommend
+---
 
-Before chasing the +10pp M6 retention target, prove out **gross retention** first. NRR is the headline but GRR is the foundation. If GRR is solid (95%+) and the only issue is expansion not happening fast enough, the +10pp investment is clearly worth $344k+ ARR. If GRR is weak (sub-90%), the +10pp expansion goal masks the real problem.
+## Executive Summary
+
+- **Headline.** Mature cohorts show 127.9% blended 12-month NRR. Strong land-and-expand profile on a small sample.
+- **The real story is two expansion phases behaving differently.** Mid-cycle expansion (M3 to M6) has collapsed from +9pp to +2pp across four cohorts. Late-cycle expansion looks renewal-driven: Q1 2024 is flat from M9 to M12 then jumps to 147.3% at M18.
+- **Implication.** Some of the apparent cohort decay is a real expansion-engine problem; some is simply that newer cohorts have not yet reached their renewal moment. The headline retention curve obscures both.
+- **Caveat.** Net retention above 100% does not prove the base is healthy. Logo retention, churn, GRR, and contract structure are not visible in this dataset.
+- **Working hypothesis.** Mid-cycle expansion has broken at scale, mechanism unknown. Renewal-cycle expansion may still be intact but is observed in only one cohort.
+- **Modelled upside.** A 10 percentage point M6 improvement on the two pre-M6 cohorts adds $268k to $344k of M18 ARR; broader sensitivity (all pre-M18 cohorts) is $552k to $710k. Trajectory case should be read as an upper bound given the renewal-event distortion in Q1 2024.
+- **Next steps.** Pull contract structure for Q1 and Q2 2024 to test the ramp-artifact view. Track Q2 2024 through M18 to see whether the renewal-cycle expansion repeats.
