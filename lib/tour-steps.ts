@@ -1508,10 +1508,19 @@ export const TOUR_STEPS: TourStep[] = [
     path: "/",
     selector: ".tour-anchor-sidebar-about",
     side: "right",
-    title: "More detail lives here",
+    title: "Want the full memo?",
     description: `
-      <p>You opened with the orientation widget; this is where the full memo lives. The <strong>About this build</strong> link in the sidebar opens it: the three case-study parts, source + reference docs, problem and reframe, build vs buy, five key decisions, what's real vs stubbed, and the 90-day plan.</p>
-      <p class="muted">Re-take the tour or pick a single chapter anytime from the sidebar's tour button.</p>
+      <p class="lead">Click <strong>About this build</strong> in the sidebar (this highlighted link).</p>
+      <p>What you'll find there:</p>
+      <ul>
+        <li>The three case-study parts (this build, cohort analysis, day-one plan)</li>
+        <li>Source and reference docs (README, PROJECT.md, repo)</li>
+        <li>The problem and the reframe</li>
+        <li>Build vs buy decisions</li>
+        <li>Five key design decisions</li>
+        <li>What is real vs what is stubbed</li>
+        <li>The 90-day plan</li>
+      </ul>
     `,
     next: "advance",
     nextLabel: "Next",
@@ -1521,16 +1530,23 @@ export const TOUR_STEPS: TourStep[] = [
     id: "tour-complete",
     chapter: "intake",
     path: "/",
-    title: "Tour complete · Thanks for walking",
+    title: "🎉 Tour complete",
     description: `
-      <p class="lead">You've walked all six chapters of the build.</p>
-      <ul>
-        <li>✓ <strong>Dashboard.</strong> Orientation, KPIs, filters.</li>
-        <li>✓ <strong>Workflow.</strong> Bolt MSA from review to send.</li>
-        <li>✓ <strong>Signed record.</strong> Audit trail and writeback.</li>
-        <li>✓ <strong>Signed archive.</strong> Filed contracts by type.</li>
-        <li>✓ <strong>Templates.</strong> Catalog and rogue governance.</li>
-        <li>✓ <strong>New contract.</strong> Three-step intake to clause check.</li>
+      <div style="display:flex;align-items:center;gap:10px;margin:0 0 10px 0;">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:999px;background:rgba(34,197,94,0.12);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(22,163,74)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </span>
+        <span style="font-weight:600;color:#0f172a;">All six chapters walked.</span>
+      </div>
+      <ul style="margin:0 0 10px 0;padding-left:0;list-style:none;">
+        <li style="display:flex;align-items:flex-start;gap:6px;line-height:1.55;"><span style="color:rgb(22,163,74);">✓</span> <span><strong>Dashboard.</strong> Orientation, KPIs, filters.</span></li>
+        <li style="display:flex;align-items:flex-start;gap:6px;line-height:1.55;"><span style="color:rgb(22,163,74);">✓</span> <span><strong>Workflow.</strong> Bolt MSA from review to send.</span></li>
+        <li style="display:flex;align-items:flex-start;gap:6px;line-height:1.55;"><span style="color:rgb(22,163,74);">✓</span> <span><strong>Signed record.</strong> Audit trail and writeback.</span></li>
+        <li style="display:flex;align-items:flex-start;gap:6px;line-height:1.55;"><span style="color:rgb(22,163,74);">✓</span> <span><strong>Signed archive.</strong> Filed contracts by type.</span></li>
+        <li style="display:flex;align-items:flex-start;gap:6px;line-height:1.55;"><span style="color:rgb(22,163,74);">✓</span> <span><strong>Templates.</strong> Catalog and rogue governance.</span></li>
+        <li style="display:flex;align-items:flex-start;gap:6px;line-height:1.55;"><span style="color:rgb(22,163,74);">✓</span> <span><strong>New contract.</strong> Three-step intake to clause check.</span></li>
       </ul>
       <p>Next: open <strong>About this build</strong> in the sidebar for the full memo, or browse the dashboard freely. Re-take the tour anytime from the sidebar's tour button.</p>
       <p class="muted">Thanks for taking the time. — Jeewoo</p>
