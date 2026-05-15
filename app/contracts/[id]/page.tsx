@@ -203,12 +203,18 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
     return () => mo.disconnect();
   }, [contract]);
 
-  // Auto-advance the tour when the operator's approval TRANSITIONS to
-  // approved during either the approval-approve step (first approval) or
-  // the approval-undo step (re-approve after undo). The transition guard
-  // (hasMountedRef + prevApprovedRef) prevents a spurious fire on initial
-  // page mount when the row is already approved (e.g. user resumed the
-  // tour at the undo step).
+  // Auto-advance the tour based on operator approval transitions while on
+  // the approval-related steps. Three behaviors share one observer:
+  //
+  // 1. approval-approve: fire when operator transitions pending -> approved
+  //    (first approve click).
+  // 2. approval-undo: fire when operator transitions approved -> pending
+  //    (Undo click). The user has seen the affordance; advance to the
+  //    finishing step that walks them through re-approve + simulates.
+  //
+  // The transition guard (hasMountedRef + prevApprovedRef) prevents a
+  // spurious fire on initial page mount when the row is already approved
+  // (e.g. user resumed the tour at the undo step).
   const tourApproveHasMountedRef = useRef(false);
   const tourPrevOperatorApprovedRef = useRef(false);
   useEffect(() => {
@@ -222,31 +228,38 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
     tourPrevOperatorApprovedRef.current = isApproved;
     tourApproveHasMountedRef.current = true;
     if (!wasMounted) return;
-    if (!isApproved) return;
-    if (wasApproved) return;
     const state = readTourState();
     if (!state.active) return;
     const step = TOUR_STEPS[state.stepIndex];
-    if (step?.id !== "approval-approve" && step?.id !== "approval-undo") return;
-    window.dispatchEvent(
-      new CustomEvent("tour:auto-next", { detail: { fromStepId: step.id } }),
-    );
+    if (!step) return;
+    // pending -> approved on approval-approve step (first approve)
+    if (step.id === "approval-approve" && !wasApproved && isApproved) {
+      window.dispatchEvent(
+        new CustomEvent("tour:auto-next", { detail: { fromStepId: step.id } }),
+      );
+      return;
+    }
+    // approved -> pending on approval-undo step (user clicked Undo)
+    if (step.id === "approval-undo" && wasApproved && !isApproved) {
+      window.dispatchEvent(
+        new CustomEvent("tour:auto-next", { detail: { fromStepId: step.id } }),
+      );
+      return;
+    }
   }, [contract]);
 
-  // Auto-advance the tour when ALL non-operator approvals are approved during
-  // the approval-simulate-others step. Both Magnus and Sara must be green for
-  // Send to unlock; once both are, the next step (preview-envelope) becomes
-  // the natural target.
+  // Auto-advance the tour when EVERY approval (operator + non-operator) is
+  // green during the approval-simulate-others step. The step copy walks
+  // re-Approve (if the user undid) plus both Simulate clicks; once all rows
+  // are approved, Send unlocks and the next step (preview-envelope) renders.
   useEffect(() => {
     if (!contract) return;
-    const others = contract.approvals?.filter(
-      (a) => a.assignedName !== OPERATOR_NAME,
-    ) ?? [];
-    if (others.length === 0) return;
-    const allOthersApproved = others.every(
+    const all = contract.approvals ?? [];
+    if (all.length === 0) return;
+    const allApprovedNow = all.every(
       (a) => a.status === "approved" || a.status === "auto_approved",
     );
-    if (!allOthersApproved) return;
+    if (!allApprovedNow) return;
     const state = readTourState();
     if (!state.active) return;
     const step = TOUR_STEPS[state.stepIndex];

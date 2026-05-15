@@ -484,24 +484,18 @@ export const TOUR_STEPS: TourStep[] = [
     id: "approval-undo",
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
-    // Anchor on the operator's row, NOT the Undo chip itself. The chip
-    // unmounts when the user clicks Undo (row returns to pending), so
-    // anchoring on the chip orphans the popover. The row stays in DOM
-    // through both states; the popover just stays beside it. The contract
-    // page auto-advances when the user re-Approves after undo, so the
-    // user never sits on a stale popover.
-    selector: ".tour-anchor-approval-operator-row",
+    // Anchor on the Undo chip itself. driver.js's overlay blocks the
+    // surrounding row; user can either click Undo to see the audit-only
+    // behavior (which auto-advances the tour) or click Next on the
+    // popover to skip the demo and go straight to finishing the chain.
+    selector: ".tour-anchor-approval-undo",
     side: "left",
     title: "Undo: only before send",
     description: `
-      <p>The <strong>Undo</strong> chip next to <em>Approved</em> withdraws your approval. The row flips back to pending and shows <strong>Approve</strong> again.</p>
-      <p>Click <strong>Undo</strong>, then click <strong>Approve</strong> to restore the green state. The tour follows automatically, then walks you to the other rows.</p>
+      <p>The <strong>Undo</strong> chip withdraws your approval. Click it to test (the tour follows), or click <strong>Next</strong> to skip ahead.</p>
       <p class="muted">Every Undo writes a new audit row; the original Approved row stays. Undo is refused once the envelope is in DocuSign.</p>
     `,
-    // The contract page dispatches `tour:auto-next` when the operator
-    // approval becomes approved AGAIN (after Undo + re-Approve). hideNext
-    // keeps the user from skipping the cycle accidentally.
-    hideNext: true,
+    next: "advance",
   },
   {
     id: "approval-simulate-others",
@@ -509,14 +503,14 @@ export const TOUR_STEPS: TourStep[] = [
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-approval-chain",
     side: "top",
-    title: "Approve the other rows",
+    title: "Get every row green",
     description: `
-      <p>Click <strong>Simulate X approves</strong> on the two non-operator rows (Magnus + Sara). The tour follows once both are green.</p>
-      <p class="muted">Each Simulate stands in for that approver clicking Approve in Slack. Send unlocks when every row is green.</p>
+      <p>Click <strong>Approve</strong> on your row if you undid (Martina). Then click <strong>Simulate X approves</strong> on Magnus and Sara.</p>
+      <p class="muted">Each Simulate stands in for that approver clicking Approve in Slack. Send unlocks once every row is green; the tour follows.</p>
     `,
-    // In-app Simulate clicks are the forward path. The contract page
-    // dispatches `tour:auto-next` when both non-operator approvals are
-    // approved.
+    // The contract page dispatches `tour:auto-next` when ALL approvals
+    // (operator + non-operator) are approved. hideNext keeps the user from
+    // skipping ahead before Send unlocks.
     hideNext: true,
   },
   {
