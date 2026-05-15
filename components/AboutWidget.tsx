@@ -52,7 +52,11 @@ export function AboutWidget() {
             />
           </div>
 
-          {/* Two CTAs styled like the sidebar entries */}
+          {/* Two CTAs styled like the sidebar entries. The Tour button is
+              desktop-only because the tour (driver.js popovers anchored on
+              specific layouts) is hidden on viewports < 768px. On mobile we
+              swap it for a small honest hint so a phone user understands the
+              gap rather than tapping a dead button. */}
           <div className="mt-3.5 flex flex-wrap items-center gap-2">
             <Link
               href="/about"
@@ -69,12 +73,16 @@ export function AboutWidget() {
                   window.dispatchEvent(new CustomEvent("tour:menu-open"));
                 }
               }}
-              className="inline-flex items-center gap-2.5 rounded-lg border border-accent-200 bg-accent-50 px-3 py-2 text-[13px] font-medium text-accent-700 transition-colors hover:bg-accent-100"
+              className="hidden items-center gap-2.5 rounded-lg border border-accent-200 bg-accent-50 px-3 py-2 text-[13px] font-medium text-accent-700 transition-colors hover:bg-accent-100 sm:inline-flex"
             >
               <Play className="h-4 w-4 shrink-0" />
               Take the tour
               <span className="text-[10.5px] font-normal text-accent-700/80">~9 min</span>
             </button>
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-ink-100 bg-ink-50/60 px-2.5 py-1.5 text-[11.5px] text-ink-500 sm:hidden">
+              <Play className="h-3 w-3 shrink-0 text-ink-400" />
+              Guided tour is desktop-only (~9 min).
+            </span>
           </div>
         </div>
       </div>

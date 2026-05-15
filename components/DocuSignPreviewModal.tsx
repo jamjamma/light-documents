@@ -254,7 +254,7 @@ function DocumentPage({
         <div className="font-mono text-ink-500">{contract.id}.docx · {contract.name}</div>
         <div className="text-ink-600">Page {page} of {totalPages}</div>
       </div>
-      <div className="min-h-[480px] px-10 py-8 font-serif text-[13px] leading-relaxed text-ink-800">
+      <div className="min-h-[480px] px-4 py-6 font-serif text-[13px] leading-relaxed text-ink-800 sm:px-10 sm:py-8">
         <PageBody page={page} totalPages={totalPages} contract={contract} template={template} signers={signers} />
       </div>
     </div>

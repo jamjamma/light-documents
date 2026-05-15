@@ -127,7 +127,9 @@ export function ApprovalChain({
                         type="button"
                         onClick={() => onUndoApprove(a)}
                         className={clsx(
-                          "tour-anchor-approval-undo inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-ink-700 ring-1 ring-inset ring-ink-200 hover:bg-ink-100 hover:text-ink-900",
+                          // Mobile: padded out to ~32px tall so the pill is
+                          // actually tappable; desktop keeps the dense pill.
+                          "tour-anchor-approval-undo inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-[12px] font-medium text-ink-700 ring-1 ring-inset ring-ink-200 hover:bg-ink-100 hover:text-ink-900 sm:px-2 sm:py-0.5 sm:text-[11px]",
                         )}
                         title="Withdraw your approval. Returns the row to pending and walks the contract back to awaiting_approval if this was the last approver."
                       >

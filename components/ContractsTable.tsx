@@ -141,75 +141,136 @@ export function ContractsTable({ contracts, filter, onFilterChange, awaitingRole
           description="Try a different filter or create a new contract from the sidebar."
         />
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-[1080px] table-fixed">
-            <colgroup>
-              <col style={{ width: "24%" }} />
-              <col style={{ width: "14%" }} />
-              <col style={{ width: "15%" }} />
-              <col style={{ width: "9%" }} />
-              <col style={{ width: "16%" }} />
-              <col style={{ width: "12%" }} />
-              <col style={{ width: "8%" }} />
-              <col style={{ width: "2%" }} />
-            </colgroup>
-            <thead>
-              <tr className="border-b border-ink-100">
-                <SortableTh field="name" sort={sort} onClick={toggleSort} className="px-5">Contract</SortableTh>
-                <SortableTh field="type" sort={sort} onClick={toggleSort}>Type</SortableTh>
-                <SortableTh field="counterparty" sort={sort} onClick={toggleSort}>Counterparty</SortableTh>
-                <SortableTh field="valueEur" sort={sort} onClick={toggleSort} align="right">Value</SortableTh>
-                <SortableTh field="stage" sort={sort} onClick={toggleSort}>Stage</SortableTh>
-                <SortableTh field="owner" sort={sort} onClick={toggleSort}>Owner</SortableTh>
-                <SortableTh field="updatedAt" sort={sort} onClick={toggleSort}>Updated</SortableTh>
-                <th className="px-5 py-2.5"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-ink-100">
-              {sorted.map((c) => (
-                <tr
-                  key={c.id}
-                  className={clsx("row-hover", c.id === "c_bolt_msa" && "tour-anchor-hero-row")}
-                >
-                  <td className="px-5 py-3.5 align-top font-medium text-ink-900">
-                    <Link href={contractHref(c)} className="flex items-start gap-2.5 hover:underline">
-                      <DocumentTypeIcon type={c.type} size="sm" />
-                      <span className="line-clamp-2 leading-snug">{c.name}</span>
-                      {isStale(c) && (
-                        <span
-                          className="ml-1 inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0 text-[10px] font-medium text-amber-700 ring-1 ring-inset ring-amber-200"
-                          title={`No movement for ${Math.floor(stageAgeDays(c))} days. Consider pinging the approver or reassigning.`}
-                        >
-                          <Clock className="h-2.5 w-2.5" /> stale
-                        </span>
-                      )}
-                    </Link>
-                  </td>
-                  <td className="px-3 py-3.5 align-top"><DocumentTypeBadge type={c.type} /></td>
-                  <td className="px-3 py-3.5 align-top text-ink-600">
-                    <span className="line-clamp-2 leading-snug">{c.counterparty}</span>
-                  </td>
-                  <td className="px-3 py-3.5 text-right align-top tabular-nums text-ink-700">{formatEurCompact(c.valueEur)}</td>
-                  <td className="px-3 py-3.5 align-top"><StatusBadge stage={c.stage} /></td>
-                  <td className="px-3 py-3.5 align-top">
-                    <div className="flex items-start gap-2">
-                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink-100 text-[10px] font-semibold text-ink-700">
-                        {initials(c.owner)}
+        <>
+          {/* Mobile: card stack. The 8-column table forces ~700px of horizontal
+              scroll on a phone, which buries the right-hand columns. Cards
+              promote each contract's name + type + counterparty into the
+              primary visual hierarchy and tuck Value / Stage / Owner / Updated
+              into a 2-column meta grid below. Same Link target, same content
+              fidelity. */}
+          <ul className="divide-y divide-ink-100 sm:hidden">
+            {sorted.map((c) => (
+              <li
+                key={c.id}
+                className={clsx("row-hover", c.id === "c_bolt_msa" && "tour-anchor-hero-row")}
+              >
+                <Link href={contractHref(c)} className="block px-4 py-3.5">
+                  <div className="flex items-start gap-2.5">
+                    <DocumentTypeIcon type={c.type} size="sm" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="font-medium leading-snug text-ink-900 line-clamp-2">{c.name}</div>
+                        <ChevronRight className="h-4 w-4 shrink-0 text-ink-400" />
                       </div>
-                      <div className="line-clamp-2 text-xs leading-snug text-ink-600">{c.owner}</div>
+                      <div className="mt-0.5 text-[12px] leading-snug text-ink-500 line-clamp-1">
+                        {c.counterparty}
+                      </div>
+                      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <DocumentTypeBadge type={c.type} />
+                        <StatusBadge stage={c.stage} />
+                        {isStale(c) && (
+                          <span
+                            className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 ring-1 ring-inset ring-amber-200"
+                            title={`No movement for ${Math.floor(stageAgeDays(c))} days.`}
+                          >
+                            <Clock className="h-2.5 w-2.5" /> stale
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-ink-500">
+                        <div>
+                          <div className="text-[10px] uppercase tracking-wider text-ink-400">Value</div>
+                          <div className="tabular-nums text-ink-700">{formatEurCompact(c.valueEur)}</div>
+                        </div>
+                        <div>
+                          <div className="text-[10px] uppercase tracking-wider text-ink-400">Updated</div>
+                          <div className="text-ink-700">{relativeDays(c.updatedAt)}</div>
+                        </div>
+                        <div className="col-span-2 flex items-center gap-1.5">
+                          <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink-100 text-[9px] font-semibold text-ink-700">
+                            {initials(c.owner)}
+                          </div>
+                          <div className="truncate text-ink-700">{c.owner}</div>
+                        </div>
+                      </div>
                     </div>
-                  </td>
-                  <td className="px-3 py-3.5 align-top whitespace-nowrap text-xs text-ink-500">{relativeDays(c.updatedAt)}</td>
-                  <td className="px-5 py-3.5 text-right align-top">
-                    <Link href={contractHref(c)} className="inline-flex items-center text-ink-400 hover:text-ink-900">
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
-                  </td>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {/* Desktop / tablet: keep the table (sortable, denser scan). */}
+          <div className="hidden overflow-x-auto sm:block">
+            <table className="min-w-[1080px] table-fixed">
+              <colgroup>
+                <col style={{ width: "24%" }} />
+                <col style={{ width: "14%" }} />
+                <col style={{ width: "15%" }} />
+                <col style={{ width: "9%" }} />
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "12%" }} />
+                <col style={{ width: "8%" }} />
+                <col style={{ width: "2%" }} />
+              </colgroup>
+              <thead>
+                <tr className="border-b border-ink-100">
+                  <SortableTh field="name" sort={sort} onClick={toggleSort} className="px-5">Contract</SortableTh>
+                  <SortableTh field="type" sort={sort} onClick={toggleSort}>Type</SortableTh>
+                  <SortableTh field="counterparty" sort={sort} onClick={toggleSort}>Counterparty</SortableTh>
+                  <SortableTh field="valueEur" sort={sort} onClick={toggleSort} align="right">Value</SortableTh>
+                  <SortableTh field="stage" sort={sort} onClick={toggleSort}>Stage</SortableTh>
+                  <SortableTh field="owner" sort={sort} onClick={toggleSort}>Owner</SortableTh>
+                  <SortableTh field="updatedAt" sort={sort} onClick={toggleSort}>Updated</SortableTh>
+                  <th className="px-5 py-2.5"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-ink-100">
+                {sorted.map((c) => (
+                  <tr
+                    key={c.id}
+                    className={clsx("row-hover", c.id === "c_bolt_msa" && "tour-anchor-hero-row")}
+                  >
+                    <td className="px-5 py-3.5 align-top font-medium text-ink-900">
+                      <Link href={contractHref(c)} className="flex items-start gap-2.5 hover:underline">
+                        <DocumentTypeIcon type={c.type} size="sm" />
+                        <span className="line-clamp-2 leading-snug">{c.name}</span>
+                        {isStale(c) && (
+                          <span
+                            className="ml-1 inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0 text-[10px] font-medium text-amber-700 ring-1 ring-inset ring-amber-200"
+                            title={`No movement for ${Math.floor(stageAgeDays(c))} days. Consider pinging the approver or reassigning.`}
+                          >
+                            <Clock className="h-2.5 w-2.5" /> stale
+                          </span>
+                        )}
+                      </Link>
+                    </td>
+                    <td className="px-3 py-3.5 align-top"><DocumentTypeBadge type={c.type} /></td>
+                    <td className="px-3 py-3.5 align-top text-ink-600">
+                      <span className="line-clamp-2 leading-snug">{c.counterparty}</span>
+                    </td>
+                    <td className="px-3 py-3.5 text-right align-top tabular-nums text-ink-700">{formatEurCompact(c.valueEur)}</td>
+                    <td className="px-3 py-3.5 align-top"><StatusBadge stage={c.stage} /></td>
+                    <td className="px-3 py-3.5 align-top">
+                      <div className="flex items-start gap-2">
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink-100 text-[10px] font-semibold text-ink-700">
+                          {initials(c.owner)}
+                        </div>
+                        <div className="line-clamp-2 text-xs leading-snug text-ink-600">{c.owner}</div>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3.5 align-top whitespace-nowrap text-xs text-ink-500">{relativeDays(c.updatedAt)}</td>
+                    <td className="px-5 py-3.5 text-right align-top">
+                      <Link href={contractHref(c)} className="inline-flex items-center text-ink-400 hover:text-ink-900">
+                        <ChevronRight className="h-4 w-4" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </section>
   );
