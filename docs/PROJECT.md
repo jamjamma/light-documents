@@ -10,7 +10,7 @@
 **The stated problem (Word edits and hand-placed DocuSign fields) is real, and the workflow below eliminates both.** The strategic opportunity available to Light that other CLM vendors cannot match:
 
 - **Commercial contracts carry structured data.** MSAs and Order Forms → revenue and billing. Employment → headcount and compensation. Warrants → cap table. Vendor → AP and obligation tracking.
-- **NDAs are the exception.** No commercial value to post. They file for retention only (ADR 14).
+- **NDAs are the exception.** No commercial value to post. They file for retention only (see §14 in `docs/decisions.md`).
 - **The writeback lands where Light has a receiver.** The prototype emits the payload on `envelope-completed`. Production wires it into whichever receivers Light operates.
 
 The PDF is the audit artifact, the data is the product.

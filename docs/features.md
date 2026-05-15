@@ -2,6 +2,8 @@
 
 This doc walks through every feature: what it is, why it exists, how it works, and what is real vs stubbed.
 
+> **Note on volumes and field counts below.** The case study brief states 50 to 100 contracts per month in total. The per-template volume splits and per-template field counts in this doc are illustrative estimates used to shape the build, not figures from Light. The variable lists themselves (Counterparty, value, payment terms, etc.) are template-design facts about what each document type typically contains, and would not change with a different volume profile.
+
 ## How the manual editing friction is killed, by document type
 
 The case study calls out two specific frictions: "manually edited in Word" and "fields highlighted by hand." Both are solved per document type as follows.
@@ -28,7 +30,7 @@ The case study calls out two specific frictions: "manually edited in Word" and "
 
 ### MSA (Master Services Agreement)
 
-**What was manually edited today:** 15-20 fields per contract. Counterparty, value, payment terms, liability cap, indemnity, governing law, term, auto-renew, DPA flag, signer name + title + email.
+**What was manually edited today:** Counterparty, value, payment terms, liability cap, indemnity, governing law, term, auto-renew, DPA flag, signer name + title + email. Each is a place for a typo or a stale value.
 
 **Volume:** ~30-50 / month from Sales.
 
@@ -54,7 +56,7 @@ The case study calls out two specific frictions: "manually edited in Word" and "
 
 ### Employment Contract (Denmark)
 
-**What was manually edited today:** the worst offender. ~20+ fields per offer.
+**What was manually edited today:** the most variable-heavy template by design.
 
 Candidate name, role, base salary, variable %, start date, manager, probation, notice period, work location, equity bps, vesting, sign-on bonus, relocation, conditional sections (commission plan, IP assignment, non-compete).
 

@@ -31,8 +31,8 @@ The demo, the About page, and this README contain the same answer at different l
 
 The brief names two visible frictions:
 
-- **Manual Word edits per contract.** ~15-20 fields hand-typed per MSA. ~20+ per employment offer. ~30+ for a warrant.
-- **Hand-placed DocuSign fields.** ~5-10 minutes dragging signature, date, and initial blocks per envelope, per signer.
+- **Manual Word edits per contract.** Counterparty, value, payment terms, liability cap, indemnity, governing law, term, auto-renew, DPA flag, signer name + title + email, and more depending on document type. Volume of fields varies by template but every one is a place for a typo or a stale value.
+- **Hand-placed DocuSign fields.** Signature, date, and initial blocks dragged into position per envelope, per signer, every time.
 
 At Light's stated volume (50 to 100 contracts / month), that is a steady operational tax. Both frictions can be eliminated with the right workflow layer in between.
 
@@ -44,7 +44,7 @@ While rebuilding the flow, there is a strategic opportunity available to Light t
 - **NDAs are the exception.** No commercial value to post. They file for retention only. The audit trail is the system of record (see [decisions.md §14](docs/decisions.md)).
 - **The writeback lands where Light has a receiver.** The prototype emits the structured payload on `envelope-completed`. Production wires it into whichever receivers Light operates or is building. The 90-day roadmap treats this as a parallel workstream, not a precondition.
 
-The PDF is the audit artifact, the data is the product. That is the wedge.
+The PDF is the audit artifact, the data is the product. That is the potential wedge, if Light wants to operationalise it.
 
 ---
 
@@ -97,7 +97,7 @@ Friction is not in any single team. It lives at the **handoffs**. The build is s
 |---|---|---|
 | Sales → Legal (clause review) | AE waits days for a review; Legal re-reads the same MSA every week | Clause check runs at intake; only deviations route to Legal, with reasons attached |
 | Legal → Finance (approval thresholds) | Approver chain assembled by Slack DM, sometimes the wrong person | Rule-based routing engine, owned by Head of F&O, deduplicates approvers by role and resolves channel collisions |
-| Drafting → DocuSign (field placement) | 5-10 minutes per envelope dragging fields | Anchor tags placed once in the master, DocuSign places fields on every send |
+| Drafting → DocuSign (field placement) | Fields dragged into position per envelope, every time | Anchor tags placed once in the master, DocuSign places fields on every send |
 | DocuSign → ledger / HRIS / cap table | RevOps re-keys MRR, People re-keys headcount, Finance re-keys vesting | Structured writeback on `envelope-completed`. Conditional on Light exposing the receiver. |
 | Master template update mid-flow | In-flight contracts silently change shape | Version pinned at create time, stale banner when master updates |
 | Board / external counsel signing | Outside-Slack approvers get lost | Email magic links with audit-grade access |
@@ -110,7 +110,7 @@ Friction is not in any single team. It lives at the **handoffs**. The build is s
 |---|---|---|
 | E-signature, identity, audit trail | **Buy / keep DocuSign** | eIDAS-compliant in EU, ESIGN in US, court-tested. Not our edge. |
 | Template authoring | **Keep Word + Drive** | Legal will not adopt a new editor. We read templates from Drive, we do not host editing. |
-| Full CLM (Ironclad, Juro, SpotDraft) | **Defer, not dismiss** | Juro and SpotDraft now target Series A SaaS in Europe with SMB pricing and ~30-day implementations. A pilot would cover ~70% of this workflow. The 30% they do not cover is the strategic wedge: writeback into Light's systems of record, routing rules owned by Head of F&O, and integration with the source records Light's customers already trust. Revisit at 500+ contracts / month or when post-signature obligation tracking dominates. |
+| Full CLM (Ironclad, Juro, SpotDraft) | **Defer, not dismiss** | Juro and SpotDraft now target Series A SaaS in Europe with SMB pricing and ~30-day implementations. A pilot would cover ~70% of this workflow. The 30% they do not cover is what's interesting for Light: writeback into Light's systems of record, routing rules owned by Head of F&O, and integration with the source records Light's customers already trust. Revisit at 500+ contracts / month or when post-signature obligation tracking dominates. |
 | Workflow layer (intake → check → route → envelope → writeback) | **Build** | The gap that simpler tools do not fill and the larger CLMs over-build. Sized for Light's volume today, designed so the most useful part of it (the writeback shape) can be lifted into Light's product later. |
 
 ## The one key decision
@@ -121,9 +121,9 @@ Three reasons:
 
 1. **Legal.** Rebuilding the signing layer means inheriting eIDAS, ESIGN, UETA, authority-to-bind verification, witnessing rules, and a decade of case-law compliance. Wrong battle for a Series A finance company.
 2. **Adoption.** Counsel writes contracts in Word. Forcing them into a new editor kills the rollout. We read what they write; we do not replace where they write.
-3. **Strategic fit.** For the contract types that carry commercial data, the structured payload belongs in the systems of record. The PDF is the audit artifact. NDAs file for retention only (ADR 14). This is the approach that matches Light's product thesis without overclaiming.
+3. **Strategic fit.** For the contract types that carry commercial data, the structured payload belongs in the systems of record. The PDF is the audit artifact. NDAs file for retention only (see the NDA carve-out in [docs/decisions.md](docs/decisions.md)). This is the approach that matches Light's product thesis without overclaiming.
 
-Smallest technical embodiment: DocuSign anchor tags embedded in templates as white-on-white text, paired with typed variables. Collapses "manually drag signature fields" from ~5 minutes per envelope to zero, deterministically, without writing any signing code ourselves.
+Smallest technical embodiment: DocuSign anchor tags embedded in templates as white-on-white text, paired with typed variables. Collapses "manually drag signature fields" to zero, deterministically, by doing the work once in the master template instead of per envelope. No signing code written.
 
 ---
 
@@ -131,8 +131,8 @@ Smallest technical embodiment: DocuSign anchor tags embedded in templates as whi
 
 | Friction today | With Light Documents |
 |---|---|
-| 15-20 fields hand-edited in Word per MSA | 0-3 exceptions, rest prefilled from source records |
-| 5-10 minutes dragging DocuSign fields per envelope | 0 minutes, anchor tags placed once in the master |
+| Multiple fields hand-edited in Word per contract | Exceptions only; the rest is prefilled from source records |
+| Fields dragged into position per envelope, every time | Anchor tags placed once in the master, DocuSign places fields on every send |
 | Approval chasing over Slack DMs and email | Rule-triggered routing, with reasons attached to every approval |
 | Wrong template version risk | Version pinned at create time, stale banner when master updates |
 | Manual ledger entry by RevOps after signing | Structured writeback on `envelope-completed` (conditional on Light exposing the receiver) |
@@ -220,8 +220,8 @@ These are the assumptions this answer is built on. They are worth flagging becau
 The full analysis lives at [case-study/PART-2-COHORT-ANALYSIS.md](case-study/PART-2-COHORT-ANALYSIS.md). Headline answers:
 
 - **Blended 12-month NRR (revenue-weighted, Q1 + Q2 2024): 127.9%.** Directional only; the sample is two mature cohorts.
-- **The real story is that two expansion phases behave very differently.** Mid-cycle expansion (M3 → M6) has collapsed from +9pp to +2pp across four cohorts. Late-cycle expansion looks renewal-driven: Q1 2024 is flat from M9 to M12 then jumps to 147.3% by M18.
-- **Implication.** Some of the apparent cohort decay is a real expansion-engine problem; some is structural (newer cohorts have not yet reached their renewal moment). The headline curve obscures both.
+- **Two expansion phases are diverging.** Mid-cycle (M3 → M6) has collapsed from +9pp to +2pp across four cohorts. Late-cycle is renewal-driven: Q1 2024 is flat from M9 to M12 then jumps to 147.3% by M18.
+- **What that means.** Some of the apparent cohort decay is a real expansion-engine problem. Some is structural (newer cohorts have not reached their renewal moment yet). The headline NRR averages both, hiding both.
 - **What to investigate first.** Pull contract structure for Q1 and Q2 2024 to test whether stronger ramp / renewal terms explain the M18 jump. Track Q2 2024 through M18 to see whether the late-cycle event repeats.
 - **ARR sensitivity.** A 10pp M6 uplift on the two pre-M6 cohorts adds **$268k to $344k of incremental M18 ARR** (persistence to trajectory). Across all pre-M18 cohorts the range is $552k to $710k. The trajectory case is an upper bound because Q1 2024's M6→M18 ratio is inflated by what looks like a renewal-cycle event.
 
@@ -230,7 +230,7 @@ The full analysis lives at [case-study/PART-2-COHORT-ANALYSIS.md](case-study/PAR
 The full version lives at [case-study/PART-3-DAY-ONE.md](case-study/PART-3-DAY-ONE.md). Headline answers:
 
 - **The 1-1 with Martina is the deliverable.** The week before it is for arriving with one position worth her time, and for not asking her what I could have found out on my own.
-- **I would read on three lenses in parallel.** Lens 1: what is actually happening on the ground (Slack channels, customer calls, support tickets, the real ARR roster). Lens 2: what leadership says should be happening (OKRs, all-hands, Martina's last update). Lens 3: how the outside sees Light (Atomico / Balderton memos, Jonathan's talks, adjacent battles). The analytical value is in the gaps between them.
+- **Three lenses, read in parallel.** Lens 1, what is actually happening on the ground (internal comms, customer calls, support, the real ARR roster). Lens 2, what leadership says should be happening (strategy docs, all-hands, Martina's last update). Lens 3, how the outside sees Light (publicly available investor framing, Jonathan's public talks, adjacent battles). The analytical value sits in the gaps between them.
 - **I would map people to handoffs, not titles.** The other F&O person, deployment / CS, one AE, one ledger engineer, one legal. Sit in on a deployment standup, one customer kickoff, one month-end close. Not Jonathan; he should not pay the tax of a week-one chat.
 - **The one point of view I would bring.** Find the handoffs, not the loudest pain. The internal practice is product research (Linear runs on Linear, Lovable on Lovable). Earn the right to bigger opinions later. What I want from the 1-1 is for Martina to tell me where this is wrong.
 

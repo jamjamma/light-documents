@@ -26,11 +26,11 @@ The key architectural and product decisions, with alternatives considered and wh
 - **Employment contracts** → headcount and compensation
 - **Warrant agreements** → cap table
 - **Vendor agreements** → AP and obligation tracking
-- **NDAs** → retention metadata only, no writeback (see ADR 14)
+- **NDAs** → retention metadata only, no writeback (see §14 below)
 
 **Boundaries this decision draws explicitly:**
 
-- **NDAs are the exception** (ADR 14). No commercial value to post. They file for retention only.
+- **NDAs are the exception** (see §14 below). No commercial value to post. They file for retention only.
 - **The writeback runs where Light has a receiver.** The prototype emits the payload on `envelope-completed`. Production wires it into whichever receivers Light operates. The 90-day roadmap treats this as a parallel workstream, not a precondition.
 
 **Alternatives considered:**
@@ -194,7 +194,7 @@ The numbers and named entities are inputs; if Light is on a different structure 
 
 **Decision:** NDAs are filed for retention only. They do not produce a Light ledger entry. The audit trail is the system of record (who signed, when, on which template version). The signed-record page surfaces this explicitly: "NDAs do not write to the ledger by design. There is no MRR, headcount, or equity to record."
 
-**Why this exists:** ADR 2 says contracts emit structured data into a system of record. The implicit assumption (that every contract type maps to the *ledger*) is wrong for NDAs. An NDA has no commercial value, no headcount, no cap-table impact, and no obligation worth posting to the GL. Forcing one in would create a phantom record that downstream consumers (renewal alerts, MRR rollups, board reporting) would have to filter out anyway. The system of record for an NDA is the retention metadata + audit trail; that is intentional, not an omission.
+**Why this exists:** §2 says contracts emit structured data into a system of record. The implicit assumption (that every contract type maps to the *ledger*) is wrong for NDAs. An NDA has no commercial value, no headcount, no cap-table impact, and no obligation worth posting to the GL. Forcing one in would create a phantom record that downstream consumers (renewal alerts, MRR rollups, board reporting) would have to filter out anyway. The system of record for an NDA is the retention metadata + audit trail; that is intentional, not an omission.
 
 **Where it lives in code:** `buildLedgerImpact()` in `lib/contract-store.ts` short-circuits with `null` for `type === "NDA"`. `simulateSigned()` only attaches `contract.ledger` when the result is non-null, and the audit event reads "Filed to Drive (retention only, no ledger writeback)" instead of the standard "Filed to Drive, ledger updated".
 

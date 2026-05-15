@@ -66,31 +66,37 @@ Triangulating across the three lenses is closer to the real work than reading an
 
 ## Who I would talk to
 
-Martina is the destination. Everyone else is mapped to a specific handoff I want a clearer view of, because handoffs are where this role's leverage lives.
+Martina is the destination. Everyone else is mapped to a specific handoff. Handoffs are where this role's leverage lives.
 
-| Person | Why | What I want from them |
+### Five 1-1s
+
+| Person | Handoff they sit on | What I want from them |
 |---|---|---|
-| Whoever is already on F&O (or Martina's closest cross-functional ally, if it is still her and me) | Sits on the internal F&O cadence | The real close timeline. What is automated, what is not. Where she runs hot. What has been tried and parked. |
-| Deployment or Customer Success lead | Sits on the closed-won → live customer handoff (where the case study problem bites) | What breaks during onboarding, week by week. Where their hours go that they wish did not. |
-| One AE or commercial lead | Sits on the customer ask → contract / billing reality handoff | What customers raise late in the cycle that we cannot answer cleanly. Where deal terms do not carry through to ops. |
-| One engineer on the ledger or workflow team | Sits on the product capability → ops automation handoff | What "AI-native" means in the codebase versus the marketing. What is automatable today without anyone shipping new code. |
-| Legal or compliance (in-house or fractional) | Sits on the commercial intent → legally binding artefact handoff (the case study itself) | The issuance process from their seat, before I form a view. |
+| Whoever else is on F&O (or Martina's closest cross-functional ally if it is still her and me) | The internal F&O cadence | The real month-end timeline. What is automated, what is not. Where she runs hot. What has been tried and parked. |
+| Deployment or CS lead | Closed-won → live customer (where the case study problem bites) | What breaks during onboarding, week by week. Where their hours go that they wish did not. |
+| One AE or commercial lead | Customer ask → contract / billing reality | What customers raise late that we cannot answer cleanly. Where deal terms do not carry through to ops. |
+| One engineer on the ledger or workflow team | Product capability → ops automation | What "AI-native" means in the codebase vs the marketing. What is automatable today without shipping new code. |
+| Legal or compliance (in-house or fractional) | Commercial intent → legally binding artefact (the case study itself) | The issuance process from their seat, before I form a view. |
 
-### Meetings I would sit in on (rather than ask for coffee)
+### Three meetings to sit in on, silently
 
-- Weekly deployment standup.
-- One customer kickoff or QBR.
-- The next month-end close, silently.
+| Meeting | What I learn |
+|---|---|
+| Weekly deployment standup | What is actually slow this week, in the team's own words |
+| One customer kickoff or QBR | How customers describe what they bought, and what they expect from us next |
+| The next month-end close | The shape of the operating cadence Martina actually runs |
 
 ### Who I would not ask for time
 
-- **Jonathan.** He is running a 30x-growth company through a US expansion. A week-one junior asking for 30 minutes is the tax a fast-moving CEO should not pay. I would absorb his thinking from all-hands, Slack, and Loom. If he wants the 30 minutes later, that is a different conversation.
+**Jonathan.** He is running a 30x-growth company through a US expansion. A week-one junior asking for 30 minutes is the tax a fast-moving CEO should not pay. I would absorb his thinking from all-hands, internal video, and press. If he wants the 30 minutes later, that is a different conversation.
 
 ### Ground rules
 
-- 30-minute time-box per chat.
-- One-paragraph note after each.
-- If a pattern shows up by Wednesday, I follow it. If not, I keep questions tight rather than chase ambiguity.
+| Rule | Why |
+|---|---|
+| 30-minute time-box per chat | Respects their week and forces me to come prepared |
+| One-paragraph note after each | Forces synthesis the same day, while the conversation is still warm |
+| Follow patterns that show up by Wednesday | If three people independently name the same friction, that is the signal. If not, I keep questions tight rather than chase ambiguity. |
 
 ---
 
