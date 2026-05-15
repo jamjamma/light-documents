@@ -35,8 +35,12 @@ export default function AboutPage() {
       />
       <div className="mx-auto max-w-4xl space-y-5 px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
 
-        {/* ─────────────────────────  TOP: TOUR CTA  ───────────────────────── */}
-        <div className="rounded-lg border border-accent-300 bg-accent-50/60 p-4">
+        {/* ─────────────────────────  TOP: TOUR CTA  ─────────────────────────
+            Tour itself is desktop-only (gated to viewports >= 768px in
+            TourController). On mobile we replace the full CTA card with a
+            slim hint so phone readers aren't told to take a tour they
+            cannot run. */}
+        <div className="hidden rounded-lg border border-accent-300 bg-accent-50/60 p-4 sm:block">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex-1 space-y-2">
               {/* Title — names the feature explicitly */}
@@ -70,6 +74,11 @@ export default function AboutPage() {
               ~9 min
             </span>
           </div>
+        </div>
+        {/* Mobile-only honest hint replacing the CTA above. */}
+        <div className="flex items-center gap-2 rounded-lg border border-ink-100 bg-ink-50/60 px-3 py-2 text-[12px] text-ink-600 sm:hidden">
+          <Play className="h-3.5 w-3.5 shrink-0 text-ink-400" />
+          <span>Guided tour is desktop-only (~9 min). The memo below covers the same ground.</span>
         </div>
 
         {/* ─────────────────────────  TOP: PROMINENT LINKS  ───────────────────────── */}
