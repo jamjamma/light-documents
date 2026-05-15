@@ -117,7 +117,7 @@ export default function AboutPage() {
                 <PrimaryLinkTile
                   href={PROJECT_DOC_URL}
                   title="PROJECT.md"
-                  detail="State machine, engines, every branch."
+                  detail="Engineering deep-dive into how the build works."
                   icon={<FileText className="h-3.5 w-3.5" />}
                 />
                 <PrimaryLinkTile
