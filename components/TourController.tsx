@@ -221,6 +221,7 @@ export function TourController() {
             title: step.title,
             description: step.description,
             ...(el ? { side: step.side ?? "bottom" } : {}),
+            ...(el && step.align ? { align: step.align } : {}),
             showButtons: buttons,
             disableButtons: [],
             nextBtnText: step.nextLabel ?? (idx === TOUR_STEPS.length - 1 ? "Finish" : "Next"),

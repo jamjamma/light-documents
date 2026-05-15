@@ -129,6 +129,13 @@ export interface TourStep {
   /** Where to position the popover relative to the anchor. */
   side?: Side;
   /**
+   * Alignment of the popover along the side axis. Passes through to
+   * driver.js. With side="top" or side="bottom", controls left/center/
+   * right alignment; with side="left" or side="right", controls top/
+   * center/bottom. driver.js default is "start".
+   */
+  align?: "start" | "center" | "end";
+  /**
    * What "Next" should do:
    *  - `advance` (default): just advance to the next step. If the next step
    *    is on a different path, the controller goes dormant until the user
@@ -593,17 +600,17 @@ export const TOUR_STEPS: TourStep[] = [
     id: "modal-pagenav",
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
-    // Anchor on the whole PageNav container. driver.js's overlay blocks
-    // pointer events on every element EXCEPT what's inside the active
-    // stage; anchoring on the active page button alone meant the user
-    // couldn't click the other page numbers (overlay swallowed those
-    // clicks). The whole nav becomes the click target so 1, 2, 3, ...
-    // and the Previous/Next arrows are all live.
+    // Anchor on the whole PageNav container so every page button (1-6)
+    // and the Previous/Next arrows are inside the active stage and
+    // clickable (driver.js's overlay blocks pointer events on everything
+    // outside the stage). side "bottom" puts the popover BELOW the nav
+    // instead of on top, where it was covering the document preview the
+    // user is supposed to be inspecting.
     selector: ".tour-anchor-modal-pagenav",
-    side: "top",
+    side: "bottom",
     title: "Flip through the pages",
     description: `
-      <p><strong>Click any page number</strong> below to preview that page. Click the <strong>last page</strong> to jump to the signature block; the tour follows automatically.</p>
+      <p>Click any page button above to preview that page. The tour follows when you reach the last page.</p>
     `,
     // Only paging to the last page (in-app) or Back advances the tour. The
     // modal dispatches `tour:auto-next` when page === totalPages.
@@ -630,17 +637,17 @@ export const TOUR_STEPS: TourStep[] = [
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
     selector: ".tour-anchor-modal-send",
-    // side="left": the Send button lives at the bottom-right of the modal
-    // footer. "top" let driver.js auto-flip to the right when the popover
-    // didn't fit above, which placed the popover OUTSIDE the modal making
-    // the arrow look detached. "left" sits the popover inside the modal
-    // body next to the button so the highlight + arrow + popover read as
-    // one unit pointing at the modal's Send button (not the contract page
-    // Send button visible behind the modal).
-    side: "left",
+    // side="top" + align="end": the Send button sits at the bottom-right
+    // of the modal footer. Top-aligned-to-the-right puts the popover
+    // above the button with the popover's right edge flush to the
+    // button's right edge, and the arrow at popover-bottom-right pointing
+    // straight down at Send. This reads as "this button" without the
+    // popover floating off to the side.
+    side: "top",
+    align: "end",
     title: "Send via DocuSign",
     description: `
-      <p>Click <strong>Send via DocuSign</strong> in the modal footer. The envelope fires; the page redirects to the signed record; the tour follows.</p>
+      <p>Click <strong>Send via DocuSign</strong>. The envelope fires; the page redirects to the signed record; the tour follows.</p>
     `,
     next: "advance",
     effect: "modal:open",
@@ -1235,13 +1242,13 @@ export const TOUR_STEPS: TourStep[] = [
     // panel the user is reading about. The RogueTemplatesPanel watches for
     // unmount of `showSlackPreview` while on this step and dispatches
     // tour:auto-next, so clicking Send DM or Cancel both advance the tour
-    // cleanly instead of orphaning the popover.
+    // cleanly to the after-notify recap step.
     selector: ".tour-anchor-rogue-slack-preview",
-    side: "top",
+    side: "bottom",
     title: "What gets sent",
     description: `
-      <p>The Slack message previewed below: file name, % match, the diff, the recommended action, and the recipient's rationale.</p>
-      <p>Click <strong>Cancel</strong> to back out, or <strong>Send DM / Send post</strong> to dispatch. Either click advances the tour.</p>
+      <p>The Slack message above: file name, % match, the diff, the recommended action, and the recipient's rationale.</p>
+      <p>Click <strong>Cancel</strong> to back out, or <strong>Send DM / Send post</strong> to dispatch. The tour shows you the outcome next.</p>
       <p class="muted">In production we post via the Slack Web API with interactive Acknowledge / Reroute / Snooze buttons; replies thread back into the audit log.</p>
     `,
     next: "advance",
@@ -1249,6 +1256,24 @@ export const TOUR_STEPS: TourStep[] = [
     // tour:auto-next. hideNext keeps the user from skipping ahead before
     // seeing one of the two outcomes.
     hideNext: true,
+  },
+  {
+    id: "templates-rogue-after-notify",
+    chapter: "templates",
+    path: "/templates",
+    // Anchor on the row itself so we land cleanly whether the user clicked
+    // Send (notified stamp now present) or Cancel (no stamp; row reverts).
+    // Either way the highlight reads as "your action landed here", not as
+    // a stale popover orphaned by the preview unmounting.
+    selector: ".tour-anchor-rogue-row",
+    side: "bottom",
+    title: "Action recorded",
+    description: `
+      <p>If you sent the message, a <strong>Slack DM sent to</strong> chip appears on the row with a timestamp and an Undo. Cancel leaves no trace and the row stays unactioned.</p>
+      <p class="muted">Send and Archive are independent: a file can be both notified and archived, neither, or either alone. Each writes its own audit row.</p>
+    `,
+    next: "advance",
+    lockInteraction: true,
   },
   {
     id: "templates-to-intake",
@@ -1377,10 +1402,12 @@ export const TOUR_STEPS: TourStep[] = [
     id: "intake-after-send",
     chapter: "intake",
     path: "*",
-    selector: ".tour-anchor-preview-envelope",
-    // side="top": Preview envelope sits in the Send-via-DocuSign card's
-    // action bar. The popover floats above the button row with the arrow
-    // tight against the Preview envelope target.
+    // Anchor on the whole action bar (Save draft, Preview envelope, Send
+    // via DocuSign) instead of just Preview envelope. The previous anchor
+    // visually mis-implied "click Preview envelope here", which is wrong
+    // for this terminal step. A broader highlight reads as "these are the
+    // actions you saw on Bolt; they work the same way here."
+    selector: ".tour-anchor-contract-actions",
     side: "top",
     title: "End of the workflow",
     description: `
@@ -1388,8 +1415,8 @@ export const TOUR_STEPS: TourStep[] = [
       <p class="muted">Click <strong>Next</strong> to wrap up on the dashboard.</p>
     `,
     next: "advance",
-    // Block Preview envelope click on this step. We are wrapping the tour,
-    // not walking the modal again. User must click Next on the popover.
+    // Block button clicks on this step. We are wrapping the tour, not
+    // walking the modal again. User must click Next on the popover.
     lockInteraction: true,
   },
 

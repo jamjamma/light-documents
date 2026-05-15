@@ -45,8 +45,8 @@ export default function AboutPage() {
             approved business terms to a signed agreement whose data flows back into Light&apos;s systems of record.
           </p>
           <ul className="ml-1 mt-1 space-y-1 text-[13px]">
-            <li className="flex gap-2"><span className="text-ink-400">•</span><span>No new editor for Counsel.</span></li>
-            <li className="flex gap-2"><span className="text-ink-400">•</span><span>No new signing primitive.</span></li>
+            <li className="flex gap-2"><span className="text-ink-400">•</span><span>No new editor for the lawyers who own the master templates. They keep working in Word.</span></li>
+            <li className="flex gap-2"><span className="text-ink-400">•</span><span>No new signing primitive. DocuSign stays the system of record for signatures.</span></li>
             <li className="flex gap-2"><span className="text-ink-400">•</span><span>The work happens in the gap, which is exactly the gap Light&apos;s ERP wedge can fill.</span></li>
           </ul>
         </Section>

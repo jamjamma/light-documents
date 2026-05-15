@@ -440,7 +440,7 @@ export default function ContractDetailPage({ params }: { params: Promise<{ id: s
           title="Send via DocuSign"
           subtitle="Variables substituted from intake. Anchor tags placed automatically."
           actions={
-            <div className="flex flex-wrap gap-2">
+            <div className="tour-anchor-contract-actions flex flex-wrap gap-2">
               <Button
                 variant="ghost"
                 size="sm"

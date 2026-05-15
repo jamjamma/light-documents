@@ -361,7 +361,12 @@ function RogueRow({
                 </span>
               )}
               {action.notified && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-sage-50 px-2 py-0.5 text-sage-500 ring-1 ring-inset ring-sage-500/20">
+                <span
+                  className={clsx(
+                    "inline-flex items-center gap-1 rounded-full bg-sage-50 px-2 py-0.5 text-sage-500 ring-1 ring-inset ring-sage-500/20",
+                    isFirst && "tour-anchor-rogue-notified-stamp",
+                  )}
+                >
                   <Check className="h-3 w-3" />
                   {action.notified.channel === "slack_dm" ? "Slack DM" : "Slack channel"} sent to{" "}
                   <span className="font-medium">{action.notified.recipient}</span> · {formatDateTime(action.notified.at)}
