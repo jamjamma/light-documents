@@ -16,6 +16,7 @@ import {
   Github,
   FileText,
   BookOpen,
+  Play,
 } from "lucide-react";
 
 const REPO_URL = "https://github.com/jamjamma/light-documents";
@@ -37,16 +38,31 @@ export default function AboutPage() {
         {/* ─────────────────────────  TOP: TOUR CTA  ───────────────────────── */}
         <div className="rounded-lg border border-accent-300 bg-accent-50/60 p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex-1 space-y-1.5">
-              {/* Lead — direct, logical, cause→effect */}
-              <div className="text-[14.5px] font-bold text-ink-900">
-                Built to save you reading time.
+            <div className="flex-1 space-y-2">
+              {/* Title — names the feature explicitly */}
+              <div className="flex items-center gap-2 text-[14.5px] font-bold text-ink-900">
+                <Play className="h-4 w-4 text-accent-700" />
+                Take the guided tour
               </div>
-              {/* Action subline */}
-              <p className="text-[13px] text-ink-700">
-                Take the guided tour from the sidebar instead of reading this memo. Popovers explain every surface as you walk.
-                Six chapters; start any one on its own.
+              {/* One-line why */}
+              <p className="text-[12.5px] text-ink-700">
+                Built to save you the time of reading this memo. Open it from the sidebar.
               </p>
+              {/* Scannable bullets */}
+              <ul className="space-y-1 text-[12.5px] text-ink-700">
+                <li className="flex gap-2">
+                  <span className="text-accent-700">•</span>
+                  <span>Walks the whole build with popovers on every surface.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-accent-700">•</span>
+                  <span>Six chapters; start any one on its own.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-accent-700">•</span>
+                  <span>Skip what you have already seen.</span>
+                </li>
+              </ul>
             </div>
             {/* Time chip */}
             <span className="shrink-0 self-start rounded-full bg-ink-900 px-3 py-1.5 text-[12px] font-semibold text-white">
@@ -72,17 +88,17 @@ export default function AboutPage() {
               <PrimaryLinkTile
                 href="/about"
                 title="Part 1: This memo"
-                detail="Scope, build, deliver: what to build vs buy and why."
+                detail="Build vs buy, scope, and why."
               />
               <PrimaryLinkTile
                 href={PART_2_URL}
-                title="Part 2: Read the business →"
-                detail="SaaS finance + cohort modelling (NRR diagnosis, ARR projection)."
+                title="Part 2: Read the business"
+                detail="Cohort analysis: NRR + ARR projection."
               />
               <PrimaryLinkTile
                 href={PART_3_URL}
-                title="Part 3: Day-one mindset →"
-                detail="Judgment + curiosity: the week before the 1-1 with Martina."
+                title="Part 3: Day-one mindset"
+                detail="The week before the 1-1 with Martina."
               />
             </div>
 
@@ -94,20 +110,20 @@ export default function AboutPage() {
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <PrimaryLinkTile
                   href={README_URL}
-                  title="README.md →"
-                  detail="Long-form of this build memo, on GitHub."
+                  title="README.md"
+                  detail="Long-form of this memo on GitHub."
                   icon={<FileText className="h-3.5 w-3.5" />}
                 />
                 <PrimaryLinkTile
                   href={PROJECT_DOC_URL}
-                  title="PROJECT.md →"
-                  detail="Technical deep-dive: state machine, engines, every workflow branch."
+                  title="PROJECT.md"
+                  detail="State machine, engines, every branch."
                   icon={<FileText className="h-3.5 w-3.5" />}
                 />
                 <PrimaryLinkTile
                   href={REPO_URL}
-                  title="Repo →"
-                  detail="Source code + the 14 architectural decision records."
+                  title="Repo"
+                  detail="Source + 14 architectural decisions."
                   icon={<Github className="h-3.5 w-3.5" />}
                 />
               </div>
@@ -687,7 +703,7 @@ function PrimaryLinkTile({
           {title}
           <ArrowRight className="h-3 w-3 text-ink-400 group-hover:text-ink-900" />
         </div>
-        <div className="truncate text-[11px] text-ink-500">{detail}</div>
+        <div className="text-[11px] leading-snug text-ink-500">{detail}</div>
       </div>
     </a>
   );
