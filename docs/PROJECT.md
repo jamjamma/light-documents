@@ -1,4 +1,4 @@
-# Light Documents — Project Reference
+# Light Documents: Project Reference
 
 > Single-page map of the entire build. Read top-to-bottom for a full mental
 > model. Each section is self-contained so you can jump in mid-doc.
@@ -131,15 +131,15 @@ Defined in `lib/contract-store.ts:VALID_TRANSITIONS`. Every command:
 
 ## 5. The three logic engines
 
-### 5a. Clause checker — `lib/clause-checker.ts`
+### 5a. Clause checker: `lib/clause-checker.ts`
 Pure function over typed `ClauseRule[]` attached to each template. Each rule carries:
 - `predicate(fields) → boolean` (is this standard?)
 - `observed(fields) → string` (the value in the draft)
 - `expected`, `severity` (`info` / `warn` / `block`), `reason`
 
-Output: `ClauseCheckResult[]` with status `standard` or `deviation`. The UI binds to this shape. **Swapping the engine for a Claude API call is a one-file change** — the contract with the UI is the result shape, not the engine.
+Output: `ClauseCheckResult[]` with status `standard` or `deviation`. The UI binds to this shape. **Swapping the engine for a Claude API call is a one-file change**: the contract with the UI is the result shape, not the engine.
 
-### 5b. Routing engine — `lib/routing-rules.ts` + `lib/approver-directory.ts`
+### 5b. Routing engine: `lib/routing-rules.ts` + `lib/approver-directory.ts`
 
 Two-stage:
 
@@ -147,7 +147,7 @@ Two-stage:
 
 2. **Directory layer** (`approver-directory.ts`): for each role, an `ApproverGroup` holds 1..N members with specialty tags (`type:Warrant`, `jurisdiction:UK`, `entity:Light Ltd …`) and a `strategy` (`specialty_match` / `named_default` / `all_required` / `any_round_robin`). `selectApprover()` scores members by weighted specialty match (type=10, entity=2, jurisdiction=1) so a UK MSA picks the UK in-house counsel over the Danish one, and a Warrant picks outside counsel over either in-house counsel. Active PTO `Delegation` entries automatically reroute to the named backup with `delegateOfName` set for the UI.
 
-### 5c. Signer routing — `lib/signer-routing.ts`
+### 5c. Signer routing: `lib/signer-routing.ts`
 `ENTITY_SIGNERS[Jurisdiction]` maps each Light entity (DK / UK / US) to its statutory CEO + title. `LIGHT_SIGNER_POLICY[DocumentType]` declares which Light-side roles must sign per doc type (MSA → CEO, Warrant → CFO + CEO + Witness, Vendor → Head of F&O). `resolveSigners(contract, template)` returns the ordered envelope with rationale per signer. `primaryLightSignerActor()` is the audit-trail string used by `simulateSigned()` so a UK contract reads "Jonathan Sanders (CEO, Light Ltd)" instead of just "(CEO)".
 
 ---
@@ -173,35 +173,35 @@ Two-stage:
 
 ## 7. Components
 
-### UI primitives — `components/ui/`
+### UI primitives: `components/ui/`
 `Button`, `Card`, `Badge`, `Modal` (with `headerActions` slot), `EmptyState`. Tailwind-styled, no behavioural logic.
 
 ### Layout
 `Sidebar` (slide-in drawer on mobile, collapse-to-icons on desktop, state persists in localStorage), `MobileTopBar` (sticky top bar that hosts the hamburger on mobile so it has a clear anchor instead of floating over scrolled content), `MobileNavContext` (shared drawer-open state between Sidebar and MobileTopBar), `Header` (stacks title + actions on mobile, normal padding on desktop), `Breadcrumb`, `DemoBanner`.
 
 ### Domain widgets
-- **`ContractsTable`** — sortable, stage filter tabs (All in-flight / Awaiting me / Blocked / In review) plus a type-chip row (All types / MSA / Order Form / NDA / Employment / Warrant). The two filters compose. Tabs and chips scroll horizontally on mobile.
-- **`KpiStrip`** — responsive KPI row. 2x2 grid on mobile, single row on `sm+`. Used on Dashboard + Archive.
-- **`ClauseDiff`** — clause-by-clause diff with severity coloring (info / warn / block). Stacked cards on mobile, table on desktop.
-- **`RoutingPanel`** — *why* this chain exists (rule reasons).
-- **`ApprovalChain`** — *who* + *why-this-person* + the per-row action menu. Renders an "Undo my approval" pill on rows the current operator (Martina) approved, so a mind-change before send is one click. Refuses on `sent` / `signed` / `filed`.
-- **`ApprovalActionsMenu`** — dropdown for Reassign / Re-ping / Reject. Click-away aware.
-- **`ReassignModal`** — picker with specialty chips, OOO badges, intent toggle (Reassign vs Pass on), reason presets.
-- **`RejectModal`** — danger flow with reason presets, returns the contract to `needs_info`.
-- **`IntakeForm`** — conditional fields per `DocumentType` (MSA, NDA, Order Form, Employment, Warrant).
-- **`RecordPicker`** — CRM-agnostic source-record list with system badges.
-- **`ManualEntryModal`** — type-aware manual record entry (deal / candidate / stakeholder / vendor) that sits alongside CRM/HRIS imports. Pre-fills safe boilerplate (vesting 48m, cliff 12m, payment net 30), required-but-empty fields get amber borders, validation hint sits next to the button.
-- **`TemplateCard`** + **`TemplatePicker`** + **`TemplateDetailModal`** — share visual language via `template-meta.ts`. Detail modal renders the clause rules as stacked cards on mobile, table on desktop.
-- **`DocuSignPreviewModal`** — multi-page envelope preview, signature blocks placed by anchor tags, API-payload toggle showing the actual `recipients` + `tabs` JSON.
-- **`AuditTrail`** — chronological event list with icons per event type.
-- **`LedgerImpactPanel`** — the ledger writeback (MRR, headcount, cap-table delta).
-- **`RogueTemplatesPanel`** — detected rogue copies of master templates with similarity scores + recommended action. Archive + Notify owner are interactive: Archive dims the row and surfaces an Undo pill; Notify opens an inline Slack DM preview (routing rationale + the exact `chat.postMessage` body + a production note about Interactivity buttons) and on Send replaces the buttons with a green "sent" stamp. State persists via `rogueActions` in localStorage, cleared on Reset demo.
-- **`StatusBadge`** + **`RiskBadge`** + **`DocumentTypeIcon`** — typography micro-components reused everywhere.
-- **`AboutWidget`** — the dashboard preamble that explains the build.
+- **`ContractsTable`**: sortable, stage filter tabs (All in-flight / Awaiting me / Blocked / In review) plus a type-chip row (All types / MSA / Order Form / NDA / Employment / Warrant). The two filters compose. Tabs and chips scroll horizontally on mobile.
+- **`KpiStrip`**: responsive KPI row. 2x2 grid on mobile, single row on `sm+`. Used on Dashboard + Archive.
+- **`ClauseDiff`**: clause-by-clause diff with severity coloring (info / warn / block). Stacked cards on mobile, table on desktop.
+- **`RoutingPanel`**: *why* this chain exists (rule reasons).
+- **`ApprovalChain`**: *who* + *why-this-person* + the per-row action menu. Renders an "Undo my approval" pill on rows the current operator (Martina) approved, so a mind-change before send is one click. Refuses on `sent` / `signed` / `filed`.
+- **`ApprovalActionsMenu`**: dropdown for Reassign / Re-ping / Reject. Click-away aware.
+- **`ReassignModal`**: picker with specialty chips, OOO badges, intent toggle (Reassign vs Pass on), reason presets.
+- **`RejectModal`**: danger flow with reason presets, returns the contract to `needs_info`.
+- **`IntakeForm`**: conditional fields per `DocumentType` (MSA, NDA, Order Form, Employment, Warrant).
+- **`RecordPicker`**: CRM-agnostic source-record list with system badges.
+- **`ManualEntryModal`**: type-aware manual record entry (deal / candidate / stakeholder / vendor) that sits alongside CRM/HRIS imports. Pre-fills safe boilerplate (vesting 48m, cliff 12m, payment net 30), required-but-empty fields get amber borders, validation hint sits next to the button.
+- **`TemplateCard`** + **`TemplatePicker`** + **`TemplateDetailModal`**: share visual language via `template-meta.ts`. Detail modal renders the clause rules as stacked cards on mobile, table on desktop.
+- **`DocuSignPreviewModal`**: multi-page envelope preview, signature blocks placed by anchor tags, API-payload toggle showing the actual `recipients` + `tabs` JSON.
+- **`AuditTrail`**: chronological event list with icons per event type.
+- **`LedgerImpactPanel`**: the ledger writeback (MRR, headcount, cap-table delta).
+- **`RogueTemplatesPanel`**: detected rogue copies of master templates with similarity scores + recommended action. Archive + Notify owner are interactive: Archive dims the row and surfaces an Undo pill; Notify opens an inline Slack DM preview (routing rationale + the exact `chat.postMessage` body + a production note about Interactivity buttons) and on Send replaces the buttons with a green "sent" stamp. State persists via `rogueActions` in localStorage, cleared on Reset demo.
+- **`StatusBadge`** + **`RiskBadge`** + **`DocumentTypeIcon`**: typography micro-components reused everywhere.
+- **`AboutWidget`**: the dashboard preamble that explains the build.
 
 ---
 
-## 8. Pages — `app/`
+## 8. Pages: `app/`
 
 | Route | Purpose | Notable bits |
 |---|---|---|
@@ -215,7 +215,7 @@ Two-stage:
 
 ---
 
-## 9. The approval workflow — happy path + every branch
+## 9. The approval workflow: happy path + every branch
 
 ### Happy path
 ```
@@ -289,7 +289,7 @@ Operator (simulated Martina) approves a row, changes her mind before send →
    → if her row was the last pending one and the contract had advanced to
      ready_to_send, stage walks back to awaiting_approval with a system audit
      event "Chain no longer complete; back to awaiting approval"
-Refused on sent / signed / filed — once DocuSign has the envelope, the chain
+Refused on sent / signed / filed. Once DocuSign has the envelope, the chain
 is out of the platform's hands. The store also rejects undo from anyone other
 than the original approver: operators withdrawing someone else's approval
 would erode the audit trail; route them through Reassign or Reject instead.
@@ -378,7 +378,7 @@ Every stubbed surface is labelled with a `Demo:` callout in the UI.
 | `SESSION-HANDOFF.md` | Session-state notes for continuing work across coding sessions. |
 | `docs/architecture.md` | Data flow + state model + per-engine deep dive. |
 | `docs/decisions.md` | Every key product/architectural decision with alternatives considered. 13 decisions including the late-stage closures from the audit (group-based approvers, signer routing, policy as data, template pinning, channel collision). |
-| `docs/features.md` | Per-doc-type "manual editing kill matrix" — for each template, what was edited by hand and how the system eliminates it. |
+| `docs/features.md` | Per-doc-type "manual editing kill matrix", for each template, what was edited by hand and how the system eliminates it. |
 | `docs/cross-functional.md` | Persona × action matrix, RBAC, integration plan, failure modes. |
 | `docs/demo-script.md` | The 5-minute Loom narration script. |
 | `docs/PROJECT.md` | **This document.** Full project map. |
@@ -494,7 +494,7 @@ Heaviest file is `mock-data.ts` (templates + seed data + version history). Every
 
 **Real cuts (Phase 2):**
 - Real DocuSign API integration (replaced with envelope-preview modal showing exact JSON)
-- Real Claude clause check (replaced with deterministic rules engine — same output shape)
+- Real Claude clause check (replaced with deterministic rules engine, same output shape)
 - Real Slack notifications (replaced with `Slack DM sent to X` audit events)
 - OAuth integrations for source systems (replaced with seeded mock records)
 - Authentication / RBAC (single Martina persona)
@@ -554,13 +554,13 @@ Production stack would add: Postgres, S3, Redis (BullMQ), Vercel/AWS, Google SSO
 
 ## 18. Read order if you're new
 
-1. `README.md` — five-minute orientation, build vs buy, demo flow
-2. `docs/PROJECT.md` — this doc, full map
-3. `docs/decisions.md` — the *why* behind every architectural call
-4. `docs/architecture.md` — data flow + state machine
-5. `lib/types.ts` — the contract for the codebase
-6. `lib/contract-store.ts` — the operating core
-7. `lib/routing-rules.ts` + `lib/approver-directory.ts` — the engine
+1. `README.md`, five-minute orientation, build vs buy, demo flow
+2. `docs/PROJECT.md`, this doc, full map
+3. `docs/decisions.md`, the *why* behind every architectural call
+4. `docs/architecture.md`, data flow + state machine
+5. `lib/types.ts`, the contract for the codebase
+6. `lib/contract-store.ts`, the operating core
+7. `lib/routing-rules.ts` + `lib/approver-directory.ts`, the engine
 8. Click around the app while reading
 
 ---

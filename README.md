@@ -1,11 +1,17 @@
 # Light Documents
 
 > Case study submission for the AI Strategy & Operations Associate role at Light (light.inc).
-> Part 1 of 3: scope what to build or buy to fix Light's manual document workflow, and prototype the core.
+> Part 1: scope what to build or buy to fix Light's manual document workflow, and prototype the core.
 
-**Live demo:** https://light-documents-sigma.vercel.app/
-**Repo:** https://github.com/jamjamma/light-documents
-**Suggested review path:** README (top → bottom) → live demo MSA happy path → `docs/decisions.md` for the ADRs.
+| | |
+|---|---|
+| **Live demo** | https://light-documents-sigma.vercel.app/ |
+| **Repo** | https://github.com/jamjamma/light-documents |
+| **In-app memo** | [/about](https://light-documents-sigma.vercel.app/about) (same content as this README, on the website) |
+| **Case Part 2** | [case-study/PART-2-COHORT-ANALYSIS.md](case-study/PART-2-COHORT-ANALYSIS.md) |
+| **Case Part 3** | [case-study/PART-3-DAY-ONE.md](case-study/PART-3-DAY-ONE.md) |
+
+**Suggested review path:** README top to bottom → live demo MSA happy path → [`docs/decisions.md`](docs/decisions.md) for the ADRs.
 
 ## The answer in one paragraph
 
@@ -51,9 +57,11 @@ Source records (Salesforce / HubSpot / Attio / Personio / Ashby / Manual entry)
 | Manual ledger entry by RevOps after signing | Structured writeback on `envelope-completed` |
 | Lost contracts in inboxes | Single state machine + audit trail |
 
-## Why Counsel will adopt this
+## Why Counsel will not block adoption
 
-Counsel doesn't author contracts inside Light Documents. Master templates stay as Word docs in Drive, edited where Counsel already edits. Light reads what Counsel writes; it does not host the editing. (Counsel may still log in to approve a clause deviation or sit on an approval chain. What stays out of the tool is authoring, not review.) Forcing Counsel into a new editor is the single largest reason CLM rollouts fail, and the reason we are not building one.
+Counsel does not author contracts inside Light Documents. Master templates stay as Word docs in Drive, edited where Counsel already edits. Light reads what Counsel writes; it does not host the editing. Counsel may still log in to approve a clause deviation or sit on an approval chain. What stays out of the tool is authoring, not review.
+
+Forcing Counsel into a new editor is the single largest reason CLM rollouts fail. That is the failure mode this build is designed to avoid.
 
 ## The one key decision
 
@@ -73,23 +81,23 @@ The headline demo is an **MSA end-to-end**. The other 7 of the 8 templates use t
 
 ### Hero path: MSA happy path
 
-| Step | What you click | What happens |
+| Step | Click | What happens |
 |---|---|---|
-| 1 | Land on Dashboard | Operator KPI strip (Awaiting me / Blocked / In review), demoted Cycle health line, **guided product tour auto-starts on first visit** (driver.js, 8 steps, dismissable). "New here?" callout offers "Take the tour" or "Open Bolt MSA". AboutWidget with the reframe, contracts table with stage tabs + type chips. |
-| 2 | Click "Bolt MSA" (high-risk, in review) | Detail page renders with 3 clause deviations flagged (Net 60, unlimited liability, customer-only indemnity) and 3 approval chips pending (Legal, Head of Finance, CFO) |
-| 3 | Click "Simulate: Legal approves" | Legal chip flips green; status updates; audit trail appends event |
-| 4 | Click "Preview envelope" | Modal opens with populated MSA, variables and anchor tags highlighted, DocuSign features listed (sequential signing, 30-day expiry, day-3-7-14 reminders), conditional sections listed (Service Level Exhibit, DPA, eIDAS QES applied as Light signing policy for high-value EU deals; see "Note on QES" below) |
-| 5 | Approve remaining chips, click "Send via DocuSign" | Demo: 3-day signing cycle collapsed to 1.5s → routes to Signed Record page with audit trail and writeback (MRR, ARR, renewal alert) |
+| 1 | Land on Dashboard | Operator KPI strip (Awaiting me / Blocked / In review). Contracts table with stage tabs + type chips. AboutWidget summarises the reframe. |
+| 2 | Open "Bolt MSA" (high-risk, in review) | Detail page renders with 3 clause deviations flagged (Net 60, unlimited liability, customer-only indemnity) and 3 approval chips pending (Legal, Head of Finance, CFO). |
+| 3 | "Simulate: Legal approves" | Legal chip flips green. Status updates. Audit trail appends event. |
+| 4 | "Preview envelope" | Populated MSA, variables and anchor tags highlighted, DocuSign features listed (sequential signing, 30-day expiry, day 3 / 7 / 14 reminders), conditional sections listed (Service Level Exhibit, DPA, eIDAS QES applied as Light signing policy for high-value EU deals, see "Note on QES" below). |
+| 5 | Approve remaining chips, "Send via DocuSign" | Demo: 3-day signing cycle collapsed to 1.5s. Routes to Signed Record page with audit trail and writeback (MRR, ARR, renewal alert). |
 
 ### Extensibility paths (shown to prove the machinery generalises)
 
-| Step | What you click | What happens |
+| Step | Click | What happens |
 |---|---|---|
-| 6 | Click "+ New contract" | Three-step intake: pick template (8 options), pick source record (filtered by template type, with system badge; or switch to **Manual entry** for records not in any CRM), confirm details (prefilled form with live validation) |
-| 7 | Click "Templates" in sidebar | All 8 templates with clause rules visible, sync metadata from Drive shown. The "Rogue templates" panel is a Phase-2 governance demo; Archive and Notify-owner are wired end-to-end with realistic Slack DM previews |
-| 8 | Mid-flow, change mind on an approval you just made | Each row you approved shows an **Undo my approval** pill. Click → row reverts to pending. If yours was the last vote, the contract walks back from `ready_to_send` to `awaiting_approval` |
-| 9 | Resize to mobile width | Sidebar hides; sticky top bar holds the hamburger + brand. KPIs stack 2×2. Clause review becomes stacked cards |
-| 10 | Click "About this build" in sidebar | Full submission memo in-app, including the cast-list note (all personas illustrative) |
+| 6 | "+ New contract" | Three-step intake: pick template (8 options), pick source record (filtered by template type, with system badge, or switch to **Manual entry** for records not in any CRM), confirm details (prefilled form with live validation). |
+| 7 | "Templates" in sidebar | All 8 templates with clause rules visible, sync metadata from Drive shown. The "Rogue templates" panel is a Phase-2 governance demo. Archive and Notify-owner are wired end-to-end with realistic Slack DM previews. |
+| 8 | Change mind on an approval you just made | Each row you approved shows an **Undo my approval** pill. Click and the row reverts to pending. If yours was the last vote, the contract walks back from `ready_to_send` to `awaiting_approval`. |
+| 9 | Resize to mobile width | Sidebar hides. Sticky top bar holds the hamburger + brand. KPIs stack 2×2. Clause review becomes stacked cards. |
+| 10 | "About this build" in sidebar | Full submission memo in-app, with the same content as this README plus the cast-list note. |
 
 10 in-flight + 4 signed contracts pre-seeded (14 total).
 
@@ -101,13 +109,13 @@ eIDAS QES is enforced in this workflow as **Light's signing policy** for high-va
 
 | Layer | Working | Stubbed |
 |---|---|---|
-| Routing, navigation | Real Next.js App Router | — |
+| Routing, navigation | Real Next.js App Router | None |
 | State, persistence | Real localStorage state machine, survives refresh | No real DB |
 | Template + record selection | Real typed data | Data itself is mock |
 | Manual record entry | Real type-aware form (deal / candidate / stakeholder / vendor) with prefilled defaults + live validation that names the missing fields | Record persists locally only |
-| Form validation | Real, threshold-based, live | — |
+| Form validation | Real, threshold-based, live | None |
 | Clause check | Real deterministic rules engine over typed `ClauseRule[]`. **Production swaps in Claude** (see below) | Demo: deterministic stand-in |
-| Approval routing | Real rules engine with dedup, channels, reasons | — |
+| Approval routing | Real rules engine with dedup, channels, reasons | None |
 | Approval transitions | Real, immutable, via Simulate buttons. **Undo my approval** walks the contract back to `awaiting_approval` if the chain is no longer complete | Real product fires Slack DMs with interactive buttons |
 | Reassign / Pass-on / Re-ping / Reject | Real per-row workflow actions with audit-trail fan-out | Simulated DMs |
 | Rogue template Archive / Notify owner | Real local state + real Slack DM preview with smart recipient routing | No real Slack post |
@@ -115,7 +123,7 @@ eIDAS QES is enforced in this workflow as **Light's signing policy** for high-va
 | Send → Signed | Real state transition with realistic delay | Demo: 3-day cycle collapsed to 1.5s |
 | Audit trail | Real, generated from journey events | Timestamps relative to demo session |
 | Writeback (ledger / HRIS / cap table) | Real structured payload generated per document type (journal entry shape for MSAs / Order Forms, HRIS record for Employment, cap-table grant for Warrants) | Demo: both sides of the integration are stubbed. The prototype emits the shape on the DocuSign `envelope-completed` webhook; production needs Light to expose the receiving endpoint. |
-| Mobile UX | Real responsive layout: sticky top bar with hamburger, 2×2 KPI grid, stacked-card tables, wrap-friendly action bars | — |
+| Mobile UX | Real responsive layout: sticky top bar with hamburger, 2×2 KPI grid, stacked-card tables, wrap-friendly action bars | None |
 
 Every stubbed piece carries an explicit "Demo:" callout on the screen where it appears.
 
@@ -129,13 +137,15 @@ The prototype ships a deterministic rules engine in the same shape for two reaso
 
 ## Surface area: why each piece exists
 
-This prototype has more surface than a "build an uploader" answer needs. Each piece is there because naive workflow tools break at exactly that edge:
+This prototype has more surface than a "build an uploader" answer needs. Each piece is there because the underlying workflow has a real edge case that simpler tools tend to miss:
 
-- **Committee emission + PTO delegation.** Board flows have multiple members; one is always away. Naive tools either block the whole chain or silently drop a vote.
-- **Channel-collision tiebreaking.** A single contract can fire 4 rules disagreeing on notification channel. Naive systems double-DM the same approver.
-- **Template version pinning.** Counsel updating MSA v4.2 to v4.3 mid-flow must not silently change in-flight contracts.
-- **Entity-aware signer routing.** A Light Ltd (UK) contract signed as "Light ApS CEO" would fail UK Companies House scrutiny.
-- **NDA exception to the ledger rule** ([decisions.md §14](docs/decisions.md)). NDAs have no commercial value to post; the audit trail is the system of record. The general rule this implies: when a strategic claim is type-conditional, the catch-all path in code must be explicit, not a fallthrough.
+| Surface | Edge case it handles |
+|---|---|
+| Committee emission + PTO delegation | Board flows have multiple members; one is usually away. Simpler tools either block the whole chain or silently drop a vote. |
+| Channel-collision tiebreaking | A single contract can fire four rules disagreeing on notification channel. Without resolution, the same approver gets double-DM'd. |
+| Template version pinning | Counsel updating MSA v4.2 to v4.3 mid-flow must not silently change in-flight contracts. |
+| Entity-aware signer routing | A Light Ltd (UK) contract signed as "Light ApS CEO" would fail UK Companies House scrutiny. |
+| NDA exception to the ledger rule | NDAs have no commercial value to post; the audit trail is the system of record. The general rule: when a strategic claim is type-conditional, the catch-all path in code must be explicit, not a fallthrough. See [decisions.md §14](docs/decisions.md). |
 
 Everything else was deliberately cut. See [`docs/decisions.md §15`](docs/decisions.md) for the full cut list.
 
@@ -233,6 +243,15 @@ docs/
 ├── cross-functional.md                      Persona × action matrix + integration plan + RBAC
 └── demo-script.md                           Loom recording script (5 min)
 ```
+
+## Case study parts 2 and 3
+
+Both written for the same submission. Each is self-contained and intended to be read alongside this README.
+
+| Part | What it answers | Read it |
+|---|---|---|
+| Part 2 | SaaS cohort analysis: blended NRR, retention diagnosis with hypothesis, M18 ARR projection under a 10pp M6 uplift | [case-study/PART-2-COHORT-ANALYSIS.md](case-study/PART-2-COHORT-ANALYSIS.md) |
+| Part 3 | Day-one mindset: how I would spend the week before the 1-1 with the Head of F&O, who I would talk to, what one point of view I would walk in with | [case-study/PART-3-DAY-ONE.md](case-study/PART-3-DAY-ONE.md) |
 
 ## License + attribution
 

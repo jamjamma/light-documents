@@ -44,8 +44,8 @@ The case study calls out two specific frictions: "manually edited in Word" and "
 | SLA tier | Standard 99.5%. Higher tiers via Service Level Exhibit. |
 
 **Conditional sections attached automatically:**
-- Service Level Exhibit (Exhibit A) — always
-- Data Processing Agreement (Exhibit B) — when DPA required
+- Service Level Exhibit (Exhibit A), always
+- Data Processing Agreement (Exhibit B), when DPA required
 - eIDAS QES identity verification, applied as **Light signing policy** when ARR ≥ €100k and EU governing law (not a legal requirement on every EU MSA; see policy note below)
 
 **DocuSign features used:** AutoPlace (8 anchor tags), sequential signing (counterparty first), 30-day expiry, day-3-7-14 reminders, Identify (AES) for standard EU contracts, QES on high-value EU contracts per Light policy.
@@ -73,10 +73,10 @@ Candidate name, role, base salary, variable %, start date, manager, probation, n
 | Number of options | Calculated from basis points × fully-diluted shares |
 
 **Conditional sections attached automatically:**
-- Commission Plan Exhibit — when role matches /sales|account|revenue/
-- IP Assignment Addendum — when role matches /engineer|product|design|research/
-- Equity Grant Addendum — when equityBps > 0
-- Non-compete Addendum — when role matches /vp|director|head of|chief/
+- Commission Plan Exhibit, when role matches /sales|account|revenue/
+- IP Assignment Addendum, when role matches /engineer|product|design|research/
+- Equity Grant Addendum, when equityBps > 0
+- Non-compete Addendum, when role matches /vp|director|head of|chief/
 
 **DocuSign features used:** AutoPlace (6 anchor tags + per-page initials), sequential signing (candidate first, then CEO), 7-day expiry, day-2-5 reminders, **SMS / phone identity verification** for the candidate.
 
@@ -97,9 +97,9 @@ Candidate name, role, base salary, variable %, start date, manager, probation, n
 | Board resolution reference | Typed by CFO. **System enforces presence with severity = block.** |
 
 **Conditional sections attached automatically:**
-- Board Resolution (Exhibit A) — always
-- Latest 409A Valuation (Exhibit B) — always
-- Acceleration Addendum — when applicable
+- Board Resolution (Exhibit A), always
+- Latest 409A Valuation (Exhibit B), always
+- Acceleration Addendum, when applicable
 
 **DocuSign features used:** AutoPlace (8 anchor tags including witness), sequential signing, **eIDAS QES applied per Light policy for all warrants** (warrants are high-value equity instruments; policy escalates to QES regardless of jurisdiction), **witness signer as third recipient**, 30-day expiry, day-7-14 reminders.
 
@@ -155,14 +155,14 @@ For every document type, the same mechanism:
 
 | Persona | Triggers | Reviews | Approves | Signs | Where they work |
 |---|---|---|---|---|---|
-| AE / Sales rep | Generate contract from Salesforce / HubSpot | own drafts | — | — | Salesforce + Slack |
-| Recruiter | Generate offer from Personio / Ashby | own drafts | — | — | ATS + Slack |
-| Head of People | — | All employment | Above-band exceptions | — | Slack + Light Documents |
-| Head of Finance & Ops | Owns routing rules | All contracts | Threshold approvals, daily digest | — | Light Documents (primary user) |
-| Legal | — | Clause deviations, master templates | Clause deviations | — | Slack + Word |
-| CFO | — | Above-threshold contracts | High-value, warrants | — | Slack |
-| CEO | — | Strategic | — | Most contracts | DocuSign emails |
-| Board | — | — | Warrants, equity | Equity docs | Email magic links |
+| AE / Sales rep | Generate contract from Salesforce / HubSpot | own drafts |, |, | Salesforce + Slack |
+| Recruiter | Generate offer from Personio / Ashby | own drafts |, |, | ATS + Slack |
+| Head of People |, | All employment | Above-band exceptions |, | Slack + Light Documents |
+| Head of Finance & Ops | Owns routing rules | All contracts | Threshold approvals, daily digest |, | Light Documents (primary user) |
+| Legal |, | Clause deviations, master templates | Clause deviations |, | Slack + Word |
+| CFO |, | Above-threshold contracts | High-value, warrants |, | Slack |
+| CEO |, | Strategic |, | Most contracts | DocuSign emails |
+| Board |, |, | Warrants, equity | Equity docs | Email magic links |
 
 ## What is real in the prototype vs stubbed
 

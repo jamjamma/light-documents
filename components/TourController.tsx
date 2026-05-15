@@ -107,6 +107,14 @@ export function TourController() {
         return;
       }
 
+      // Tear down any previous popover up front. If we don't, the old
+      // popover stays mounted (anchored on a possibly-already-removed DOM
+      // node) during the retry-poll for the new anchor. Visually that
+      // looks like the tour briefly points at the wrong thing. With this,
+      // the user sees "no popover" for one polling tick instead of a
+      // stale orphan.
+      destroyDriver();
+
       // Fire the optional side-effect ONCE, before the retry-poll begins.
       // Listeners (the contract detail page, the dashboard) may need to mount
       // new DOM in response to the effect — e.g. open the DocuSign preview

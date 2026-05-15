@@ -593,13 +593,13 @@ export const TOUR_STEPS: TourStep[] = [
     id: "modal-pagenav",
     chapter: "workflow",
     path: `/contracts/${HERO_CONTRACT_ID}`,
-    // Anchor on the ACTIVE page button (whichever number is currently
-    // selected). The DocuSignPreviewModal applies the active class to the
-    // selected button and re-applies on every page change. The modal also
-    // dispatches `tour:reanchor` on each click so driver.js re-renders the
-    // highlight on the new active button. Effect: the popover visually
-    // follows the operator as they click through pages 1, 2, 3, ...
-    selector: ".tour-anchor-modal-pagenav-active",
+    // Anchor on the whole PageNav container. driver.js's overlay blocks
+    // pointer events on every element EXCEPT what's inside the active
+    // stage; anchoring on the active page button alone meant the user
+    // couldn't click the other page numbers (overlay swallowed those
+    // clicks). The whole nav becomes the click target so 1, 2, 3, ...
+    // and the Previous/Next arrows are all live.
+    selector: ".tour-anchor-modal-pagenav",
     side: "top",
     title: "Flip through the pages",
     description: `

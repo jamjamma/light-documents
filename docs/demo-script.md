@@ -2,13 +2,13 @@
 
 Target: 4 to 5 minutes. Narrate the click path, lead with the reframe, end on the ledger writeback. Do not over-explain the build.
 
-## 0:00 to 0:30 — The reframe
+## 0:00 to 0:30: The reframe
 
 > "The stated problem is manual Word edits and hand-placed DocuSign fields. The workflow you're about to see eliminates both. While we're in there, there's a strategic opportunity uniquely available to Light: every signed contract is structured data that belongs in the systems of record. Other CLMs ship integrations into N ERPs. Light *is* the ERP. So my answer is: wrap DocuSign as infrastructure, keep Word for authoring, and build a workflow layer between them whose output flows into the systems of record."
 
 Open `http://localhost:3000`. Point at the AboutWidget on the Dashboard. Read the one sentence.
 
-## 0:30 to 1:30 — Dashboard + the high-risk path (Bolt MSA)
+## 0:30 to 1:30: Dashboard + the high-risk path (Bolt MSA)
 
 > "Dashboard is built for an operator. The top KPIs are 'Awaiting me', 'Blocked over 3 days', and 'In review'. What Martina has to act on, not vanity counts. Cycle health is demoted below. There's a 'Try the MSA flow' callout for first-time reviewers. Let me click into the high-risk one."
 
@@ -22,11 +22,11 @@ Scroll to Routing.
 
 Scroll to Approval chain.
 
-> "Approvers are notified via Slack DM. Demo affordance: let me simulate Legal approving. Note my own row says 'Approve' instead of 'Simulate', because I'm signed in as Martina — the product is honest about who's actually clicking what."
+> "Approvers are notified via Slack DM. Demo affordance: let me simulate Legal approving. Note my own row says 'Approve' instead of 'Simulate', because I'm signed in as Martina. The product is honest about who's actually clicking what."
 
 Click "Simulate Sara approves" (Legal). Chip flips green.
 
-## 1:30 to 2:30 — The DocuSign envelope (the field placement answer)
+## 1:30 to 2:30: The DocuSign envelope (the field placement answer)
 
 Click "Preview envelope".
 
@@ -36,7 +36,7 @@ Point at the right panel.
 
 > "DocuSign features per template: this MSA uses sequential signing, 30-day expiry, day-3-7-14 reminders, eIDAS QES because it's an EU contract over €100k. Conditional sections attached automatically: Service Level Exhibit always, DPA because the customer needs it, QES because of the value + jurisdiction trigger."
 
-## 2:30 to 3:30 — Run the happy path (Acme MSA, end-to-end)
+## 2:30 to 3:30: Run the happy path (Acme MSA, end-to-end)
 
 Close modal. Go back to Dashboard. Click Acme MSA.
 
@@ -46,7 +46,7 @@ Click Send via DocuSign. Wait for the simulated 1.5 seconds.
 
 > "Signed and filed."
 
-## 3:30 to 4:00 — The structured writeback
+## 3:30 to 4:00: The structured writeback
 
 Point at the LedgerImpactPanel on the Signed Record page.
 
@@ -56,7 +56,7 @@ Point at the Audit Trail.
 
 > "Every step is captured: created, auto-approved, sent, viewed, signed by counterparty, signed by Light, filed. Each event has actor, timestamp, and channel."
 
-## 4:00 to 4:30 — The workflow exits an operator actually needs
+## 4:00 to 4:30: The workflow exits an operator actually needs
 
 Go back to a contract in flight and click an approval. Then click **Undo my approval** on that row.
 
@@ -70,7 +70,7 @@ Click **Notify owner** on a row where lastUsedBy is still at the company.
 
 > "Inline Slack DM preview. Real recipient routing: still-employed last user gets a DM by name. Someone who left the company falls through to the team channel. No last user goes to a triage channel. The exact message body is shown. Send writes a record locally. In production, this fires `chat.postMessage` with interactive Approve / Reroute / Snooze buttons that thread back into the audit log."
 
-## 4:30 to 5:00 — The other doc types + close
+## 4:30 to 5:00: The other doc types + close
 
 Click Templates in sidebar.
 

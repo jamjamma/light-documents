@@ -1,4 +1,4 @@
-# Light Documents Case Study — Part 2
+# Light Documents Case Study, Part 2
 
 ## SaaS Cohort Analysis
 

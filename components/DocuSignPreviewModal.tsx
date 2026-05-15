@@ -78,20 +78,9 @@ export function DocuSignPreviewModal({ open, onClose, contract, template, onSend
     );
   }, [open, page, totalPages]);
 
-  // Re-anchor the tour highlight to the active page button as the user
-  // clicks through pages 1, 2, 3, ... so the popover follows the active
-  // selection. The tour step anchors on .tour-anchor-modal-pagenav-active
-  // which moves to whichever page button is currently active.
-  useEffect(() => {
-    if (!open) return;
-    const state = readTourState();
-    if (!state.active) return;
-    const step = TOUR_STEPS[state.stepIndex];
-    if (step?.id !== "modal-pagenav") return;
-    window.dispatchEvent(
-      new CustomEvent("tour:reanchor", { detail: { fromStepId: "modal-pagenav" } }),
-    );
-  }, [open, page]);
+  // (modal-pagenav now anchors on the whole PageNav container, not the
+  // active page button, so no re-anchor is needed as the user pages
+  // through. driver.js's refresh on resize covers any layout shift.)
 
   return (
     <Modal
@@ -572,9 +561,7 @@ function PageNav({ page, totalPages, onChange }: { page: number; totalPages: num
               onClick={() => onChange(p)}
               className={
                 "h-6 w-6 rounded text-[11px] font-medium " +
-                (isActive
-                  ? "bg-ink-900 text-white tour-anchor-modal-pagenav-active"
-                  : "hover:bg-white")
+                (isActive ? "bg-ink-900 text-white" : "hover:bg-white")
               }
             >
               {p}

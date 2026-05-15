@@ -35,19 +35,19 @@ How Light Documents lives in the real organisation: who uses what, how handoffs 
 
 | Persona | Triggers | Reviews | Approves | Signs | Lives in |
 |---|---|---|---|---|---|
-| AE / Sales rep | Generate contract from Salesforce / HubSpot deal | own drafts | — | — | Salesforce + Slack |
-| Sales Ops / RevOps | — | sales contracts pre-send | discount approvals if delegated | — | Salesforce + Light |
-| Recruiter | Generate offer from Personio / Ashby | own drafts | — | — | ATS + Slack |
-| Hiring manager | — | Offer details | — | — | Slack |
-| Head of People | — | All employment contracts | Above-band salary approvals | — | Slack + Light Documents |
-| Head of Finance & Ops (the case study role) | Owns routing rules + thresholds | All contracts | Threshold approvals, daily digest reviewer | — | Light Documents (primary user) |
-| Finance / accounting | — | Reads signed contracts for revrec | — | — | Light ledger |
-| In-house counsel / Legal | — | Clause deviations, master templates | Clause deviations | — | Slack + Light + Word |
-| Outside counsel | — | Bespoke (warrants, M&A) | — | — | Email + Word |
-| CFO | — | Above-threshold contracts | High-value deals, warrants, vendor | — | Slack |
-| CEO | — | — | Strategic deals | Most contracts on Light side | DocuSign emails |
-| Board | — | — | Warrants, equity grants | Equity docs | Email magic links |
-| Counterparty | — | Final document via DocuSign | — | their own signature | DocuSign emails |
+| AE / Sales rep | Generate contract from Salesforce / HubSpot deal | own drafts |, |, | Salesforce + Slack |
+| Sales Ops / RevOps |, | sales contracts pre-send | discount approvals if delegated |, | Salesforce + Light |
+| Recruiter | Generate offer from Personio / Ashby | own drafts |, |, | ATS + Slack |
+| Hiring manager |, | Offer details |, |, | Slack |
+| Head of People |, | All employment contracts | Above-band salary approvals |, | Slack + Light Documents |
+| Head of Finance & Ops (the case study role) | Owns routing rules + thresholds | All contracts | Threshold approvals, daily digest reviewer |, | Light Documents (primary user) |
+| Finance / accounting |, | Reads signed contracts for revrec |, |, | Light ledger |
+| In-house counsel / Legal |, | Clause deviations, master templates | Clause deviations |, | Slack + Light + Word |
+| Outside counsel |, | Bespoke (warrants, M&A) |, |, | Email + Word |
+| CFO |, | Above-threshold contracts | High-value deals, warrants, vendor |, | Slack |
+| CEO |, |, | Strategic deals | Most contracts on Light side | DocuSign emails |
+| Board |, |, | Warrants, equity grants | Equity docs | Email magic links |
+| Counterparty |, | Final document via DocuSign |, | their own signature | DocuSign emails |
 
 ## End-to-end walkthrough with names: Acme MSA
 
@@ -92,16 +92,16 @@ Three surfaces, used for different audiences.
 
 | Role | See | Edit drafts | Edit templates | Edit routing rules | Approve | Override approvals |
 |---|---|---|---|---|---|---|
-| AE | own deals | own | — | — | — | — |
-| Sales Ops | all sales | — | sales templates | — | discounts if delegated | — |
-| Recruiter | own roles | own | — | — | — | — |
-| Head of People | all employment | — | employment templates | salary bands | above-band exceptions | — |
-| Head of Finance & Ops | all | — | — | all routing rules | threshold approvals | yes |
-| Legal | all | — | master templates + clause rules | clause-related | clause deviations | — |
-| CFO | all | — | — | financial thresholds | high-value, warrants | yes |
-| CEO | all | — | — | — | strategic + signs | yes |
-| Board | warrants + equity only | — | — | — | equity approvals | — |
-| External counterparty | only what they're signing | — | — | — | — | — |
+| AE | own deals | own |, |, |, |, |
+| Sales Ops | all sales |, | sales templates |, | discounts if delegated |, |
+| Recruiter | own roles | own |, |, |, |, |
+| Head of People | all employment |, | employment templates | salary bands | above-band exceptions |, |
+| Head of Finance & Ops | all |, |, | all routing rules | threshold approvals | yes |
+| Legal | all |, | master templates + clause rules | clause-related | clause deviations |, |
+| CFO | all |, |, | financial thresholds | high-value, warrants | yes |
+| CEO | all |, |, |, | strategic + signs | yes |
+| Board | warrants + equity only |, |, |, | equity approvals |, |
+| External counterparty | only what they're signing |, |, |, |, |, |
 
 The Head of Finance & Ops role (the case study role) is the operating owner. Owns the rules engine. Sees everything. Can override anything.
 
