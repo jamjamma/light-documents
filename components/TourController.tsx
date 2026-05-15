@@ -238,7 +238,10 @@ export function TourController() {
           // operator sees "Workflow · 5 of 12", which reads as progress
           // within the current part rather than a long way to go.
           progressText: chapterProgressLabel(idx),
-          allowClose: true,
+          // Backdrop click does NOT dismiss the tour: it strands the user with
+          // any underlying modal still open (Slack DM preview, Reassign, DocuSign
+          // preview). Forward / Back / X / Esc are the only exit paths.
+          allowClose: false,
           allowKeyboardControl: true,
           smoothScroll: true,
           stagePadding: 6,

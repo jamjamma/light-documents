@@ -4,6 +4,31 @@ Static / code-driven sweep against the 7-phase QA plan. The interactive phases
 (1, 2, 4, 7) require browser walking and are listed as a separate checklist at
 the bottom for the human reviewer.
 
+## Status update 2026-05-15 (post-fix pass)
+
+B1, B2, B3, B4, B5 are all addressed in the post-audit commit sequence.
+Additional bugs caught by the Claude Desktop browser walk and verified against
+code:
+
+- Bolt MSA envelope-preview hardcoded "Acme MSA" filename label
+  (DocuSignPreviewModal.tsx:254). Fixed: now `{contract.name}`.
+- Intake step 3 copy named Personio but the customer-template tab strip shows
+  Attio. Fixed in tour-steps.ts.
+- "Counsel" role rename pushed through `ApproverRole` enum, routing rules,
+  audit events, IntakeForm warnings, and policy-config comments.
+  Function-references to "Legal team" left alone (template ownership, anchor-
+  tag authorship, edit-access labels). One stray "Legal" in
+  mock-data.ts:19 (`ownerTeam: "Legal"`) intentionally retained because the
+  Template `ownerTeam` field surfaces as "Owner team" in the template detail
+  modal, which refers to the function not the role.
+- Tour outside-click no longer dismisses (allowClose: false). Esc + X +
+  Forward/Back still work as exits.
+- Intake step 9 of 11 title changed from "Tour complete" (misleading, two more
+  steps follow) to "That's the workflow".
+
+Original B1-B5 findings retained below for record. Strike-throughs added where
+the live deploy moved ahead of this audit.
+
 ## Pre-flight (Phase 0)
 
 | Check | Result |
@@ -17,21 +42,21 @@ the bottom for the human reviewer.
 
 ## Confirmed bugs (fix before ship)
 
-### B1 — Routing-rules off-by-one, tour step `routing`
+### ~~B1~~ FIXED — Routing-rules off-by-one, tour step `routing`
 - **Location:** [lib/tour-steps.ts:342](lib/tour-steps.ts#L342)
 - **Says:** "Bolt triggers 3 of **13** rules:"
 - **Truth:** `ROUTING_RULES` in [lib/routing-rules.ts](lib/routing-rules.ts) has **14** entries (verified by parser).
 - **Severity:** HIGH. The QA plan singles out off-by-one KPI/count drift as a "submission-killer." This number is plainly verifiable in the same file the operator is being walked through.
 - **Suggested fix:** `<p>Bolt triggers 3 of 14 rules:</p>` (or, better, derive at render time from `ROUTING_RULES.length` so it never drifts again).
 
-### B2 — Templates chapter duration estimate
+### ~~B2~~ FIXED — Templates chapter duration estimate
 - **Location:** [lib/tour-steps.ts:1729](lib/tour-steps.ts#L1729) (`CHAPTERS` array)
 - **Says:** templates `estSeconds: 90` (1.5 minutes for 22 steps = 4 s / step)
 - **Truth:** Templates chapter contains a 7-step modal walk + 8-step rogue panel walk + 4-step catalog grouping + an intake handoff. The QA plan estimates "~9 min if walking the whole thing" which is honest. 90 s is ~6x optimistic.
 - **Severity:** MEDIUM. Operator reads the chapter chooser, picks Templates expecting 90 s, finds it took 5-7 minutes. Reads as "the build's numbers are vibes, not data" — same trust hit as B1.
 - **Suggested fix:** Bump to `estSeconds: 360` (6 minutes, conservative) or `420`. Same `formatTotalTourDuration()` will roll up. Verify dashboard chapter chooser still reads cleanly.
 
-### B3 — Terminology inconsistency: "Counsel" vs "legal" in KPI tile copy
+### ~~B3~~ FIXED — Terminology inconsistency: "Counsel" vs "legal" in KPI tile copy
 - **Location:** [lib/tour-steps.ts:207](lib/tour-steps.ts#L207) — `"In review. Clause check or legal."` (lowercase noun)
 - **Sibling:** [lib/tour-steps.ts:290](lib/tour-steps.ts#L290) — `"Clause checker or counsel actively reviewing."` (lowercase)
 - **Routing step:** [lib/tour-steps.ts:344](lib/tour-steps.ts#L344) — `"<strong>Legal.</strong> Clause deviations."` (uppercase, used as the role label)

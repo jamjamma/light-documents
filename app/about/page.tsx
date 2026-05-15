@@ -44,9 +44,10 @@ export default function AboutPage() {
                 <Play className="h-4 w-4 text-accent-700" />
                 Take the guided tour
               </div>
-              {/* One-line why */}
-              <p className="text-[12.5px] text-ink-700">
-                Built to save you the time of reading this memo. Open it from the sidebar.
+              {/* One-line why — italicized so the warm framing sits softly,
+                  not as another bold imperative. */}
+              <p className="text-[12.5px] italic text-ink-700">
+                Built to save your precious time. Open it from the sidebar.
               </p>
               {/* Scannable bullets */}
               <ul className="space-y-1 text-[12.5px] text-ink-700">

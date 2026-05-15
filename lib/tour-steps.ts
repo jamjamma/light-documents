@@ -341,7 +341,7 @@ export const TOUR_STEPS: TourStep[] = [
     description: `
       <p>Bolt triggers 3 of 14 rules:</p>
       <ul>
-        <li><strong>Legal.</strong> Clause deviations.</li>
+        <li><strong>Counsel.</strong> Clause deviations.</li>
         <li><strong>Head of F&amp;O.</strong> ARR &gt; EUR 50k.</li>
         <li><strong>CFO.</strong> ARR &gt; EUR 100k.</li>
       </ul>
@@ -1050,7 +1050,7 @@ export const TOUR_STEPS: TourStep[] = [
       <ul>
         <li><strong>Clause</strong> = which clause we look at.</li>
         <li><strong>Expected</strong> = what the master template says.</li>
-        <li><strong>Severity</strong> = info / warn / block. Block routes to Legal automatically.</li>
+        <li><strong>Severity</strong> = info / warn / block. Block routes to Counsel automatically.</li>
         <li><strong>Reason</strong> = why this rule exists (audit-friendly).</li>
       </ul>
       <p class="muted">Claude also runs against the populated document for natural-language comparison; results merge into the same shape.</p>
@@ -1343,7 +1343,7 @@ export const TOUR_STEPS: TourStep[] = [
     side: "top",
     title: "Step 2 · Pick a source record",
     description: `
-      <p>Records pulled from <strong>Salesforce</strong>, <strong>HubSpot</strong>, or <strong>Personio</strong> per template type. Manual entry available for off-CRM records.</p>
+      <p>Records pulled from <strong>Salesforce</strong>, <strong>HubSpot</strong>, or <strong>Attio</strong> per template type (Personio and Ashby on the Employment path). Manual entry available for off-CRM records.</p>
       <p class="muted"><strong>Click any record below.</strong> Variables (counterparty, value, terms, signer) auto-prefill from it. The form auto-progresses to step 3 and the tour follows.</p>
     `,
     // In-app record click is the only forward path; page dispatches
@@ -1433,7 +1433,7 @@ export const TOUR_STEPS: TourStep[] = [
     id: "done",
     chapter: "intake",
     path: "*",
-    title: "Tour complete",
+    title: "That's the workflow",
     description: `
       <ul>
         <li><strong>Dashboard.</strong> KPIs, filters, sidebar.</li>
@@ -1442,7 +1442,7 @@ export const TOUR_STEPS: TourStep[] = [
         <li><strong>Templates.</strong> Catalog + rogue governance.</li>
         <li><strong>Intake.</strong> 3-step new-contract form.</li>
       </ul>
-      <p class="lead">Click <strong>Next</strong> to land on the dashboard, where I'll point at the submission memo.</p>
+      <p class="lead">Two more pages to point at, then we're done. Click <strong>Next</strong> to land on the dashboard.</p>
     `,
     next: "navigate",
     goto: "/",
@@ -1456,7 +1456,8 @@ export const TOUR_STEPS: TourStep[] = [
     side: "bottom",
     title: "About this build",
     description: `
-      <p>One paragraph summary of the strategic reframe and a link into the full memo. The widget lives at the top of the dashboard and stays visible whenever you land here.</p>
+      <p>Top-of-dashboard preamble. One-line answer (<strong>Wrap</strong> · <strong>Keep</strong> · <strong>Build</strong>), three tiles (<strong>Problem</strong> / <strong>Answer</strong> / <strong>Wedge</strong>), and two buttons: <em>About this build</em> for the full memo, <em>Take the tour</em> for the guided walk.</p>
+      <p class="muted">Stays visible whenever you land on the dashboard so reviewers can re-enter the memo or the tour from any session.</p>
     `,
     next: "advance",
   },
@@ -1468,8 +1469,8 @@ export const TOUR_STEPS: TourStep[] = [
     side: "right",
     title: "Full submission memo",
     description: `
-      <p>The <strong>About this build</strong> link in the sidebar opens the full memo: reframe, what's real vs stubbed, what I'd build next, and the cast-list note for the personas in this demo.</p>
-      <p class="muted">Re-take the tour or pick a single chapter anytime from the same sidebar.</p>
+      <p>The <strong>About this build</strong> link in the sidebar opens the full memo: the three case-study parts, source + reference docs, the problem and reframe, build vs buy, the five key decisions, what's real vs stubbed, and the 90-day plan.</p>
+      <p class="muted">Take the tour or pick a single chapter anytime from the sidebar's tour button.</p>
     `,
     next: "advance",
     nextLabel: "Finish",
