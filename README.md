@@ -15,15 +15,50 @@
 
 ## How to read this submission
 
-There are three reading depths. Pick the one that matches your time.
+Three reading depths. Pick the one that matches your time. The fastest route is the guided tour inside the live demo, which is built to save you the time of reading any of these documents.
 
 | If you have | Open | What you get |
 |---|---|---|
-| 5 minutes | the [live demo](https://light-documents-sigma.vercel.app/), let the guided tour run | The workflow in motion. The tour points at each piece and says why it exists. |
-| 15 minutes | the [in-app About memo](https://light-documents-sigma.vercel.app/about), or this README top to bottom | Problem, reframe, how I approached it, value chain + friction map, build vs buy, the key decision, scope, 90-day roadmap, plus inline summaries of Parts 2 and 3 |
-| 45 minutes (build-side) | [`docs/PROJECT.md`](docs/PROJECT.md) | Single-page map of the build. State machine, three logic engines, every module's purpose, every workflow branch (committee, PTO, undo, NDA exception), the cut list with reasoning |
+| 5 minutes | the [live demo](https://light-documents-sigma.vercel.app/) and let the **guided tour** run | The workflow in motion, with popovers explaining each piece. This is the fastest path; the tour exists specifically to save reading time. |
+| 15 minutes | the [in-app About memo](https://light-documents-sigma.vercel.app/about), or this README top to bottom | Problem, reframe, value chain + friction map, how I approached it, build vs buy, the key decision, scope, 90-day roadmap, plus inline summaries of Parts 2 and 3 |
+| 45 minutes (build-side) | [`docs/PROJECT.md`](docs/PROJECT.md) | Single-page map of the build: state machine, three logic engines, every module's purpose, every workflow branch (committee, PTO, undo, NDA exception), the cut list with reasoning |
 
-The demo, the About page, and this README contain the same answer at different levels of compression. PROJECT.md and the rest of `docs/` are for the reader who wants to see the engineering behind that answer.
+The demo, the About page, and this README contain the same answer at three different levels of compression. PROJECT.md and the rest of `docs/` are for the reader who wants to see the engineering behind that answer.
+
+## What's in this README
+
+**Set the frame**
+
+1. [The problem](#the-problem)
+2. [The reframe](#the-reframe)
+
+**Understand the workflow**
+
+3. [The value chain and the friction map](#the-value-chain-and-the-friction-map)
+4. [How I approached this](#how-i-approached-this)
+
+**Decide what to build, what to buy, what to defer**
+
+5. [Build vs buy](#build-vs-buy)
+6. [The one key decision](#the-one-key-decision)
+7. [Friction killed: before vs after](#friction-killed-before-vs-after)
+8. [Why each piece exists (edge cases this build handles)](#why-each-piece-exists-edge-cases-this-build-handles)
+
+**Limits and what comes next**
+
+9. [What is real vs what is stubbed](#what-is-real-vs-what-is-stubbed)
+10. [What I would build next (90 days)](#what-i-would-build-next-90-days)
+11. [Stated assumptions](#stated-assumptions)
+
+**The other case-study parts**
+
+12. [Case study Part 2 (summary)](#case-study-part-2-summary)
+13. [Case study Part 3 (summary)](#case-study-part-3-summary)
+
+**Operations**
+
+14. [How to run](#how-to-run)
+15. [Where to read more (the build-side)](#where-to-read-more-the-build-side)
 
 ---
 
@@ -45,23 +80,6 @@ While rebuilding the flow, there is a strategic opportunity available to Light t
 - **The writeback lands where Light has a receiver.** The prototype emits the structured payload on `envelope-completed`. Production wires it into whichever receivers Light operates or is building. The 90-day roadmap treats this as a parallel workstream, not a precondition.
 
 The PDF is the audit artifact, the data is the product. That is the potential wedge, if Light wants to operationalise it.
-
----
-
-## How I approached this
-
-Six steps, in order, with the artifacts each one produced.
-
-| # | Step | What I produced |
-|---|---|---|
-| 1 | Read the brief and named the two visible frictions plainly | Two-line problem statement, above |
-| 2 | Mapped the contract workflow end to end as a value chain (source → intake → check → route → approve → sign → file → writeback) | Diagram below + the friction map |
-| 3 | Located where pain lives at each handoff, not just inside any single team | Friction map (next section) |
-| 4 | Asked layer by layer: build, buy, or defer | [Build vs buy table](#build-vs-buy) |
-| 5 | Walked the one key decision (wrap DocuSign, build the gap) with three reasons | [The one key decision](#the-one-key-decision) |
-| 6 | Stress-tested the design against the awkward cases (committee approvals, PTO delegation, channel collision, entity-aware signers, NDA exception, undo before send) | The [edge cases this build handles](#why-each-piece-exists) |
-
-Steps 5 and 6 are where the design earned the right to be more than "build an uploader". Most of the surface in the prototype exists because one of those edge cases would have broken a simpler tool.
 
 ---
 
@@ -101,6 +119,23 @@ Friction is not in any single team. It lives at the **handoffs**. The build is s
 | DocuSign → ledger / HRIS / cap table | RevOps re-keys MRR, People re-keys headcount, Finance re-keys vesting | Structured writeback on `envelope-completed`. Conditional on Light exposing the receiver. |
 | Master template update mid-flow | In-flight contracts silently change shape | Version pinned at create time, stale banner when master updates |
 | Board / external counsel signing | Outside-Slack approvers get lost | Email magic links with audit-grade access |
+
+---
+
+## How I approached this
+
+The thinking pipeline that produced everything above and below.
+
+| # | Step | What it produced |
+|---|---|---|
+| 1 | Read the brief and named the two visible frictions plainly | Two-line problem statement |
+| 2 | Mapped the contract workflow end to end as a value chain (source → intake → check → route → approve → sign → file → writeback) | The diagram above |
+| 3 | Located where pain lives at each handoff, not just inside any single team | The friction map above |
+| 4 | Asked layer by layer: build, buy, or defer | [Build vs buy table](#build-vs-buy) |
+| 5 | Walked the one key decision (wrap DocuSign, build the gap) with three reasons | [The one key decision](#the-one-key-decision) |
+| 6 | Stress-tested the design against the awkward cases (committee approvals, PTO delegation, channel collision, entity-aware signers, NDA exception, undo before send) | [Why each piece exists](#why-each-piece-exists-edge-cases-this-build-handles) |
+
+Steps 5 and 6 are where the design earned the right to be more than "build an uploader". Most of the surface in the prototype exists because one of those edge cases would have broken a simpler tool.
 
 ---
 
