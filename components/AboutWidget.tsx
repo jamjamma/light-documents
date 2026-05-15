@@ -21,9 +21,12 @@ export function AboutWidget() {
             About this build
           </div>
 
-          {/* One-line answer, tight + balanced */}
-          <p className="mt-2 max-w-3xl text-[13.5px] font-semibold leading-snug text-ink-900">
-            Wrap DocuSign. Keep Word + Drive. Build the workflow layer between them.
+          {/* One-line answer — only the verbs are bold so the eye can scan
+              the three actions instead of reading a wall of bold text. */}
+          <p className="mt-2 max-w-3xl text-[14px] leading-relaxed text-ink-700">
+            <strong className="text-ink-900">Wrap</strong> DocuSign.{" "}
+            <strong className="text-ink-900">Keep</strong> Word + Drive.{" "}
+            <strong className="text-ink-900">Build</strong> the workflow layer between them.
           </p>
 
           {/* 3-tile structured grid: short, parallel, scannable */}

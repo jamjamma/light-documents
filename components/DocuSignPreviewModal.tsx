@@ -251,7 +251,7 @@ function DocumentPage({
   return (
     <div className="rounded-xl border border-ink-300 bg-white shadow-card">
       <div className="flex items-center justify-between border-b border-ink-200 bg-ink-50/60 px-4 py-2 text-[11px]">
-        <div className="font-mono text-ink-500">{contract.id}.docx · Acme MSA</div>
+        <div className="font-mono text-ink-500">{contract.id}.docx · {contract.name}</div>
         <div className="text-ink-600">Page {page} of {totalPages}</div>
       </div>
       <div className="min-h-[480px] px-10 py-8 font-serif text-[13px] leading-relaxed text-ink-800">
