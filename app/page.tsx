@@ -10,8 +10,8 @@ import { ContractsTable } from "@/components/ContractsTable";
 import { Button } from "@/components/ui/Button";
 import { listContracts, computeKpis } from "@/lib/contract-store";
 import {
-  hasSeenTour,
-  markTourSeen,
+  hasSeenTourThisSession,
+  markTourSeenThisSession,
   type TourEffect,
 } from "@/lib/tour-steps";
 import type { Contract } from "@/lib/types";
@@ -25,13 +25,14 @@ export default function DashboardPage() {
   useEffect(() => {
     setContracts(listContracts());
 
-    // Auto-open the chapter chooser ONCE per browser. After it opens, we
-    // mark seen so it doesn't pop again on subsequent dashboard visits. The
-    // user can still re-open the menu via the sidebar.
-    const isFirstEver = !hasSeenTour();
+    // Auto-open the chapter chooser once per browser session. Gate is in
+    // sessionStorage so closing and reopening the tab pops the chooser
+    // again on the next dashboard load; navigating around within the
+    // session does not. Mobile is excluded because the tour is desktop-only.
+    const isFirstThisSession = !hasSeenTourThisSession();
     const isDesktop = typeof window !== "undefined" && window.innerWidth >= 768;
-    if (isFirstEver && isDesktop) {
-      markTourSeen();
+    if (isFirstThisSession && isDesktop) {
+      markTourSeenThisSession();
       const t = window.setTimeout(() => {
         window.dispatchEvent(new CustomEvent("tour:menu-open"));
       }, 600);

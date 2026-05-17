@@ -1751,6 +1751,33 @@ export function markTourSeen(): void {
 }
 
 /**
+ * Per-session variant: stored in sessionStorage so the gate resets when
+ * the user closes the browser tab and comes back. The dashboard auto-open
+ * uses this so first-time-this-session visitors get the chapter chooser
+ * even if they've already seen it in a prior session. Within a session,
+ * navigating off the dashboard and back does not re-pop the chooser.
+ */
+const TOUR_SEEN_SESSION_KEY = "tour-seen-this-session";
+
+export function hasSeenTourThisSession(): boolean {
+  if (typeof window === "undefined") return true;
+  try {
+    return window.sessionStorage.getItem(TOUR_SEEN_SESSION_KEY) === "true";
+  } catch {
+    return true;
+  }
+}
+
+export function markTourSeenThisSession(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(TOUR_SEEN_SESSION_KEY, "true");
+  } catch {
+    // ignore
+  }
+}
+
+/**
  * Tracks when the user explicitly closed the tour. Used as a defence-in-depth
  * gate so that race-condition reopens (path change firing the same tick as a
  * close, React strict-mode double effects, late-firing observers) cannot pop
@@ -1809,6 +1836,7 @@ export function resetTourState(): void {
     window.localStorage.removeItem(TOUR_CHAPTER_PROGRESS_KEY);
     window.localStorage.removeItem(TOUR_ALL_PROGRESS_KEY);
     window.localStorage.removeItem(TOUR_RECENT_CLOSE_KEY);
+    window.sessionStorage.removeItem(TOUR_SEEN_SESSION_KEY);
   } catch {
     // ignore
   }
