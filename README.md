@@ -47,18 +47,19 @@ The demo, the About page, and this README contain the same answer at three diffe
 **Limits and what comes next**
 
 9. [What is real vs what is stubbed](#what-is-real-vs-what-is-stubbed)
-10. [What I would build next (90 days)](#what-i-would-build-next-90-days)
-11. [Stated assumptions](#stated-assumptions)
+10. [How the production design keeps operating costs low](#how-the-production-design-keeps-operating-costs-low)
+11. [What I would build next (90 days)](#what-i-would-build-next-90-days)
+12. [Stated assumptions](#stated-assumptions)
 
 **The other case-study parts**
 
-12. [Case study Part 2 (summary)](#case-study-part-2-summary)
-13. [Case study Part 3 (summary)](#case-study-part-3-summary)
+13. [Case study Part 2 (summary)](#case-study-part-2-summary)
+14. [Case study Part 3 (summary)](#case-study-part-3-summary)
 
 **Operations**
 
-14. [How to run](#how-to-run)
-15. [Where to read more (the build-side)](#where-to-read-more-the-build-side)
+15. [How to run](#how-to-run)
+16. [Where to read more (the build-side)](#where-to-read-more-the-build-side)
 
 ---
 
@@ -216,6 +217,48 @@ Claude (Sonnet) reads the negotiated draft, compares clause-by-clause against th
 **Routing stays rule-based even with Claude in the loop.** Claude proposes deviations; deterministic rules decide who approves. That separation is what keeps the system auditable to Finance.
 
 The prototype ships the deterministic engine for two reasons: the demo runs without an API key or per-run cost, and reviewers can trace every flag to a typed `ClauseRule` rather than an opaque LLM call.
+
+---
+
+## How the production design keeps operating costs low
+
+Six choices in the production design that hold the running cost down. The pattern in each one: do the work once where it belongs, so the per-contract path stays cheap.
+
+### Reuse commodity infrastructure
+
+DocuSign handles signing. eIDAS in EU, ESIGN in US, court-tested. Light Documents wraps it rather than building and maintaining its own e-signature stack.
+
+Word + Drive handle authoring. Counsel uses the editor they already know. No in-app editor to build, no Legal team to retrain.
+
+### Do per-contract work once, at the master
+
+Anchor tags are placed once in each master template. DocuSign's API finds them per envelope, so signature fields are never dragged into position per contract.
+
+Template versions are pinned at create time. A mid-flow update to the master does not re-trigger clause checks on contracts already in flight; the operator sees a stale-version banner instead.
+
+Conditional sections (Service Level Exhibit, DPA, witness clauses) are declared per template and attach automatically based on field values.
+
+### Keep the workflow layer typed, not LLM-driven
+
+The routing engine is 14 typed rules. Approver selection is computed from contract fields; there is no LLM call to decide who approves.
+
+Signer routing is a static map per entity. UK contracts route to Light Ltd's signer, US to Light Inc.
+
+Ledger writeback is a structured payload computed from intake fields. The PDF is the audit artifact; the data was already typed at intake.
+
+### Use Claude only on unstructured text
+
+Typed clause rules handle the deviations the team can specify in advance: payment terms, liability cap, governing law, DPA flag. That covers roughly 80% of clauses on commercial contracts. Claude is called only for the rest: natural-language comparison on negotiated drafts and counterparty redlines.
+
+NDAs skip Claude entirely. No commercial data to write back, no clauses where LLM analysis would change a decision. See [decisions.md §14](docs/decisions.md).
+
+### Batch the background work
+
+The Drive scan for rogue templates runs once a day on a schedule, not per file on a webhook. Long-pending approvals get a daily digest email rather than per-event polling. Approve, send, and sign stay real-time; the housekeeping runs on a cron.
+
+### One adapter shape for source records
+
+`SourceRecord` is a single interface. Salesforce, HubSpot, Attio, Personio, Ashby, and Manual entry all conform to it. A new customer with a different CRM is one adapter, not a new integration code path.
 
 ---
 

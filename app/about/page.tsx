@@ -630,6 +630,7 @@ function NextGroup({
   );
 }
 
+
 function StubRow({ what, real, stubbed }: { what: string; real: string; stubbed: string }) {
   return (
     <tr>
