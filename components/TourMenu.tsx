@@ -19,6 +19,7 @@ import {
   writeAllProgress,
   writeTourState,
   markTourSeen,
+  markTourSeenThisSession,
   setTourDismissed,
   clearTourRecentlyClosed,
   resetTourState,
@@ -90,6 +91,10 @@ export function TourMenu() {
     resetDemo();
     resetTourState();
     markTourSeen();
+    // resetTourState() also clears the per-session "seen" key, so without
+    // this the dashboard auto-open re-pops the chooser on top of the
+    // welcome popover after the hard reload below.
+    markTourSeenThisSession();
     clearTourRecentlyClosed();
     writeTourState({ active: true, stepIndex: 0, mode: "all" });
     setOpen(false);
