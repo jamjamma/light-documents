@@ -1316,7 +1316,7 @@ const RAW_SEEDS: Contract[] = [
     risk: "high",
     stage: "awaiting_approval",
     createdAt: seedAt("2026-05-09T11:00:00Z"),
-    updatedAt: seedAt("2026-05-12T08:00:00Z"),
+    updatedAt: seedAt("2026-05-15T20:30:00Z"),
     fields: { ...SOURCE_RECORDS[6].data, boardResolutionRef: "BR-2026-Q2-007 (pending)" },
     audit: [
       { at: "2026-05-09T11:00:00Z", actor: "Magnus Karlsson (CFO)", event: "Warrant draft created from stakeholder record" },
@@ -1324,6 +1324,7 @@ const RAW_SEEDS: Contract[] = [
       { at: "2026-05-09T11:06:00Z", actor: "Magnus Karlsson (CFO)", event: "Approved (self, as CFO initiated)" },
       { at: "2026-05-09T15:30:00Z", actor: "Sara Friis (external counsel)", event: "Approved via email magic link" },
       { at: "2026-05-12T08:00:00Z", actor: "system", event: "Awaiting Board resolution at next quarterly meeting" },
+      { at: "2026-05-15T20:30:00Z", actor: "Magnus Karlsson (CFO)", event: "Comment posted: \"Board meeting confirmed for next Tuesday—item is on the agenda\"" },
     ],
   },
   {
@@ -1383,7 +1384,7 @@ const RAW_SEEDS: Contract[] = [
     risk: "medium",
     stage: "awaiting_approval",
     createdAt: seedAt("2026-05-13T08:45:00Z"),
-    updatedAt: seedAt("2026-05-13T08:48:00Z"),
+    updatedAt: seedAt("2026-05-17T14:20:00Z"),
     fields: SOURCE_RECORDS.find((r) => r.id === "sr_cypher")!.data,
     audit: [
       { at: "2026-05-13T08:45:00Z", actor: "Sara Lindberg (Sales)", event: "Contract created from Salesforce Opp 00855" },
@@ -1392,6 +1393,7 @@ const RAW_SEEDS: Contract[] = [
       { at: "2026-05-13T08:45:10Z", actor: "system", event: "Slack DM sent to Martina Holst (Head of Finance & Ops)" },
       { at: "2026-05-13T08:45:11Z", actor: "system", event: "Slack DM sent to Sara Friis (Counsel)" },
       { at: "2026-05-13T08:48:00Z", actor: "system", event: "Awaiting Head of Finance & Ops + Counsel approval" },
+      { at: "2026-05-17T14:20:00Z", actor: "Sara Friis (Counsel)", event: "Comment posted: \"Confirming Net 45 is acceptable given multi-year commitment—need Martina's sign-off on payment terms\"" },
     ],
   },
   {
@@ -1407,7 +1409,7 @@ const RAW_SEEDS: Contract[] = [
     risk: "low",
     stage: "awaiting_approval",
     createdAt: seedAt("2026-05-13T09:35:00Z"),
-    updatedAt: seedAt("2026-05-13T09:42:00Z"),
+    updatedAt: seedAt("2026-05-16T11:05:00Z"),
     fields: SOURCE_RECORDS.find((r) => r.id === "sr_pilot_studios")!.data,
     audit: [
       { at: "2026-05-13T09:35:00Z", actor: "Sara Lindberg (Sales)", event: "Pilot MSA created from HubSpot Deal 5102" },
@@ -1415,6 +1417,7 @@ const RAW_SEEDS: Contract[] = [
       { at: "2026-05-13T09:35:09Z", actor: "system", event: "Routing: Head of Finance & Ops (pilot revenue awareness)" },
       { at: "2026-05-13T09:35:10Z", actor: "system", event: "Slack DM sent to Martina Holst (Head of Finance & Ops)" },
       { at: "2026-05-13T09:42:00Z", actor: "system", event: "Awaiting Head of Finance & Ops approval" },
+      { at: "2026-05-16T11:05:00Z", actor: "system", event: "Reminder sent to Martina Holst via Slack (no response after 3 days)" },
     ],
   },
   {
